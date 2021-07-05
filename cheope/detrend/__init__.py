@@ -1,0 +1,1 @@
+from .detrend import SingleBayes

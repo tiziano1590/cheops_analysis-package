@@ -304,7 +304,7 @@ class SingleBayes():
             emcee_args['nthin']          = 1
             emcee_args['nthreads']       = 1
             emcee_args['progress'] = False
-            for key in ['nwalkers', 'nprerun', 'nsteps', 'nburn', 'nthin', 'progress']:
+            for key in ['nwalkers', 'nprerun', 'nsteps', 'nburn', 'nthin', 'progress', 'nthreads']:
                 if(key in emcee_yaml):
                     emcee_args[key] = emcee_yaml[key]
 
@@ -325,7 +325,7 @@ class SingleBayes():
         # CONFIGURATION
         # ======================================================================
 
-        visit_args, star_args, planet_args, emcee_args, read_file_status = self.read_file(yaml_file_in)
+        visit_args, star_args, planet_args, emcee_args, read_file_status = self.read_file()
 
         # seed = 42
         seed = visit_args['seed']
