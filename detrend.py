@@ -58,9 +58,8 @@ fig_ext = ["png", "pdf"] #", eps"]
 
 class SingleBayes():
 
-    def __init__(self, input_file, n_threads=1):
+    def __init__(self, input_file):
         self.input_file = input_file
-        self.n_threads = n_threads
 
     def check_yaml_keyword(self, keyword, yaml_input, olog=None):
 
@@ -298,11 +297,12 @@ class SingleBayes():
 
             # -- emcee_args
             emcee_yaml = yaml_input['emcee']
-            emcee_args['nwalkers'] = 128
+            emcee_args['nwalkers']       = 128
             emcee_args['nprerun']        = 512
             emcee_args['nsteps']         = 1280
-            emcee_args['nburn']                = 256
-            emcee_args['nthin']                = 1
+            emcee_args['nburn']          = 256
+            emcee_args['nthin']          = 1
+            emcee_args['nthreads']       = 1
             emcee_args['progress'] = False
             for key in ['nwalkers', 'nprerun', 'nsteps', 'nburn', 'nthin', 'progress']:
                 if(key in emcee_yaml):
@@ -427,7 +427,7 @@ class SingleBayes():
             target                                    = star_name,
             download_all                        = True,
             view_report_on_download = False,
-            n_threads = self.n_threads
+            n_threads = emcee_args['nthreads']
         )
 
         # Get original light-curve
@@ -1020,4 +1020,5 @@ class SingleBayes():
 
 
 if __name__ == "__main__":
-    
+    sb = SingleBayes()
+    sb.run_analysis()
