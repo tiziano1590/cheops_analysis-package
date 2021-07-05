@@ -9,6 +9,27 @@ go to your local Cheope repository and install it with the following command:
 pip install -e .
 ```
 
+IMPORTANT: For the correct usage of the parallel version of pycheops. 
+To do so install pycheops tiziano190 repository:
+
+```
+git clone https://github.com/tiziano1590/pycheops
+
+cd pycheops
+```
+
+switch to the parallel branch:
+
+```
+git checkout parallel
+```
+
+and install it:
+
+```
+pip install -e .
+```
+
 ### Usage
 To use it, simply digit the command:
 ```
