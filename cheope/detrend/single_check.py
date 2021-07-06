@@ -180,7 +180,7 @@ class SingleCheck:
     # ======================================================================
     # ======================================================================
 
-    def run(self, yaml_file_in):
+    def run(self):
 
         start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
@@ -188,7 +188,7 @@ class SingleCheck:
         # CONFIGURATION
         # ======================================================================
 
-        visit_args, star_args, read_file_status = self.read_file(yaml_file_in)
+        visit_args, star_args, read_file_status = self.read_file(self.input_file)
 
         # seed = 42
         seed = visit_args["seed"]
