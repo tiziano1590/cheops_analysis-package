@@ -1700,6 +1700,7 @@ class MultivisitAnalysis:
             steps=emcee_args["nsteps"],
             nwalkers=emcee_args["nwalkers"],
             progress=emcee_args["progress"],
+            n_threads=emcee_args["nthreads"],
         )
         # WARNING: better have priors on shape and gp hyperparameters,
         # otherwise gp will try to fit also the transit!
