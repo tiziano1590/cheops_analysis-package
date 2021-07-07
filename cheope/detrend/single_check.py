@@ -33,8 +33,8 @@ from pathlib import Path
 
 import yaml
 
-import pyconstants as cst
-import pycheops_analysis as pyca
+import cheope.pyconstants as cst
+import cheope.pycheops_analysis as pyca
 
 # matplotlib rc params
 my_dpi = 192

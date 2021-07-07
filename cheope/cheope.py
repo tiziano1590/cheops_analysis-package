@@ -14,7 +14,7 @@ def main():
     import numpy as np
     import glob
     import matplotlib.pyplot as plt
-    from cheope.detrend import SingleBayes, SingleCheck
+    from cheope.detrend import SingleBayes, SingleCheck, MultivisitAnalysis
 
     parser = argparse.ArgumentParser(description="Cheope")
 
@@ -46,6 +46,15 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "-m",
+        "--multivisit",
+        dest="multivisit",
+        default=False,
+        help="When set, runs a multivisit analysis for the datasets provided",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -56,7 +65,11 @@ def main():
 
     if args.single_bayes:
         sb = SingleBayes(args.input_file)
-        sb.run_analysis()
+        sb.run()
+
+    if args.multivisit:
+        multi = MultivisitAnalysis(args.input_file)
+        multi.run()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 
