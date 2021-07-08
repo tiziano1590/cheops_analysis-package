@@ -94,7 +94,7 @@ if not module_celerite2:
     sys.exit()
 
 # custom packages
-import pyconstants as cst
+import cheope.pyconstants as cst
 
 # =====================================================================
 # GLOBAL PARAMETERS
