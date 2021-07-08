@@ -1717,8 +1717,8 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_lin.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        pyca.quick_save_params(os.path.join(main_folder, "params_med_lin.dat"), par_med)
-        pyca.quick_save_params(os.path.join(main_folder, "params_mle_lin.dat"), par_mle)
+        # pyca.quick_save_params(os.path.join(main_folder, "params_med_lin.dat"), par_med, T_ref.nominal_value)
+        # pyca.quick_save_params(os.path.join(main_folder, "params_mle_lin.dat"), par_mle, T_ref.nominal_value)
 
         # bin30m_ph = bin30m/result_lin.params['P'].value
         bin30m_ph = False
@@ -1840,20 +1840,6 @@ class MultivisitAnalysis:
         printlog("REPORT", olog=olog)
         printlog("{}".format(M.fit_report(min_correl=0.8)), olog=olog)
 
-        # # some issues with fake dataset...None issue in parameters...
-        # for n in result_fit.params:
-        #   if(result_fit.params[n].stderr is None):
-        #     M.result.params[n].stderr   = 0.0
-        #     result_fit.params[n].stderr = 0.0
-        #   if(result_fit.parbest[n].stderr is None):
-        #     M.result.parbest[n].stderr   = 0.0
-        #     result_fit.parbest[n].stderr = 0.0
-
-        # print('PARAMETERS MULTIVISIT: params')
-        # result_fit.params.pretty_print(colwidth=20, precision=8, columns=['value', 'stderr'])
-        # print('PARAMETERS MULTIVISIT: parbest')
-        # result_fit.parbest.pretty_print(colwidth=20, precision=8, columns=['value', 'stderr'])
-
         printlog("PARAMETERS MULTIVISIT - FIT", olog=olog)
         par_med, stats_med, par_mle, stats_mle = pyca.get_best_parameters(
             result_fit, M, nburn=0, dataset_type="multivisit"
@@ -1863,8 +1849,8 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_fit.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        pyca.quick_save_params(os.path.join(main_folder, "params_med_fit.dat"), par_med)
-        pyca.quick_save_params(os.path.join(main_folder, "params_mle_fit.dat"), par_mle)
+        # pyca.quick_save_params(os.path.join(main_folder, "params_med_fit.dat"), par_med)
+        # pyca.quick_save_params(os.path.join(main_folder, "params_mle_fit.dat"), par_mle)
 
         printlog("LC no-detrend plot", olog=olog)
         fig = M.plot_fit(
