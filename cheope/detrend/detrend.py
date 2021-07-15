@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from pycheops import Dataset, StarProperties
 from pycheops.dataset import _kw_to_Parameter, _log_prior
 from pycheops.funcs import massradius, rhostar
+from pycheops.instrument import CHEOPS_ORBIT_MINUTES
 from lmfit import Parameter, Parameters
 from uncertainties import ufloat, UFloat
 
@@ -31,10 +32,13 @@ import time
 from pathlib import Path
 
 import yaml
+from astropy.io import fits
 
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
 import cheope.linear_ephemeris as lep
+
+from cheope.pycheops_analysis import FITSDataset
 
 # matplotlib rc params
 my_dpi = 192
@@ -2081,6 +2085,1440 @@ class MultivisitAnalysis:
                 f.write(l + "\n")
 
         return M, result_lin, result_fit
+
+
+class SingleBayesKeplerTess:
+    def __init__(self, input_file):
+        self.input_file = input_file
+
+    def check_yaml_keyword(self, keyword, yaml_input, olog=None):
+
+        l = ""
+        if keyword not in yaml_input:
+            l = "ERROR: needed keyword {} not in input file".format(keyword)
+
+        return l
+
+    # ======================================================================
+    def read_file(self):
+
+        yaml_file_in = self.input_file
+        read_file_status = []
+
+        visit_args = {}
+        star_args = {}
+        planet_args = {}
+        emcee_args = {}
+
+        if os.path.exists(yaml_file_in) and os.path.isfile(yaml_file_in):
+            with open(yaml_file_in) as in_f:
+                yaml_input = yaml.load(in_f, Loader=yaml.FullLoader)
+
+            # -- visit_args
+            key = "main_folder"
+            ck = self.check_yaml_keyword(key, yaml_input)
+            if "ERROR" in ck:
+                visit_args[key] = None
+                sys.exit(ck)
+            else:
+                visit_args[key] = os.path.abspath(yaml_input[key])
+            read_file_status.append(ck)
+
+            # fake
+            key = "visit_number"
+            visit_args[key] = None
+
+            # fake
+            key = "file_key"
+            visit_args[key] = None
+
+            key = "file_fits"
+            ck = self.check_yaml_keyword(key, yaml_input)
+            if "ERROR" in ck:
+                visit_args[key] = None
+            else:
+                visit_args[key] = os.path.abspath(yaml_input[key].strip())
+            read_file_status.append(ck)
+
+            key = "passband"
+            ck = self.check_yaml_keyword(key, yaml_input)
+            if "ERROR" in ck:
+                visit_args[key] = None
+            else:
+                pb = yaml_input[key].lower()
+                filter = ["kepler", "tess"]
+                check_kepler = pb in [
+                    filter[0][:ik] for ik in range(1, len(filter[0]) + 1)
+                ]
+                check_tess = pb in [
+                    filter[1][:ik] for ik in range(1, len(filter[1]) + 1)
+                ]
+                if check_tess:
+                    visit_args[key] = "TESS"
+                elif check_kepler:
+                    visit_args[key] = "Kepler"
+                else:
+                    visit_args[key] = None
+                    read_file_status.append(
+                        "ERROR: missing passband. Provide TESS or Kepler"
+                    )
+
+            # fake
+            key = "aperture"
+            visit_args[key] = "sap"
+            if key in yaml_input:
+                tmp = str(yaml_input[key]).lower()
+                if tmp in ["sap", "pdc"]:
+                    visit_args[key] = tmp
+                else:
+                    visit_args[key] = None
+                    read_file_status.append("ERROR: wrong aperture. Provide SAP or PDC")
+
+            # fake
+            key = "shape"
+            visit_args[key] = "fit"
+
+            key = "seed"
+            visit_args[key] = 42
+            if key in yaml_input:
+                tmp = yaml_input[key]
+                try:
+                    visit_args[key] = int(tmp)
+                except:
+                    read_file_status.append("{} must be a positive integer".format(key))
+
+            key = "single_duration_hour"
+            visit_args[key] = None
+            if key in yaml_input:
+                visit_args[key] = yaml_input[key]
+
+            # -- star_args
+            star_yaml = yaml_input["star"]
+
+            key = "star_name"
+            ck = self.check_yaml_keyword(key, star_yaml)
+            if "ERROR" in ck:
+                star_args[key] = None
+            else:
+                star_args[key] = star_yaml[key]
+            read_file_status.append(ck)
+
+            key = "Rstar"
+            ck = self.check_yaml_keyword(key, star_yaml)
+            if "ERROR" in ck:
+                star_args[key] = None
+            else:
+                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
+            read_file_status.append(ck)
+
+            key = "Mstar"
+            ck = self.check_yaml_keyword(key, star_yaml)
+            if "ERROR" in ck:
+                star_args[key] = None
+            else:
+                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
+            read_file_status.append(ck)
+
+            key = "teff"
+            star_args[key] = None
+            if key in star_yaml:
+                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
+
+            key = "logg"
+            star_args[key] = None
+            if key in star_yaml:
+                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
+
+            key = "feh"
+            star_args[key] = None
+            if key in star_yaml:
+                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
+
+            # -- planet_args
+            planet_yaml = yaml_input["planet"]
+
+            key = "T_ref"
+            ck = self.check_yaml_keyword(key, planet_yaml)
+            if "ERROR" in ck:
+                planet_args[key] = None
+            else:
+                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
+            read_file_status.append(ck)
+
+            key = "P"
+            ck = self.check_yaml_keyword(key, planet_yaml)
+            if "ERROR" in ck:
+                planet_args[key] = None
+            else:
+                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
+            read_file_status.append(ck)
+
+            if "D" in planet_yaml:
+                D = ufloat(planet_yaml["D"][0], planet_yaml["D"][1])
+                k = um.sqrt(D)
+            elif "k" in planet_yaml:
+                k = ufloat(planet_yaml["k"][0], planet_yaml["k"][1])
+                D = k ** 2
+            elif "Rp" in planet_yaml:
+                Rp = ufloat(planet_yaml["Rp"][0], planet_yaml["Rp"][1]) * cst.Rears
+                k = Rp / star_args["Rstar"]
+                D = k ** 2
+            else:
+                read_file_status.append(
+                    "ERROR: missing needed planet keyword: D or k or Rp (Rearth)"
+                )
+                # sys.exit()
+            planet_args["D"] = D
+            planet_args["k"] = k
+
+            if "inc" in planet_yaml and "aRs" in planet_yaml and "b" in planet_yaml:
+                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
+                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
+                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
+            elif "inc" in planet_yaml and "aRs" in planet_yaml:
+                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
+                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
+                b = aRs * um.cos(inc * cst.deg2rad)
+            elif "b" in planet_yaml and "aRs" in planet_yaml:
+                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
+                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
+                inc = um.acos(b / aRs) * cst.rad2deg
+            elif "b" in planet_yaml and "inc" in planet_yaml:
+                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
+                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
+                aRs = b / um.cos(inc * cst.deg2rad)
+            else:
+                read_file_status.append(
+                    "ERROR: missing needed one of these pairs/combinations: (inc, aRs) or (b, aRs) or (b, inc) or (inc, aRs, b)"
+                )
+                inc, aRs, b = 90.0, 1.0, 0.0
+                # sys.exit()
+            planet_args["inc"] = inc
+            planet_args["aRs"] = aRs
+            planet_args["b"] = b
+
+            if "T14" in planet_yaml:
+                if planet_args["P"] is None:
+                    W = None
+                else:
+                    W = (
+                        ufloat(planet_yaml["T14"][0], planet_yaml["T14"][1])
+                        / planet_args["P"]
+                    )
+            else:
+                W = um.sqrt((1 + k) ** 2 - b ** 2) / np.pi / aRs
+            planet_args["W"] = W
+
+            ecc = ufloat(0.0, 0.0)
+            if "ecc" in planet_yaml:
+                # print('planet_yaml["ecc"]', planet_yaml['ecc'])
+                if str(planet_yaml["ecc"]).lower() != "none":
+                    try:
+                        ecc = ufloat(planet_yaml["ecc"][0], planet_yaml["ecc"][1])
+                    except:
+                        read_file_status.append("wrong ecc format: setting to 0+/-0")
+                        ecc = ufloat(0.0, 0.0)
+            se = um.sqrt(ecc)
+            w = ufloat(90.0, 0.0)
+            if "w" in planet_yaml:
+                # print('planet_yaml["w"]', planet_yaml['w'])
+                if str(planet_yaml["w"]).lower() != "none":
+                    try:
+                        w = ufloat(planet_yaml["w"][0], planet_yaml["w"][1])
+                    except:
+                        read_file_status.append("wrong w format: setting to 90+/-0 deg")
+                        w = ufloat(90.0, 0.0)
+            w_r = w * cst.deg2rad
+            f_c = se * um.cos(w_r)
+            f_s = se * um.sin(w_r)
+            planet_args["ecc"] = ecc
+            planet_args["w"] = w
+            planet_args["f_c"] = f_c
+            planet_args["f_s"] = f_s
+
+            key = "Kms"
+            ck = self.check_yaml_keyword(key, planet_yaml)
+            if "ERROR" in ck:
+                planet_args[key] = None
+            else:
+                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
+            read_file_status.append(ck)
+
+            # -- emcee_args
+            emcee_yaml = yaml_input["emcee"]
+            emcee_args["nwalkers"] = 256
+            emcee_args["nprerun"] = 512
+            emcee_args["nsteps"] = 1024
+            emcee_args["nburn"] = 0
+            emcee_args["nthin"] = 1
+            emcee_args["progress"] = True
+            for key in ["nwalkers", "nprerun", "nsteps", "nburn", "nthin", "progress"]:
+                if key in emcee_yaml:
+                    emcee_args[key] = emcee_yaml[key]
+
+        else:
+            read_file_status.append("NOT VALID INPUT FILE:\n{}".format(yaml_file_in))
+            # sys.exit()
+
+        return visit_args, star_args, planet_args, emcee_args, read_file_status
+
+    # =============================================================================
+
+    def load_fits_file(self, file_fits, olog=None):
+
+        info = {}
+
+        printlog("Reading fits file: {}".format(file_fits), olog=olog)
+        # load fits file and extract needed data and header keywords
+        with fits.open(file_fits) as hdul:
+            hdul.info()
+            btjd = hdul[1].header["BJDREFI"]
+            data_raw = hdul[1].data
+            exp_time = hdul[1].header["TIMEDEL"]
+
+        info["BTJD"] = btjd
+        info["EXP_TIME"] = exp_time
+
+        printlog(
+            "Time ref. = {} and exposure time {} in days.".format(btjd, exp_time),
+            olog=olog,
+        )
+        nraw = np.shape(data_raw)
+        names = data_raw.names.copy()
+        data_keys = []
+        ok = np.ones(nraw).astype(bool)
+        for k in names:
+            if "PSF" not in k:
+                nan = np.isnan(data_raw[k])
+                # nnan = np.sum(nan)
+                ok = np.logical_and(ok, ~nan)
+                data_keys.append(k)
+        nok = np.sum(ok)
+        info["n_data"] = nok
+        printlog("Total number of good points: {}".format(nok), olog=olog)
+        # data = data_raw[ok]
+        data = {}
+        for k in data_keys:
+            data[k] = data_raw[k][ok]
+
+        return data, info
+
+    # =============================================================================
+
+    def get_transit_epochs(self, data, info, visit_args, planet_args, olog=None):
+
+        T_ref = planet_args["T_ref"]
+        P = planet_args["P"]
+        Wd = planet_args["W"] * P
+        vdurh = visit_args["single_duration_hour"]
+        if vdurh is None:
+            vdurh = 1.5 * Wd.n * cst.day2hour + 3.0 * CHEOPS_ORBIT_MINUTES * cst.min2day
+        vdur = vdurh / cst.day2hour
+        hdur = 0.5 * vdur
+        vdur_co = vdur * cst.day2min / CHEOPS_ORBIT_MINUTES
+
+        btjd = info["BTJD"]
+
+        printlog("Computing feasible epochs", olog=olog)
+        t = data["TIME"] + btjd
+        emin = np.rint((np.min(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emin
+        if x < np.min(t):
+            emin += 1
+        emax = np.rint((np.max(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emax
+        if x < np.max(t):
+            emax -= 1
+        printlog("epoch min = {} max = {}".format(emin, emax), olog=olog)
+        epochs = np.arange(emin, emax + 1, 1)
+
+        printlog(
+            "Selecting lc portion centered on transit time with duration of {:.5f} d = {:.2} CHEOPS orbits".format(
+                vdur, vdur_co
+            ),
+            olog=olog,
+        )
+
+        # printlog("t min: {:.5f}".format(np.min(t)))
+        # printlog("t max: {:.5f}".format(np.max(t)))
+
+        transits = []
+
+        for i_epo, epo in enumerate(epochs):
+            printlog("", olog=olog)
+
+            bjd_lin = T_ref.n + P.n * epo
+            printlog(
+                "Epoch = {:.0f} ==> T_0 = {:.5f} BJD_TDB [{:.5f} , {:.5f}]".format(
+                    epo, bjd_lin, bjd_lin - hdur, bjd_lin + hdur
+                ),
+                olog=olog,
+            )
+
+            sel = np.logical_and(t >= bjd_lin - hdur, t < bjd_lin + hdur)
+            nsel = np.sum(sel)
+            wsel = np.logical_and(t >= bjd_lin - Wd.n * 0.5, t > bjd_lin + Wd.n * 0.5)
+            nwsel = np.sum(wsel)
+            if nsel > 0 and nwsel > 3:
+                tra = {}
+                tra["epoch"] = epo
+                tra["data"] = {}
+                for k, v in data.items():
+                    tra["data"][k] = v[sel]
+                bjdref = int(np.min(tra["data"]["TIME"]) + btjd)
+                tra["bjdref"] = bjdref
+                Tlin = bjd_lin - bjdref
+                tra["T_0"] = (Tlin - 0.5 * Wd.n, Tlin, Tlin + 0.5 * Wd.n)
+                transits.append(tra)
+            else:
+                printlog("Not enough points for lc fit.", olog=olog)
+                pass
+
+        return transits
+
+    def single_epoch_analysis(
+        self,
+        transit,
+        info,
+        star,
+        visit_args,
+        planet_args,
+        emcee_args,
+        epoch_folder,
+        olog=None,
+    ):
+
+        epoch_name = os.path.basename(epoch_folder)
+
+        printlog("\nLoading dataset", olog=olog)
+        # fake dataset
+        dataset = FITSDataset(
+            file_key="CH_PR100015_TG006701_V0200",  # fake file_key
+            target=star.identifier,
+            download_all=True,
+            view_report_on_download=False,
+        )
+
+        printlog("Getting light curve for selected aperture", olog=olog)
+        t, f, ef = dataset.get_FITS_lightcurve(
+            visit_args, transit, info, reject_highpoints=False, verbose=True
+        )
+
+        # TO clip or not to clip
+        printlog("Clip outliers", olog=olog)
+        t, f, ef = dataset.clip_outliers(verbose=True)
+
+        P = planet_args["P"]
+
+        D = planet_args["D"]
+        k = planet_args["k"]
+
+        inc = planet_args["inc"]
+        aRs = planet_args["aRs"]
+        b = planet_args["b"]
+
+        W = planet_args["W"]
+
+        ecc = planet_args["ecc"]
+        w = planet_args["w"]
+        f_c = planet_args["f_c"]
+        f_s = planet_args["f_s"]
+
+        T_0 = transit["T_0"]
+
+        # # RV SEMI-AMPLITUDE IN m/s NEEDED TO USE MASSRADIUS FUNCTION
+        # Kms = planet_args['Kms']
+
+        printlog(
+            "\nPARAMETERS OF INPUT - CUSTOM - TO BE MODIFY FOR EACH TARGET & PLANET & VISIT",
+            olog=olog,
+        )
+        printlog("P    = {} d".format(P), olog=olog)
+        printlog("k    = {} ==> D = k^2 = {}".format(k, D), olog=olog)
+        printlog("i    = {} deg".format(inc), olog=olog)
+        printlog("a/Rs = {}".format(aRs), olog=olog)
+        printlog("b    = {}".format(b), olog=olog)
+        printlog("W    = {}*P = {} d = {} h".format(W, W * P, W * P * 24.0), olog=olog)
+        printlog("ecc  = {}".format(ecc), olog=olog)
+        printlog("w    = {}".format(w), olog=olog)
+        printlog("f_c  = {}".format(f_c), olog=olog)
+        printlog("f_s  = {}".format(f_s), olog=olog)
+        printlog("T_0  = {}\n".format(T_0), olog=olog)
+
+        # determine the out-of-transit lc for initial guess of c based on T_0 min/max
+        oot = np.logical_or(t < T_0[0], t > T_0[2])
+
+        # DEFINE HERE HOW TO USE THE PARAMETERS,
+        # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
+        in_par = Parameters()
+        in_par["P"] = Parameter(
+            "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        )
+        in_par["T_0"] = Parameter(
+            "T_0", value=T_0[1], vary=True, min=T_0[0], max=T_0[2], user_data=None
+        )
+
+        # I will randomize only fitting parameters...
+        in_par["D"] = Parameter(
+            "D",
+            value=np.abs(np.random.normal(loc=D.n, scale=D.s)),
+            vary=True,
+            min=0.5 * D.n,
+            max=1.5 * D.n,
+            user_data=D,
+        )
+        in_par["W"] = Parameter(
+            "W",
+            value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
+            vary=True,
+            min=0.5 * W.n,
+            max=1.5 * W.n,
+            user_data=W,
+        )
+        in_par["b"] = Parameter(
+            "b",
+            value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
+            vary=True,
+            min=0.0,
+            max=1.5,
+            user_data=b,
+        )
+
+        in_par["h_1"] = Parameter(
+            "h_1",
+            value=star.h_1.n,
+            vary=True,
+            min=0.0,
+            max=1.0,
+            user_data=ufloat(star.h_1.n, 0.1),
+        )
+        in_par["h_2"] = Parameter(
+            "h_2",
+            value=star.h_2.n,
+            vary=True,
+            min=0.0,
+            max=1.0,
+            user_data=ufloat(star.h_2.n, 0.1),
+        )
+
+        in_par["f_s"] = Parameter(
+            "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        )
+        in_par["f_c"] = Parameter(
+            "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        )
+
+        in_par["logrho"] = Parameter(
+            "logrho",
+            value=star.logrho.n,
+            vary=True,
+            min=-9,
+            max=6,
+            user_data=star.logrho,
+        )
+        in_par["c"] = Parameter(
+            "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
+        )
+
+        ### *** 1) FIT TRANSIT MODEL ONLY WITH LMFIT
+        det_par = {
+            "dfdt": None,
+            "d2fdt2": None,
+            "dfdbg": None,
+            "dfdcontam": None,
+            "dfdsmear": None,
+            "dfdx": None,
+            "dfdy": None,
+            "d2fdx2": None,
+            "d2fdy2": None,
+            "dfdsinphi": None,
+            "dfdcosphi": None,
+            "dfdsin2phi": None,
+            "dfdcos2phi": None,
+            "dfdsin3phi": None,
+            "dfdcos3phi": None,
+            "ramp": None,
+            "glint_scale": None,
+        }
+
+        # LMFIT 0-------------------------------------------------------------
+        printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
+        # Fit with lmfit
+        lmfit0 = dataset.lmfit_transit(
+            P=in_par["P"],
+            T_0=in_par["T_0"],
+            f_c=in_par["f_c"],
+            f_s=in_par["f_s"],
+            D=in_par["D"],
+            W=in_par["W"],
+            b=in_par["b"],
+            h_1=in_par["h_1"],
+            h_2=in_par["h_2"],
+            logrhoprior=in_par["logrho"],
+            c=in_par["c"],
+            dfdt=det_par["dfdt"],
+            d2fdt2=det_par["d2fdt2"],
+            dfdbg=det_par["dfdbg"],
+            dfdcontam=det_par["dfdcontam"],
+            dfdsmear=det_par["dfdsmear"],
+            dfdx=det_par["dfdx"],
+            dfdy=det_par["dfdy"],
+            d2fdx2=det_par["d2fdx2"],
+            d2fdy2=det_par["d2fdy2"],
+            dfdsinphi=det_par["dfdsinphi"],
+            dfdcosphi=det_par["dfdcosphi"],
+            dfdsin2phi=det_par["dfdsin2phi"],
+            dfdcos2phi=det_par["dfdcos2phi"],
+            dfdsin3phi=det_par["dfdsin3phi"],
+            dfdcos3phi=det_par["dfdcos3phi"],
+            ramp=det_par["ramp"],
+            glint_scale=det_par["glint_scale"],
+        )
+
+        lmfit0_rep = dataset.lmfit_report(min_correl=0.5)
+        # for l in lmfit0_rep:
+        #   printlog(l, olog=olog)
+        printlog(lmfit0_rep, olog=olog)
+        printlog("", olog=olog)
+
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    epoch_folder, "00_lmfit0_roll_angle_vs_residual.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        # best-fit plot
+        params_lm0 = lmfit0.params.copy()
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_lm0,
+            par_type="lm",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(epoch_folder, "00_lc_lmfit0.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "00_lc_lmfit0.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "00_params_lmfit0.dat"),
+            params_lm0,
+            dataset.lc["bjd_ref"],
+        )
+
+        ### *** 2) determine the std of the residuals w.r.t. fitted parameters
+        dataset.gp = None  # force gp = None in the dataset
+        stats_lm0 = pyca.computes_rms(
+            dataset, params_best=params_lm0, glint=False, olog=olog
+        )
+        sigma_0 = stats_lm0["flux-all (w/o GP)"]["RMS (unbinned)"][0] * 1.0e-6
+        dprior = ufloat(0, sigma_0)
+        printlog("sigma_0 = {:.6f}".format(sigma_0), olog=olog)
+
+        printlog(
+            "Assign prior ufloat(0,sigma_0) to all the detrending parameters", olog=olog
+        )
+        for k in det_par.keys():
+            if k not in ["dfdcontam", "dfdsmear", "ramp", "glint_scale"]:
+                det_par[k] = dprior
+            # printlog("{:20s} = {:.6f}".format(k, det_par[k]), olog=olog)
+        printlog(
+            "dfdt and d2fdt2 will have a prior of kind N(0, sigma_0/dt),\nwhere dt=max(t)-min(t)",
+            olog=olog,
+        )
+        dt = dataset.lc["time"][-1] - dataset.lc["time"][0]
+        for k in ["dfdt", "d2fdt2"]:
+            det_par[k] = dprior / dt
+
+        ### *** 3) while loop to determine bayes factor and which parameters remove and keep
+        while_cnt = 0
+        while True:
+            # LMFIT -------------------------------------------------------------
+            printlog("\n- LMFIT - iter {}".format(while_cnt), olog=olog)
+            # Fit with lmfit
+            lmfit_loop = dataset.lmfit_transit(
+                P=in_par["P"],
+                T_0=in_par["T_0"],
+                f_c=in_par["f_c"],
+                f_s=in_par["f_s"],
+                D=in_par["D"],
+                W=in_par["W"],
+                b=in_par["b"],
+                h_1=in_par["h_1"],
+                h_2=in_par["h_2"],
+                logrhoprior=in_par["logrho"],
+                c=in_par["c"],
+                dfdt=det_par["dfdt"],
+                d2fdt2=det_par["d2fdt2"],
+                dfdbg=det_par["dfdbg"],
+                dfdcontam=det_par["dfdcontam"],
+                dfdsmear=det_par["dfdsmear"],
+                dfdx=det_par["dfdx"],
+                dfdy=det_par["dfdy"],
+                d2fdx2=det_par["d2fdx2"],
+                d2fdy2=det_par["d2fdy2"],
+                dfdsinphi=det_par["dfdsinphi"],
+                dfdcosphi=det_par["dfdcosphi"],
+                dfdsin2phi=det_par["dfdsin2phi"],
+                dfdcos2phi=det_par["dfdcos2phi"],
+                dfdsin3phi=det_par["dfdsin3phi"],
+                dfdcos3phi=det_par["dfdcos3phi"],
+                ramp=det_par["ramp"],
+                glint_scale=det_par["glint_scale"],
+            )
+            printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
+            printlog("", olog=olog)
+
+            params_lm_loop = lmfit_loop.params.copy()
+
+            printlog(
+                "Bayes Factors ( >~ 1 ==> discard parameter) sorted in descending order",
+                olog=olog,
+            )
+            BF = pyca.computes_bayes_factor(params_lm_loop)
+            # printlog("{}".format(BF), olog=olog)
+            nBFgtone = 0
+            to_rem = {}
+            for k, v in BF.items():
+                printlog("{:20s} = {:7.3f}".format(k, v), olog=olog)
+                if v > 1:
+                    if "sin" in k:
+                        kc = k.replace("sin", "cos")
+                        vc = BF[kc]
+                        if vc > 1 and nBFgtone == 0:
+                            to_rem[k] = v
+                            to_rem[kc] = vc
+                            nBFgtone += 1
+                    elif "cos" in k:
+                        ks = k.replace("cos", "sin")
+                        vs = BF[ks]
+                        if vs > 1 and nBFgtone == 0:
+                            to_rem[k] = v
+                            to_rem[ks] = vs
+                            nBFgtone += 1
+                    else:
+                        if nBFgtone == 0:
+                            to_rem[k] = v
+                        nBFgtone += 1
+            # if none detrending parameters has BF > 1 we can stop
+            if nBFgtone == 0:
+                break
+            else:
+                # remove detrending parameter with highest BF
+                for k, v in to_rem.items():
+                    printlog(
+                        "Removing parameter: {:20s} with Bayes Factor = {:7.3f}".format(
+                            k, v
+                        ),
+                        olog=olog,
+                    )
+                    det_par[k] = None
+
+                while_cnt += 1
+
+        printlog(
+            "\n-DONE BAYES FACTOR SELECTION IN {} ITERATIONS".format(while_cnt),
+            olog=olog,
+        )
+        printlog("with detrending parameters:", olog=olog)
+        det_list = []
+        for k, v in det_par.items():
+            if v is not None:
+                det_list.append(k)
+                printlog("{:20s} = {:9.5f}".format(k, v), olog=olog)
+        printlog("\n{}".format(", ".join(det_list)), olog=olog)
+
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    epoch_folder, "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        # best-fit plot
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_lm_loop,
+            par_type="lm",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(epoch_folder, "01_lc_lmfit_loop.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "01_lc_lmfit_loop.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        stats_lm = pyca.computes_rms(
+            dataset, params_best=params_lm_loop, glint=False, olog=olog
+        )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "01_params_lmfit_loop.dat"),
+            params_lm_loop,
+            dataset.lc["bjd_ref"],
+        )
+
+        ### *** ==============================================================
+        ### *** ===== EMCEE ==================================================
+
+        nwalkers = emcee_args["nwalkers"]
+        nprerun = emcee_args["nprerun"]
+        nsteps = emcee_args["nsteps"]
+        nburn = emcee_args["nburn"]
+        nthin = emcee_args["nthin"]
+        progress = emcee_args["progress"]
+
+        # Run emcee from last best fit
+        printlog("\n-Run emcee from last best fit with:", olog=olog)
+        printlog(" nwalkers = {}".format(nwalkers), olog=olog)
+        printlog(" nprerun  = {}".format(nprerun), olog=olog)
+        printlog(" nsteps   = {}".format(nsteps), olog=olog)
+        printlog(" nburn    = {}".format(nburn), olog=olog)
+        printlog(" nthin    = {}".format(nthin), olog=olog)
+        printlog("", olog=olog)
+
+        # EMCEE-------------------------------------------------------------
+        result = dataset.emcee_sampler(
+            params=params_lm_loop,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            add_shoterm=False,
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        params_med, stats_med, params_mle, stats_mle = pyca.get_best_parameters(
+            result, dataset, nburn=nburn, dataset_type="visit", update_dataset=True
+        )
+        # update emcee.params -> median and emcee.params_mle -> mle
+        for p in dataset.emcee.params:
+            dataset.emcee.params[p] = params_med[p]
+            dataset.emcee.params_best[p] = params_mle[p]
+
+        printlog("MEDIAN PARAMETERS", olog=olog)
+        for p in params_med:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med[p].value, params_med[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "02_params_emcee_median.dat"),
+            params_med,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(dataset, params_best=params_med, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med,
+            par_type="median",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "02_lc_emcee_median.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_lc_emcee_median.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_fft_emcee_median.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("MLE PARAMETERS", olog=olog)
+        for p in params_mle:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle[p].value, params_mle[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "02_params_emcee_mle.dat"),
+            params_mle,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(dataset, params_best=params_mle, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle,
+            par_type="mle",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "02_lc_emcee_mle.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_lc_emcee_mle.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_fft_emcee_mle.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        params = {"med": params_med, "mle": params_mle}
+
+        file_emcee = pyca.save_dataset(
+            dataset, epoch_folder, star.identifier, epoch_name, gp=False
+        )
+        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        ### *** ==============================================================
+        ### *** ===== TRAIN GP ===============================================
+        printlog("", olog=olog)
+        printlog("TRAIN GP HYPERPARAMETERS FIXING PARAMETERS", olog=olog)
+
+        params_fixed = pyca.copy_parameters(params_mle)
+        # for p in ['T_0','D','W','b']: # only transit shape
+        for p in params_mle:  # fixing all transit and detrending parameters
+            params_fixed[p].set(vary=False)
+        params_fixed["log_sigma"].set(vary=True)
+
+        result_gp_train = dataset.emcee_sampler(
+            params=params_fixed,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            add_shoterm=True,
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains of GP training", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "03_trace_emcee_gp_train.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        (
+            params_med_gp_train,
+            stats_med,
+            params_mle_gp_train,
+            stats_mle,
+        ) = pyca.get_best_parameters(
+            result_gp_train,
+            dataset,
+            nburn=nburn,
+            dataset_type="visit",
+            update_dataset=False,
+        )
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp_train,
+            par_type="median-GPtrain",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(
+                epoch_folder, "03_lc_emcee_median_gp_train.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    epoch_folder, "03_lc_emcee_median_gp_train.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp_train,
+            par_type="mle-GPtrain",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "03_lc_emcee_mle_gp_train.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "03_lc_emcee_mle_gp_train.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        ### *** =======================================++=====================
+        ### *** ===== FIT TRANSIT + DETRENDING + GP =++=======================
+        printlog("\nRUN FULL FIT TRANSIT+DETRENDING+GP W/ EMCEE", olog=olog)
+
+        params_fit_gp = pyca.copy_parameters(params_mle)
+        for p in ["log_S0", "log_omega0", "log_sigma"]:
+            # params_fit_gp[p] = params_mle_gp_train[p]
+            # printlog("{} = {} user_data = {} (vary = {})".format(p,
+            #   params_fit_gp[p], params_fit_gp[p].user_data, params_fit_gp[p].vary),
+            #   olog=olog
+            # )
+            # params_fit_gp[p].user_data = ufloat(params_mle_gp_train[p].value, 2*params_mle_gp_train[p].stderr)
+            # printlog("{} = {} user_data = {} (vary = {})".format(p,
+            #   params_fit_gp[p], params_fit_gp[p].user_data, params_fit_gp[p].vary),
+            #   olog=olog
+            # )
+            params_fit_gp.add(
+                p,
+                value=params_mle_gp_train[p].value,
+                vary=True,
+                min=params_mle_gp_train[p].min,
+                max=params_mle_gp_train[p].max,
+            )
+            params_fit_gp[p].user_data = ufloat(
+                params_mle_gp_train[p].value, 2 * params_mle_gp_train[p].stderr
+            )
+
+        # log_Q = 1/sqrt(2)
+        params_fit_gp.add("log_Q", value=np.log(1 / np.sqrt(2)), vary=False)
+
+        result_gp = dataset.emcee_sampler(
+            params=params_fit_gp,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            # add_shoterm = True, # not needed the second time
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        (
+            params_med_gp,
+            stats_med_gp,
+            params_mle_gp,
+            stats_mle_gp,
+        ) = pyca.get_best_parameters(
+            result_gp, dataset, nburn=nburn, dataset_type="visit", update_dataset=True
+        )
+        # update emcee.params -> median and emcee.params_mle -> mle
+        for p in dataset.emcee.params:
+            dataset.emcee.params[p] = params_med_gp[p]
+            dataset.emcee.params_best[p] = params_mle_gp[p]
+
+        printlog("MEDIAN PARAMETERS w/ GP", olog=olog)
+        for p in params_med_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med_gp[p].value, params_med_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "04_params_emcee_median_gp.dat"),
+            params_med_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(
+            dataset, params_best=params_med_gp, glint=False, olog=olog
+        )
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp,
+            par_type="median w/ GP",
+            nsamples=nwalkers,
+            flatchains=result_gp.chain,
+            model_filename=os.path.join(epoch_folder, "04_lc_emcee_median_gp.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_lc_emcee_median_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_fft_emcee_median_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("MLE PARAMETERS w/ GP", olog=olog)
+        for p in params_mle_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle_gp[p].value, params_mle_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "04_params_emcee_mle_gp.dat"),
+            params_mle_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(
+            dataset, params_best=params_mle_gp, glint=False, olog=olog
+        )
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp,
+            par_type="mle w/ GP",
+            nsamples=nwalkers,
+            flatchains=result_gp.chain,
+            model_filename=os.path.join(epoch_folder, "04_lc_emcee_mle_gp.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_lc_emcee_mle_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_fft_emcee_mle_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        params_gp = {"med": params_med_gp, "mle": params_mle_gp}
+
+        file_emcee = pyca.save_dataset(
+            dataset, epoch_folder, star.identifier, epoch_name, gp=True
+        )
+        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        return (
+            stats_lm,
+            stats_med,
+            stats_mle,
+            params,
+            stats_med_gp,
+            stats_mle_gp,
+            params_gp,
+        )
+
+    # =============================================================================
+
+    def run(self):
+
+        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
+        # ======================================================================
+        # CONFIGURATION
+        # ======================================================================
+
+        (
+            visit_args,
+            star_args,
+            planet_args,
+            emcee_args,
+            read_file_status,
+        ) = self.read_file()
+
+        # seed = 42
+        seed = visit_args["seed"]
+        np.random.seed(seed)
+
+        passband = visit_args["passband"]
+        aperture = visit_args["aperture"]
+        file_fits = visit_args["file_fits"]
+        file_name = os.path.basename(file_fits).replace(".fits", "_{}".format(aperture))
+
+        logs_folder = os.path.join(visit_args["main_folder"], "logs")
+        if not os.path.isdir(logs_folder):
+            os.makedirs(logs_folder, exist_ok=True)
+        log_file = os.path.join(logs_folder, "{}_{}.log".format(start_time, file_name))
+        olog = open(log_file, "w")
+
+        printlog("", olog=olog)
+        printlog(
+            "###################################################################",
+            olog=olog,
+        )
+        printlog(
+            " ANALYSIS OF TESS/KEPLER OBSERVATION - DET. PARS. FROM BAYES FACTOR",
+            olog=olog,
+        )
+        printlog(
+            "###################################################################",
+            olog=olog,
+        )
+
+        # =====================
+        # TARGET STAR
+        # =====================
+        # target name, without planet or something else. It has to be a name in simbad
+        star_name = star_args["star_name"]
+
+        printlog("TARGET: {}".format(star_name), olog=olog)
+        printlog("FILE: {}".format(file_fits), olog=olog)
+        printlog("PASSBAND: {}".format(passband), olog=olog)
+        printlog("APERTURE: {}".format(aperture), olog=olog)
+
+        # CHECK INPUT FILE
+        error_read = False
+        for l in read_file_status:
+            if len(l) > 0:
+                printlog(l, olog=olog)
+            if "ERROR" in l:
+                error_read = True
+        if error_read:
+            olog.close()
+            sys.exit()
+
+        main_folder = os.path.join(visit_args["main_folder"], file_name)
+        if not os.path.isdir(main_folder):
+            os.makedirs(main_folder, exist_ok=True)
+
+        printlog("SAVING OUTPUT INTO FOLDER {}".format(main_folder), olog=olog)
+
+        # stellar parameters
+        # from WG TS3
+        Rstar = star_args["Rstar"]
+        Mstar = star_args["Mstar"]
+        teff = star_args["teff"]
+        logg = star_args["logg"]
+        feh = star_args["feh"]
+
+        star = pyca.CustomStarProperties(
+            star_name,
+            match_arcsec=None,
+            teff=teff,
+            logg=logg,
+            metal=feh,
+            dace=False,
+            passband=passband,
+        )
+
+        printlog("STAR INFORMATION", olog=olog)
+        printlog(star, olog=olog)
+        if star.logrho is None:
+            printlog("logrho not available from sweetcat...computed:", olog=olog)
+            rho_star = Mstar / (Rstar ** 3)
+            logrho = um.log10(rho_star)
+            star.logrho = logrho
+            printlog("logrho = {}".format(logrho), olog=olog)
+
+        printlog("rho  = {} rho_sun".format(10 ** star.logrho), olog=olog)
+
+        # ======================================================================
+        # Load data
+        fits_data, fits_info = self.load_fits_file(file_fits)
+        transits = self.get_transit_epochs(
+            fits_data, fits_info, visit_args, planet_args, olog=olog
+        )
+
+        printlog("Loop on transits ...", olog=olog)
+        # loop on transits found in the TESS/Kepler data
+        head = "# EPOCH"
+        head = "{0:s} {1:s}_RChiSq {1:s}_lnL {1:s}_lnP {1:s}_BIC {1:s}_AIC {1:s}_RMS".format(
+            head, "LM"
+        )
+        head = "{0:s} {1:s}_RChiSq {1:s}_lnL {1:s}_lnP {1:s}_BIC {1:s}_AIC {1:s}_RMS".format(
+            head, "MED"
+        )
+        head = "{0:s} {1:s}_RChiSq {1:s}_lnL {1:s}_lnP {1:s}_BIC {1:s}_AIC {1:s}_RMS".format(
+            head, "MLE"
+        )
+        head = "{0:s} err_T0_s".format(head)
+        head = "{0:s} {1:s}_RChiSq_{2:s} {1:s}_lnL_{2:s} {1:s}_lnP_{2:s} {1:s}_BIC_{2:s} {1:s}_AIC_{2:s} {1:s}_RMS_{2:s}".format(
+            head, "MED", "GP"
+        )
+        head = "{0:s} {1:s}_RChiSq_{2:s} {1:s}_lnL_{2:s} {1:s}_lnP_{2:s} {1:s}_BIC_{2:s} {1:s}_AIC_{2:s} {1:s}_RMS_{2:s}".format(
+            head, "MLE", "GP"
+        )
+        head = "{0:s} err_T0_s_{1:s}".format(head, "GP")
+        lines = []
+
+        for transit in transits:
+            epo = transit["epoch"]
+            printlog("\nTransit with epoch = {:.0f}".format(epo), olog=olog)
+            # creates sub folder
+            epoch_name = "epoch_{:04.0f}".format(epo)
+            epoch_folder = os.path.join(main_folder, epoch_name)
+            printlog("Output will be stored in {}".format(epoch_folder), olog=olog)
+            if not os.path.isdir(epoch_folder):
+                os.makedirs(epoch_folder, exist_ok=True)
+
+            (
+                s_lm,
+                s_med,
+                s_mle,
+                params,
+                s_med_gp,
+                s_mle_gp,
+                params_gp,
+            ) = self.single_epoch_analysis(
+                transit,
+                fits_info,
+                star,
+                visit_args,
+                planet_args,
+                emcee_args,
+                epoch_folder,
+                olog=olog,
+            )
+
+            line = "{:04.0f}".format(epo)
+
+            s = s_lm["flux-all (w/o GP)"]
+            line = "{:s} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}".format(
+                line,
+                s["Red. ChiSqr"],
+                s["lnL"],
+                s["lnP"],
+                s["BIC"],
+                s["AIC"],
+                s["lnL"],
+                s["RMS (unbinned)"][0],
+            )
+
+            s = s_med["flux-all (w/o GP)"]
+            line = "{:s} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}".format(
+                line,
+                s["Red. ChiSqr"],
+                s["lnL"],
+                s["lnP"],
+                s["BIC"],
+                s["AIC"],
+                s["lnL"],
+                s["RMS (unbinned)"][0],
+            )
+            s = s_mle["flux-all (w/o GP)"]
+            line = "{:s} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}".format(
+                line,
+                s["Red. ChiSqr"],
+                s["lnL"],
+                s["lnP"],
+                s["BIC"],
+                s["AIC"],
+                s["lnL"],
+                s["RMS (unbinned)"][0],
+            )
+            line = "{:s} {:7.1f}".format(
+                line, params["med"]["T_0"].stderr * cst.day2sec
+            )
+
+            s = s_med_gp["flux-all (w/ GP)"]
+            line = "{:s} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}".format(
+                line,
+                s["Red. ChiSqr"],
+                s["lnL"],
+                s["lnP"],
+                s["BIC"],
+                s["AIC"],
+                s["lnL"],
+                s["RMS (unbinned)"][0],
+            )
+            s = s_mle_gp["flux-all (w/ GP)"]
+            line = "{:s} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}".format(
+                line,
+                s["Red. ChiSqr"],
+                s["lnL"],
+                s["lnP"],
+                s["BIC"],
+                s["AIC"],
+                s["lnL"],
+                s["RMS (unbinned)"][0],
+            )
+            line = "{:s} {:7.1f}".format(
+                line, params_gp["med"]["T_0"].stderr * cst.day2sec
+            )
+            printlog("", olog=olog)
+            printlog(head, olog=olog)
+            printlog(line, olog=olog)
+
+            lines.append(line)
+        # END for transit in transits
+
+        printlog("", olog=olog)
+        printlog("# === SUMMARY === #", olog=olog)
+        printlog("", olog=olog)
+        summary_file = os.path.join(main_folder, "quick_summary.dat")
+        ofs = open(summary_file, "w")
+        printlog(head, olog=olog)
+        ofs.write("{:s}\n".format(head))
+        for line in lines:
+            printlog(line, olog=olog)
+            ofs.write("{:s}\n".format(line))
+        ofs.close()
+
+        printlog("", olog=olog)
+        printlog(" *********** ", olog=olog)
+        printlog("--COMPLETED--", olog=olog)
+        printlog(" *********** ", olog=olog)
+        printlog("", olog=olog)
+
+        olog.close()
+
+        return
 
 
 if __name__ == "__main__":

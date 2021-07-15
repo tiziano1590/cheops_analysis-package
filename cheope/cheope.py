@@ -14,7 +14,12 @@ def main():
     import numpy as np
     import glob
     import matplotlib.pyplot as plt
-    from cheope.detrend import SingleBayes, SingleCheck, MultivisitAnalysis
+    from cheope.detrend import (
+        SingleBayes,
+        SingleBayesKeplerTess,
+        SingleCheck,
+        MultivisitAnalysis,
+    )
 
     parser = argparse.ArgumentParser(description="Cheope")
 
@@ -34,6 +39,16 @@ def main():
         default=False,
         help="When set, runs single visit detrending to compute the Bayes Factor"
         + "as a function of the models and their parameters",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "-skt",
+        "--single-kepler-tess",
+        dest="single_kepler_tess",
+        default=False,
+        help="When set, runs single visit detrending to compute the Bayes Factor"
+        + "as a function of the models and their parameters. Including Kepler/Tess points.",
         action="store_true",
     )
 
@@ -66,6 +81,10 @@ def main():
     if args.single_bayes:
         sb = SingleBayes(args.input_file)
         sb.run()
+
+    if args.single_kepler_tess:
+        skt = SingleBayesKeplerTess(args.input_file)
+        skt.run()
 
     if args.multivisit:
         multi = MultivisitAnalysis(args.input_file)

@@ -60,3 +60,22 @@ To run Cheope in this configuration use the command:
 ```
 cheope -i path/to/parameters/file.yml -sb
 ```
+
+### Run analysis for a Single Visit including also your Kepler/TESS points
+
+A normal Single visit run, including Kepler/TESS observation.
+
+The command is:
+
+```
+cheope -i path/to/parameters/file.yml -skt
+```
+
+### Multivisit run
+
+In this mode, if folds all the input observations and runs a multivisit analysis.
+To activate the multivisit mode, run:
+
+```
+cheope -i path/to/parameters/file.yml -m
+```
