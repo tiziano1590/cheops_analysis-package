@@ -692,6 +692,28 @@ class SingleBayes:
                 bbox_inches="tight",
             )
         plt.close(fig)
+
+        # input params plot
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            in_par,
+            par_type='input',
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(visit_folder.resolve(), '00_lc_0_input.dat')
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(visit_folder.resolve(), '00_lc_0_input.{}'.format(ext)),
+                bbox_inches='tight'
+            )
+        plt.close(fig)
+        pyca.quick_save_params(
+            os.path.join(visit_folder.resolve(), "00_params_0_input.dat"),
+            in_par,
+            dataset.lc["bjd_ref"]
+        )
+
         # best-fit plot
         params_lm0 = lmfit0.params.copy()
         fig, _ = pyca.model_plot_fit(
@@ -884,10 +906,10 @@ class SingleBayes:
         # Run emcee from last best fit
         printlog("\n-Run emcee from last best fit with:", olog=olog)
         printlog(" nwalkers = {}".format(nwalkers), olog=olog)
-        printlog(" nprerun    = {}".format(nprerun), olog=olog)
-        printlog(" nsteps     = {}".format(nsteps), olog=olog)
-        printlog(" nburn        = {}".format(nburn), olog=olog)
-        printlog(" nthin        = {}".format(nthin), olog=olog)
+        printlog(" nprerun  = {}".format(nprerun), olog=olog)
+        printlog(" nsteps   = {}".format(nsteps), olog=olog)
+        printlog(" nburn    = {}".format(nburn), olog=olog)
+        printlog(" nthin    = {}".format(nthin), olog=olog)
         printlog("", olog=olog)
 
         # EMCEE-------------------------------------------------------------
