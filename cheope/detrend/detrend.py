@@ -2740,6 +2740,28 @@ class SingleBayesKeplerTess:
                 bbox_inches="tight",
             )
         plt.close(fig)
+
+        # input params plot
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            in_par,
+            par_type='input',
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(epoch_folder, '00_lc_0_input.dat')
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, '00_lc_0_input.{}'.format(ext)),
+                bbox_inches='tight'
+            )
+        plt.close(fig)
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "00_params_0_input.dat"),
+            in_par,
+            dataset.lc["bjd_ref"]
+        )
+
         # best-fit plot
         params_lm0 = lmfit0.params.copy()
         fig, _ = pyca.model_plot_fit(
