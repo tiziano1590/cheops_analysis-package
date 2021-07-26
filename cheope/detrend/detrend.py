@@ -202,6 +202,22 @@ class SingleBayes:
             if key in star_yaml:
                 star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
 
+            key = "h_1"
+            star_args[key] = None
+            if key in star_yaml:
+                star_args[key + "_fit"] = star_yaml[key]["fit"]
+                star_args[key] = ufloat(
+                    star_yaml[key]["value"][0], star_yaml[key]["value"][1]
+                )
+
+            key = "h_2"
+            star_args[key] = None
+            if key in star_yaml:
+                star_args[key + "_fit"] = star_yaml[key]["fit"]
+                star_args[key] = ufloat(
+                    star_yaml[key]["value"][0], star_yaml[key]["value"][1]
+                )
+
             # -- planet_args
             planet_yaml = yaml_input["planet"]
 
@@ -584,21 +600,32 @@ class SingleBayes:
             in_par["W"].value = W.n
             in_par["b"].value = b.n
 
+        vary_h_1 = True
+        if star_args["h_1"] != None:
+            star.h_1 = star_args["h_1"]
+            vary_h_1 = star_args["h_1_fit"]
+
+        vary_h_2 = True
+        if star_args["h_2"] != None:
+            star.h_2 = star_args["h_2"]
+            vary_h_2 = star_args["h_2_fit"]
+
         in_par["h_1"] = Parameter(
             "h_1",
-            value=star.h_1.n,
-            vary=True,
+            value=star.h_1.n,  # key value
+            vary=vary_h_1,  # key
             min=0.0,
             max=1.0,
-            user_data=ufloat(star.h_1.n, 0.1),
+            user_data=ufloat(star.h_1.n, 10 * star.h_1.s),
         )
+
         in_par["h_2"] = Parameter(
             "h_2",
             value=star.h_2.n,
-            vary=True,
+            vary=vary_h_2,
             min=0.0,
             max=1.0,
-            user_data=ufloat(star.h_2.n, 0.1),
+            user_data=ufloat(star.h_2.n, 10 * star.h_2.s),
         )
 
         in_par["f_s"] = Parameter(
@@ -697,21 +724,21 @@ class SingleBayes:
         fig, _ = pyca.model_plot_fit(
             dataset,
             in_par,
-            par_type='input',
+            par_type="input",
             nsamples=0,
             flatchains=None,
-            model_filename=os.path.join(visit_folder.resolve(), '00_lc_0_input.dat')
+            model_filename=os.path.join(visit_folder.resolve(), "00_lc_0_input.dat"),
         )
         for ext in fig_ext:
             fig.savefig(
-                os.path.join(visit_folder.resolve(), '00_lc_0_input.{}'.format(ext)),
-                bbox_inches='tight'
+                os.path.join(visit_folder.resolve(), "00_lc_0_input.{}".format(ext)),
+                bbox_inches="tight",
             )
         plt.close(fig)
         pyca.quick_save_params(
             os.path.join(visit_folder.resolve(), "00_params_0_input.dat"),
             in_par,
-            dataset.lc["bjd_ref"]
+            dataset.lc["bjd_ref"],
         )
 
         # best-fit plot
