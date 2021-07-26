@@ -64,6 +64,8 @@ printlog = pyca.printlog
 fig_ext = ["png", "pdf"]  # ", eps"]
 
 
+# TEST MERGING 001
+
 class SingleBayes:
     def __init__(self, input_file):
         self.input_file = input_file
