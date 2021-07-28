@@ -236,6 +236,8 @@ params_units["log_S0"] = "-"
 params_units["log_omega0"] = "-"
 params_units["log_Q"] = "-"
 params_units["det"] = "-"
+params_units["t_exp"] = "d"
+params_units["n_over"] = "-"
 
 
 # ======================================================================
@@ -606,6 +608,51 @@ def get_full_model(dataset, params_in=None, time=None):
 
 
 # =====================================================================
+
+def binned_rms(stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o GP)", olog=None):
+    rms_unbin = np.std(residuals, ddof=1) * 1.0e6
+    for binw in rms_time_in:
+        if binw >= 1.0:
+            binw_str = "{:1.0f}hr".format(binw)
+        else:
+            binw_str = "{:2.0f}min".format(binw * 60.0)
+        nrms = 1
+        try:
+            _, _, e_bin, n_bin = lcbin(t_lc, residuals, binwidth=binw * cst.hour2day) # returns: t_bin, f_bin, e_bin, n_bin
+            rms_bin = e_bin * np.sqrt(n_bin - 1)
+            nrms = len(rms_bin)
+            if nrms > 1:
+                rms = np.mean(rms_bin) * 1.0e6
+                std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
+                printlog(
+                    "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
+                        binw_str, rms, std, nrms
+                    ),
+                    olog=olog,
+                )
+            else:
+                rms, std = rms_unbin, 0.0
+                printlog(
+                    "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {}): N_BIN < 2!".format(
+                        binw_str, rms, std, nrms
+                    ),
+                    olog=olog,
+                )
+        except:
+            rms, std, nrms = rms_unbin, 0.0, 1
+            printlog(
+                "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {}): CANNOT BIN THE LC!".format(
+                    binw_str, rms, std, nrms
+                ),
+                olog=olog,
+            )
+        stats_dict[keyword]["RMS ({:8s})".format(binw_str)] = [
+            rms,
+            std,
+            nrms,
+        ]
+    return
+
 # COMPUTE RMS FOR A SINGLE DATASET FOR GIVEN PARAMS
 def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None):
 
@@ -694,28 +741,9 @@ def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=N
     rms_unbin = np.std(res, ddof=1) * 1.0e6
     printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
     statistics["flux-all (w/o GP)"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
+
     if do_rms_bin:
-        for binw in rms_time:
-            _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
-            rms_bin = e_bin * np.sqrt(n_bin - 1)
-            nrms = len(rms_bin)
-            rms = np.mean(rms_bin) * 1.0e6
-            std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
-            if binw >= 1.0:
-                binw_str = "{:1.0f}hr".format(binw)
-            else:
-                binw_str = "{:2.0f}min".format(binw * 60.0)
-            printlog(
-                "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
-                    binw_str, rms, std, nrms
-                ),
-                olog=olog,
-            )
-            statistics["flux-all (w/o GP)"]["RMS ({:8s})".format(binw_str)] = [
-                rms,
-                std,
-                nrms,
-            ]
+        binned_rms(statistics, t, res, rms_time, keyword="flux-all (w/o GP)")
     printlog("", olog=olog)
 
     printlog("GP status: {}".format(dataset.gp), olog=olog)
@@ -777,27 +805,28 @@ def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=N
         printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
         statistics["flux-all (w/ GP)"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
         if do_rms_bin:
-            for binw in rms_time:
-                _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
-                rms_bin = e_bin * np.sqrt(n_bin - 1)
-                nrms = len(rms_bin)
-                rms = np.mean(rms_bin) * 1.0e6
-                std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
-                if binw >= 1.0:
-                    binw_str = "{:1.0f}hr".format(binw)
-                else:
-                    binw_str = "{:2.0f}min".format(binw * 60.0)
-                printlog(
-                    "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
-                        binw_str, rms, std, nrms
-                    ),
-                    olog=olog,
-                )
-                statistics["flux-all (w/ GP)"]["RMS ({:8s})".format(binw_str)] = [
-                    rms,
-                    std,
-                    nrms,
-                ]
+            binned_rms(statistics, t, res, rms_time, keyword="flux-all (w/ GP)")
+            # for binw in rms_time:
+            #     _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
+            #     rms_bin = e_bin * np.sqrt(n_bin - 1)
+            #     nrms = len(rms_bin)
+            #     rms = np.mean(rms_bin) * 1.0e6
+            #     std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
+            #     if binw >= 1.0:
+            #         binw_str = "{:1.0f}hr".format(binw)
+            #     else:
+            #         binw_str = "{:2.0f}min".format(binw * 60.0)
+            #     printlog(
+            #         "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
+            #             binw_str, rms, std, nrms
+            #         ),
+            #         olog=olog,
+            #     )
+            #     statistics["flux-all (w/ GP)"]["RMS ({:8s})".format(binw_str)] = [
+            #         rms,
+            #         std,
+            #         nrms,
+            #     ]
         printlog("", olog=olog)
 
     printlog("=================", olog=olog)
@@ -815,27 +844,28 @@ def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=N
     printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
     statistics["flux-transit"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
     if do_rms_bin:
-        for binw in rms_time:
-            _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
-            rms_bin = e_bin * np.sqrt(n_bin - 1)
-            nrms = len(rms_bin)
-            rms = np.mean(rms_bin) * 1.0e6
-            std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
-            if binw >= 1.0:
-                binw_str = "{:1.0f}hr".format(binw)
-            else:
-                binw_str = "{:2.0f}min".format(binw * 60.0)
-            printlog(
-                "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
-                    binw_str, rms, std, nrms
-                ),
-                olog=olog,
-            )
-            statistics["flux-transit"]["RMS ({:8s})".format(binw_str)] = [
-                rms,
-                std,
-                nrms,
-            ]
+        binned_rms(statistics, t, res, rms_time, keyword="flux-transit")
+        # for binw in rms_time:
+        #     _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
+        #     rms_bin = e_bin * np.sqrt(n_bin - 1)
+        #     nrms = len(rms_bin)
+        #     rms = np.mean(rms_bin) * 1.0e6
+        #     std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
+        #     if binw >= 1.0:
+        #         binw_str = "{:1.0f}hr".format(binw)
+        #     else:
+        #         binw_str = "{:2.0f}min".format(binw * 60.0)
+        #     printlog(
+        #         "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
+        #             binw_str, rms, std, nrms
+        #         ),
+        #         olog=olog,
+        #     )
+        #     statistics["flux-transit"]["RMS ({:8s})".format(binw_str)] = [
+        #         rms,
+        #         std,
+        #         nrms,
+        #     ]
     printlog("", olog=olog)
 
     return statistics
@@ -5840,7 +5870,11 @@ class FITSDataset(Dataset):
         self.aperture = aperture
         self.FITS_data = FITS_data
 
+        btjd = info["BTJD"]
+
+        # TESS "normal lc"
         # TIME TIMECORR CADENCENO SAP_FLUX SAP_FLUX_ERR SAP_BKG SAP_BKG_ERR PDCSAP_FLUX PDCSAP_FLUX_ERR SAP_QUALITY MOM_CENTR1 MOM_CENTR1_ERR MOM_CENTR2 MOM_CENTR2_ERR POS_CORR1 POS_CORR2
+        # TESS HLSP/QLP HAS NO PDC AND NO SAP_FLUX_ERR, BUT KSPSAP_FLUX/_ERR
 
         if aperture == "pdc":
             key_flux = "PCDSAP_FLUX"
@@ -5849,8 +5883,12 @@ class FITSDataset(Dataset):
             key_flux = "SAP_FLUX"
             key_flux_err = "SAP_FLUX_ERR"
 
+        # CHECK IF key_flux_err in the data keyword, if not it means we are probably using HLSP/QPL lc.
+        if(key_flux_err not in transit.keys()):
+            key_flux = "KSPSAP_FLUX"
+            key_flux_err = "KSPSAP_FLUX_ERR"
+
         flux_raw = transit["data"][key_flux]
-        btjd = info["BTJD"]
 
         # TODO get_quality_combination base on QUALITY_FLAGS
         # ok = np.logical_and(
@@ -5876,9 +5914,15 @@ class FITSDataset(Dataset):
         flux = data_ok[key_flux]
         flux_err = data_ok[key_flux_err]
 
-        centroid_x, centroid_y = data_ok["MOM_CENTR1"], data_ok["MOM_CENTR2"]
-        xoff = data_ok["POS_CORR1"]
-        yoff = data_ok["POS_CORR2"]
+        if("KSP" in key_flux):
+            centroid_x, centroid_y = data_ok["SAP_X"], data_ok["SAP_Y"]
+            xoff = centroid_x - np.median(centroid_x)
+            yoff = centroid_y - np.median(centroid_y)
+        else:
+            centroid_x, centroid_y = data_ok["MOM_CENTR1"], data_ok["MOM_CENTR2"]
+            xoff = data_ok["POS_CORR1"]
+            yoff = data_ok["POS_CORR2"]
+
         bg = data_ok["SAP_BKG"]
 
         # set to zeros

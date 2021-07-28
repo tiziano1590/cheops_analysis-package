@@ -4,6 +4,7 @@
 # WG-P3 EXPLORE/TTV
 
 
+from math import floor
 import emcee
 import matplotlib as mpl
 
@@ -63,8 +64,6 @@ printlog = pyca.printlog
 
 fig_ext = ["png", "pdf"]  # ", eps"]
 
-
-# TEST MERGING 001
 
 class SingleBayes:
     def __init__(self, input_file):
@@ -546,13 +545,13 @@ class SingleBayes:
         printlog("P        = {} d".format(P), olog=olog)
         printlog("k        = {} ==> D = k^2 = {}".format(k, D), olog=olog)
         printlog("i        = {} deg".format(inc), olog=olog)
-        printlog("a/Rs = {}".format(aRs), olog=olog)
+        printlog("a/Rs     = {}".format(aRs), olog=olog)
         printlog("b        = {}".format(b), olog=olog)
         printlog(
             "W        = {}*P = {} d = {} h".format(W, W * P, W * P * 24.0), olog=olog
         )
         printlog("ecc    = {}".format(ecc), olog=olog)
-        printlog("w        = {}".format(w), olog=olog)
+        printlog("w      = {}".format(w), olog=olog)
         printlog("f_c    = {}".format(f_c), olog=olog)
         printlog("f_s    = {}".format(f_s), olog=olog)
         printlog("T_0    = {}\n".format(T_0), olog=olog)
@@ -797,16 +796,22 @@ class SingleBayes:
             # Fit with lmfit
             lmfit_loop = dataset.lmfit_transit(
                 P=in_par["P"],
-                T_0=in_par["T_0"],
+                # T_0=in_par["T_0"],
                 f_c=in_par["f_c"],
                 f_s=in_par["f_s"],
-                D=in_par["D"],
-                W=in_par["W"],
-                b=in_par["b"],
-                h_1=in_par["h_1"],
-                h_2=in_par["h_2"],
+                # D=in_par["D"],
+                # W=in_par["W"],
+                # b=in_par["b"],
+                # h_1=in_par["h_1"],
+                # h_2=in_par["h_2"],
+                T_0=params_lm0["T_0"],
+                D=params_lm0["D"],
+                W=params_lm0["W"],
+                b=params_lm0["b"],
+                h_1=params_lm0["h_1"],
+                h_2=params_lm0["h_2"],
                 logrhoprior=in_par["logrho"],
-                c=in_par["c"],
+                c=params_lm0["c"],
                 dfdt=det_par["dfdt"],
                 d2fdt2=det_par["d2fdt2"],
                 dfdbg=det_par["dfdbg"],
@@ -2225,9 +2230,14 @@ class SingleBayesKeplerTess:
                     visit_args[key] = None
                     read_file_status.append("ERROR: wrong aperture. Provide SAP or PDC")
 
-            # fake
             key = "shape"
             visit_args[key] = "fit"
+            if key in yaml_input:
+                tmp = yaml_input[key].strip().lower()
+                if tmp in ["fit", "fix"]:
+                    visit_args[key] = tmp
+                else:
+                    read_file_status.append("{} set to default: fit".format(key))
 
             key = "seed"
             visit_args[key] = 42
@@ -2242,6 +2252,17 @@ class SingleBayesKeplerTess:
             visit_args[key] = None
             if key in yaml_input:
                 visit_args[key] = yaml_input[key]
+
+            key = "clip_outliers"
+            visit_args[key] = 5
+            if key in yaml_input:
+                try:
+                    co = round(yaml_input[key])
+                    if co < 1:
+                        co = 0
+                    visit_args[key] = co
+                except:
+                    read_file_status.append("{} must be a positive integer. Set to 5-sigma clip by default.".format(key))
 
             # -- star_args
             star_yaml = yaml_input["star"]
@@ -2555,9 +2576,10 @@ class SingleBayesKeplerTess:
             visit_args, transit, info, reject_highpoints=False, verbose=True
         )
 
-        # TO clip or not to clip
-        printlog("Clip outliers", olog=olog)
-        t, f, ef = dataset.clip_outliers(verbose=True)
+        if visit_args["clip_outliers"] > 0:
+            # TO clip or not to clip
+            printlog("Clip outliers", olog=olog)
+            t, f, ef = dataset.clip_outliers(verbose=True)
 
         P = planet_args["P"]
 
@@ -2635,6 +2657,13 @@ class SingleBayesKeplerTess:
             user_data=b,
         )
 
+        if visit_args["shape"] == "fix":
+            for n in ["D", "W", "b"]:
+                in_par[n].vary = False
+            in_par["D"].value = D.n
+            in_par["W"].value = W.n
+            in_par["b"].value = b.n
+
         in_par["h_1"] = Parameter(
             "h_1",
             value=star.h_1.n,
@@ -2651,6 +2680,7 @@ class SingleBayesKeplerTess:
             max=1.0,
             user_data=ufloat(star.h_2.n, 0.1),
         )
+
 
         in_par["f_s"] = Parameter(
             "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
@@ -2670,6 +2700,7 @@ class SingleBayesKeplerTess:
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
+        
 
         ### *** 1) FIT TRANSIT MODEL ONLY WITH LMFIT
         det_par = {
@@ -2691,6 +2722,8 @@ class SingleBayesKeplerTess:
             "ramp": None,
             "glint_scale": None,
         }
+
+        t_exp_s = info["EXP_TIME"]*cst.day2sec
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
@@ -2724,6 +2757,7 @@ class SingleBayesKeplerTess:
             dfdcos3phi=det_par["dfdcos3phi"],
             ramp=det_par["ramp"],
             glint_scale=det_par["glint_scale"],
+            t_exp_s=t_exp_s
         )
 
         lmfit0_rep = dataset.lmfit_report(min_correl=0.5)
@@ -2744,6 +2778,18 @@ class SingleBayesKeplerTess:
         plt.close(fig)
 
         # input params plot
+
+        k = "t_exp"
+        in_par[k] = Parameter(k, 
+            value=lmfit0.params[k].value, 
+            vary=False
+        )
+        k = "n_over"
+        in_par[k] = Parameter(k, 
+            value=lmfit0.params[k].value, 
+            vary=False
+        )
+
         fig, _ = pyca.model_plot_fit(
             dataset,
             in_par,
@@ -2818,14 +2864,20 @@ class SingleBayesKeplerTess:
             # Fit with lmfit
             lmfit_loop = dataset.lmfit_transit(
                 P=in_par["P"],
-                T_0=in_par["T_0"],
+                # T_0=in_par["T_0"],
                 f_c=in_par["f_c"],
                 f_s=in_par["f_s"],
-                D=in_par["D"],
-                W=in_par["W"],
-                b=in_par["b"],
-                h_1=in_par["h_1"],
-                h_2=in_par["h_2"],
+                # D=in_par["D"],
+                # W=in_par["W"],
+                # b=in_par["b"],
+                # h_1=in_par["h_1"],
+                # h_2=in_par["h_2"],
+                T_0=params_lm0["T_0"],
+                D=params_lm0["D"],
+                W=params_lm0["W"],
+                b=params_lm0["b"],
+                h_1=params_lm0["h_1"],
+                h_2=params_lm0["h_2"],
                 logrhoprior=in_par["logrho"],
                 c=in_par["c"],
                 dfdt=det_par["dfdt"],
@@ -2845,6 +2897,7 @@ class SingleBayesKeplerTess:
                 dfdcos3phi=det_par["dfdcos3phi"],
                 ramp=det_par["ramp"],
                 glint_scale=det_par["glint_scale"],
+                t_exp_s=info["EXP_TIME"]*cst.day2sec
             )
             printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
             printlog("", olog=olog)
@@ -3361,8 +3414,12 @@ class SingleBayesKeplerTess:
 
         passband = visit_args["passband"]
         aperture = visit_args["aperture"]
+        shape    = visit_args["shape"]
         file_fits = visit_args["file_fits"]
-        file_name = os.path.basename(file_fits).replace(".fits", "_{}".format(aperture))
+        file_name = os.path.basename(file_fits).replace(".fits", "_{}_{}".format(
+            aperture, shape
+            )
+        )
 
         logs_folder = os.path.join(visit_args["main_folder"], "logs")
         if not os.path.isdir(logs_folder):
