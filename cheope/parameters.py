@@ -39,7 +39,7 @@ class ReadFile:
             "h_2",
         ]
 
-        self.planet_keys = ["P", "D", "inc", "aRs", "ecc", "w", "T0", "Kms"]
+        self.planet_keys = ["P", "D", "inc", "aRs", "ecc", "w", "T_0", "Kms"]
 
         self.emcee_keys = [
             "nwalkers",
@@ -73,37 +73,40 @@ class ReadFile:
     def star_pars(self):
 
         for key in self.star_keys:
-            self.star_args[key] = self.yaml_input["star"].get(key)
-            # TODO Restructure to get it flexible when the dictionary is not defined within the yml file
-            if isinstance(self.star_args[key], list):
-                value = self.star_args[key]
-                self.star_args[key]["fit"] = False
-                self.star_args[key]["value"] = value
-
-            if not isinstance(self.star_args[key], str):
-                self.star_args[key + "_fit"] = self.star_args[key].get(
-                    "fit", value=False
+            inval = self.yaml_input["star"].get(key)  # get the input value
+            if isinstance(inval, str):
+                self.star_args[key] = inval
+            elif isinstance(inval, list):
+                self.star_args[key + "_fit"] = False
+                self.star_args[key] = ufloat(inval[0], inval[1])
+            elif isinstance(inval, dict):
+                self.star_args[key + "_fit"] = inval.get("fit")
+                tmp_val = inval.get("value")
+                self.star_args[key] = ufloat(tmp_val[0], tmp_val[1])
+            else:
+                self.read_file_status.append(
+                    f"{key} should be either a list or a dictionary."
                 )
-                self.star_args[key] = self.star_args[key].get("value")
-                if isinstance(self.star_args[key], list):
-                    self.star_args[key] = ufloat(
-                        self.star_args[key][0], self.star_args[key][1]
-                    )
-                self.read_file_status.append(self.err_msg(key, self.yaml_input["star"]))
+
+            self.read_file_status.append(self.err_msg(key, self.yaml_input["star"]))
 
     def planet_pars(self):
 
         for key in self.planet_keys:
-            self.planet_args[key] = self.yaml_input["planet"].get(key)
-            self.planet_args[key + "_fit"] = self.planet_args[key].get(
-                "fit", value=False
-            )
-            self.planet_args[key] = self.planet_args[key].get("value")
-            if isinstance(self.planet_args[key], list):
-                self.planet_args[key] = ufloat(
-                    self.planet_args[key][0], self.planet_args[key][1]
+            inval = self.yaml_input["planet"].get(key)  # get the input value
+            if isinstance(inval, str):
+                self.planet_args[key] = inval
+            elif isinstance(inval, list):
+                self.planet_args[key + "_fit"] = False
+                self.planet_args[key] = ufloat(inval[0], inval[1])
+            elif isinstance(inval, dict):
+                self.planet_args[key + "_fit"] = inval.get("fit")
+                tmp_val = inval.get("value")
+                self.planet_args[key] = ufloat(tmp_val[0], tmp_val[1])
+            else:
+                self.read_file_status.append(
+                    f"{key} should be either a list or a dictionary."
                 )
-
             self.read_file_status.append(self.err_msg(key, self.yaml_input["planet"]))
 
         self.apply_planet_conditions()
@@ -118,9 +121,9 @@ class ReadFile:
         self.emcee_args["nthreads"] = 1
         self.emcee_args["progress"] = False
 
-        for key in self.emcee_args:
+        for key in self.emcee_keys:
             self.emcee_args[key] = self.yaml_input["emcee"].get(
-                key, value=self.emcee_args[key]
+                key, self.emcee_args[key]
             )
 
     def apply_visit_conditions(self):
@@ -245,8 +248,13 @@ class ReadFile:
         self.planet_args["f_c"] = f_c
         self.planet_args["f_s"] = f_s
 
+        self.planet_args["T_0"] = planet_yaml["T_0"]
+
     def err_msg(self, keyword, dictionary):
-        if dictionary.get(keyword) == None:
-            return f"ERROR: needed keyword {keyword} not in input file. Set to None."
+        if dictionary.get(keyword) == None and keyword not in [
+            "glint_type",
+            "clipping",
+        ]:
+            return f"ERROR: keyword {keyword} not in input file. Set to None."
         else:
             return ""
