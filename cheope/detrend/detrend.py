@@ -69,7 +69,7 @@ fig_ext = ["png", "pdf"]  # ", eps"]
 class SingleBayes:
     def __init__(self, input_file):
         self.input_file = input_file
-        self.fitting_pars = [
+        self.input_pars = [
             "P",
             "T_0",
             "D",
@@ -100,6 +100,16 @@ class SingleBayes:
             inpars.emcee_args,
             inpars.read_file_status,
         )
+
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                self.read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
 
         # seed = 42
         seed = visit_args["seed"]
@@ -287,98 +297,37 @@ class SingleBayes:
         printlog("T_0    = {}\n".format(T_0), olog=olog)
 
         # determine the out-of-transit lc for initial guess of c based on T_0 min/max
-        oot = np.logical_or(t < T_0[0], t > T_0[2])
+        oot = np.logical_or(
+            t < planet_args["T_0_bounds"][0], t > planet_args["T_0_bounds"][1]
+        )
 
         # DEFINE HERE HOW TO USE THE PARAMETERS,
         # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
 
         in_par = Parameters()
-        in_par["P"] = Parameter(
-            "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["T_0"] = Parameter(
-            "T_0", value=T_0[1], vary=True, min=T_0[0], max=T_0[2], user_data=None
-        )
 
-        # I will randomize only fitting parameters...
-        in_par["D"] = Parameter(
-            "D",
-            value=np.abs(np.random.normal(loc=D.n, scale=D.s)),
-            vary=True,
-            min=0.5 * D.n,
-            max=1.5 * D.n,
-            user_data=D,
-        )
-        in_par["W"] = Parameter(
-            "W",
-            value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
-            vary=True,
-            min=0.5 * W.n,
-            max=1.5 * W.n,
-            user_data=W,
-        )
-        in_par["b"] = Parameter(
-            "b",
-            value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
-            vary=True,
-            min=0.0,
-            max=1.5,
-            user_data=b,
-        )
-        if shape == "fix":
-            for n in ["D", "W", "b"]:
-                in_par[n].vary = False
-            in_par["D"].value = D.n
-            in_par["W"].value = W.n
-            in_par["b"].value = b.n
-
-        vary_h_1 = True
-        if star_args["h_1"] != None:
-            star.h_1 = star_args["h_1"]
-            vary_h_1 = star_args["h_1_fit"]
-
-        vary_h_2 = True
-        if star_args["h_2"] != None:
-            star.h_2 = star_args["h_2"]
-            vary_h_2 = star_args["h_2_fit"]
-
-        in_par["h_1"] = Parameter(
-            "h_1",
-            value=star.h_1.n,  # key value
-            vary=vary_h_1,  # key
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_1.n, 10 * star.h_1.s),
-        )
-
-        in_par["h_2"] = Parameter(
-            "h_2",
-            value=star.h_2.n,
-            vary=vary_h_2,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_2.n, 10 * star.h_2.s),
-        )
-
-        # TODO continue with the conditions on f_s, f_c, h1, h2 and rho
-
-        # TODO fix T0 definition with the bounds
-
-        in_par["f_s"] = Parameter(
-            "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["f_c"] = Parameter(
-            "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-
-        in_par["logrho"] = Parameter(
-            "logrho",
-            value=star.logrho.n,
-            vary=True,
-            min=-9,
-            max=6,
-            user_data=star.logrho,
-        )
+        for key in self.input_pars:
+            cat = category_args(key)
+            if key in ["D", "W", "b"]:
+                # Randomize here
+                val = np.abs(
+                    np.random.normal(
+                        loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                    )
+                )
+            else:
+                val = cat[key]
+            in_par[key] = Parameter(
+                key,
+                value=val,
+                vary=cat[key + "_fit"],
+                min=cat[key + "_bounds"][0],
+                max=cat[key + "_bounds"][1],
+                user_data=cat[
+                    key + "_user_data"
+                ],  # TODO Exception has occurred: TypeError
+                # loop of ufunc does not support argument 0 of type AffineScalarFunc which has no callable arcsin method
+            )
 
         # Treat "c" separately
         in_par["c"] = Parameter(
