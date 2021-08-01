@@ -69,6 +69,19 @@ fig_ext = ["png", "pdf"]  # ", eps"]
 class SingleBayes:
     def __init__(self, input_file):
         self.input_file = input_file
+        self.fitting_pars = [
+            "P",
+            "T_0",
+            "D",
+            "W",
+            "b",
+            "h_1",
+            "h_2",
+            "f_s",
+            "f_c",
+            "logrho",
+            "c",
+        ]
 
     def run(self):
 
@@ -278,6 +291,7 @@ class SingleBayes:
 
         # DEFINE HERE HOW TO USE THE PARAMETERS,
         # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
+
         in_par = Parameters()
         in_par["P"] = Parameter(
             "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
@@ -346,6 +360,10 @@ class SingleBayes:
             user_data=ufloat(star.h_2.n, 10 * star.h_2.s),
         )
 
+        # TODO continue with the conditions on f_s, f_c, h1, h2 and rho
+
+        # TODO fix T0 definition with the bounds
+
         in_par["f_s"] = Parameter(
             "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
         )
@@ -361,6 +379,8 @@ class SingleBayes:
             max=6,
             user_data=star.logrho,
         )
+
+        # Treat "c" separately
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
@@ -646,6 +666,7 @@ class SingleBayes:
         nsteps = emcee_args["nsteps"]
         nburn = emcee_args["nburn"]
         nthin = emcee_args["nthin"]
+        nthreads = emcee_args["nthreads"]
         progress = emcee_args["progress"]
 
         # Run emcee from last best fit
@@ -654,6 +675,7 @@ class SingleBayes:
         printlog(" nprerun  = {}".format(nprerun), olog=olog)
         printlog(" nsteps   = {}".format(nsteps), olog=olog)
         printlog(" nburn    = {}".format(nburn), olog=olog)
+        printlog(" nthreads = {}".format(nthreads), olog=olog)
         printlog(" nthin    = {}".format(nthin), olog=olog)
         printlog("", olog=olog)
 

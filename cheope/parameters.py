@@ -61,6 +61,7 @@ class ReadFile:
         self.star_pars()
         self.planet_pars()
         self.emcee_pars()
+        self.set_input_parameters()
 
     def visit_pars(self):
         # -- visit_args
@@ -77,18 +78,27 @@ class ReadFile:
             if isinstance(inval, str):
                 self.star_args[key] = inval
             elif isinstance(inval, list):
-                self.star_args[key + "_fit"] = False
                 self.star_args[key] = ufloat(inval[0], inval[1])
+                self.star_args[key + "_fit"] = False
+                self.star_args[key + "_bounds"] = (-np.inf, np.inf)
+                self.star_args[key + "_user_data"] = None
             elif isinstance(inval, dict):
-                self.star_args[key + "_fit"] = inval.get("fit")
-                tmp_val = inval.get("value")
-                self.star_args[key] = ufloat(tmp_val[0], tmp_val[1])
+                val = inval.get("value")
+                fit = inval.get("fit")
+                self.star_args[key] = ufloat(val[0], val[1])
+                self.star_args[key + "_fit"] = fit
+                self.star_args[key + "_bounds"] = inval.get("bounds", (-np.inf, np.inf))
+                self.star_args[key + "_user_data"] = inval.get("user_data", None)
             else:
                 self.read_file_status.append(
                     f"{key} should be either a list or a dictionary."
                 )
+            if key in self.yaml_input["input_pars"]:
+                self.star_args[key + "_fit"] = True
 
             self.read_file_status.append(self.err_msg(key, self.yaml_input["star"]))
+
+        self.apply_star_conditions()
 
     def planet_pars(self):
 
@@ -97,16 +107,27 @@ class ReadFile:
             if isinstance(inval, str):
                 self.planet_args[key] = inval
             elif isinstance(inval, list):
-                self.planet_args[key + "_fit"] = False
                 self.planet_args[key] = ufloat(inval[0], inval[1])
+                self.planet_args[key + "_fit"] = False
+                self.planet_args[key + "_bounds"] = (-np.inf, np.inf)
+                self.planet_args[key + "_user_data"] = None
             elif isinstance(inval, dict):
-                self.planet_args[key + "_fit"] = inval.get("fit")
-                tmp_val = inval.get("value")
-                self.planet_args[key] = ufloat(tmp_val[0], tmp_val[1])
+                val = inval.get("value")
+                fit = inval.get("fit")
+                self.planet_args[key] = ufloat(val[0], val[1])
+                self.planet_args[key + "_fit"] = fit
+                self.planet_args[key + "_bounds"] = inval.get(
+                    "bounds", (-np.inf, np.inf)
+                )
+                self.planet_args[key + "_user_data"] = inval.get("user_data", None)
+
             else:
                 self.read_file_status.append(
                     f"{key} should be either a list or a dictionary."
                 )
+            if key in self.yaml_input["input_pars"]:
+                self.planet_args[key + "_fit"] = True
+
             self.read_file_status.append(self.err_msg(key, self.yaml_input["planet"]))
 
         self.apply_planet_conditions()
@@ -162,6 +183,9 @@ class ReadFile:
         self.visit_args["glint_type"] = self.visit_args["glint_type"].strip().lower()
         if not self.visit_args["glint_type"] in glints:
             self.visit_args["glint_type"] = False
+
+    def apply_star_conditions(self):
+        pass
 
     def apply_planet_conditions(self):
 
@@ -248,7 +272,53 @@ class ReadFile:
         self.planet_args["f_c"] = f_c
         self.planet_args["f_s"] = f_s
 
-        self.planet_args["T_0"] = planet_yaml["T_0"]
+        # self.planet_args["T_0"] = planet_yaml["T_0"]
+
+        # Define some generic rules related to the shape of the light curve
+        if self.planet_args["D_bounds"] == (-np.inf, np.inf):
+            self.planet_args["D_bounds"] = (
+                0.5 * self.planet_args["D"].n,
+                1.5 * self.planet_args["D"].n,
+            )
+            self.planet_args["D_user_data"] = self.planet_args["D"]
+
+        if self.planet_args["W_bounds"] == (-np.inf, np.inf):
+            self.planet_args["W_bounds"] = (
+                0.5 * self.planet_args["W"].n,
+                1.5 * self.planet_args["W"].n,
+            )
+            self.planet_args["W_user_data"] = self.planet_args["W"]
+
+        if self.planet_args["b_bounds"] == (-np.inf, np.inf):
+            self.planet_args["b_bounds"] = (
+                0.0,
+                1.5,
+            )
+            self.planet_args["b_user_data"] = self.planet_args["b"]
+
+        if self.visit_args["shape"] == "fix":
+            self.planet_args["D_fit"] = False
+            self.planet_args["W_fit"] = False
+            self.planet_args["b_fit"] = False
+
+    def set_input_parameters(self):
+        fitpars = self.yaml_input["input_pars"]
+
+        for par in fitpars:
+            categ = self.category_args(par)
+            categ[par + "_fit"] = True
+
+            print("")
+
+    def category_args(self, par):
+        if par in self.star_args.keys():
+            return self.star_args
+        elif par in self.planet_args.keys():
+            return self.planet_args
+        else:
+            self.read_file_status.append(
+                f"ERROR: {par} is not defined in neither the star or planet arguments"
+            )
 
     def err_msg(self, keyword, dictionary):
         if dictionary.get(keyword) == None and keyword not in [
