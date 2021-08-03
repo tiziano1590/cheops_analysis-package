@@ -76,20 +76,24 @@ class ReadFile:
 
         for key in self.star_keys:
             inval = self.yaml_input["star"].get(key)  # get the input value
+
             if isinstance(inval, str):
                 self.star_args[key] = inval
             elif isinstance(inval, list):
                 self.star_args[key] = ufloat(inval[0], inval[1])
                 self.star_args[key + "_fit"] = False
-                self.star_args[key + "_bounds"] = (-np.inf, np.inf)
-                self.star_args[key + "_user_data"] = None
+                self.star_args[key + "_bounds"] = [-np.inf, np.inf]
+                self.star_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):
                 val = inval.get("value")
                 fit = inval.get("fit")
-                self.star_args[key] = ufloat(val[0], val[1])
+                self.star_args[key] = ufloat(val[0], val[1]).n
                 self.star_args[key + "_fit"] = fit
-                self.star_args[key + "_bounds"] = inval.get("bounds", (-np.inf, np.inf))
-                self.star_args[key + "_user_data"] = ufloat(val[0], 10 * val[1])
+                self.star_args[key + "_bounds"] = inval.get("bounds", [-np.inf, np.inf])
+                self.star_args[key + "_user_data"] = ufloat(val[0], val[1])
+                # if key == "h_1":
+                #     print("HAHA")
+                #     break
             else:
                 self.read_file_status.append(
                     f"{key} should be either a list or a dictionary."
@@ -108,15 +112,15 @@ class ReadFile:
             elif isinstance(inval, list):
                 self.planet_args[key] = ufloat(inval[0], inval[1])
                 self.planet_args[key + "_fit"] = False
-                self.planet_args[key + "_bounds"] = (-np.inf, np.inf)
-                self.planet_args[key + "_user_data"] = None
+                self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
+                self.planet_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):
                 val = inval.get("value")
                 fit = inval.get("fit")
-                self.planet_args[key] = ufloat(val[0], val[1])
+                self.planet_args[key] = val[0]
                 self.planet_args[key + "_fit"] = fit
                 self.planet_args[key + "_bounds"] = inval.get(
-                    "bounds", (-np.inf, np.inf)
+                    "bounds", [-np.inf, np.inf]
                 )
                 self.planet_args[key + "_user_data"] = ufloat(val[0], val[1])
 
@@ -200,15 +204,15 @@ class ReadFile:
             self.star_args["h_2"] = star.h_2.n
             self.star_args["h_1_fit"] = True
             self.star_args["h_2_fit"] = True
-            self.star_args["h_1_bounds"] = (0, 1)
-            self.star_args["h_2_bounds"] = (0, 1)
+            self.star_args["h_1_bounds"] = [0, 1]
+            self.star_args["h_2_bounds"] = [0, 1]
             self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 10 * star.h_1.s)
             self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 10 * star.h_2.s)
 
         if self.yaml_input["star"].get("logrho") == None:
             self.star_args["logrho"] = star.logrho.n
             self.star_args["logrho_fit"] = True
-            self.star_args["logrho_bounds"] = (-9, 6)
+            self.star_args["logrho_bounds"] = [-9, 6]
             self.star_args["logrho_user_data"] = star.logrho
 
     def apply_planet_conditions(self):
@@ -230,10 +234,10 @@ class ReadFile:
             )
 
         self.planet_args["D"] = D.n
-        self.planet_args["D_bounds"] = (
+        self.planet_args["D_bounds"] = [
             0.5 * D.n,
             1.5 * D.n,
-        )
+        ]
         self.planet_args["D_fit"] = True
         self.planet_args["D_user_data"] = D
 
@@ -261,14 +265,14 @@ class ReadFile:
             )
             inc, aRs, b = 90.0, 1.0, 0.0
             # sys.exit()
-        self.planet_args["inc"] = inc
-        self.planet_args["aRs"] = aRs
+        self.planet_args["inc"] = inc.n
+        self.planet_args["aRs"] = aRs.n
         self.planet_args["b"] = b.n
         self.planet_args["b_fit"] = True
-        self.planet_args["b_bounds"] = (
+        self.planet_args["b_bounds"] = [
             0.0,
             1.5,
-        )
+        ]
         self.planet_args["b_user_data"] = b
 
         if "T14" in planet_yaml:
@@ -280,10 +284,10 @@ class ReadFile:
             W = um.sqrt((1 + k) ** 2 - b ** 2) / np.pi / aRs
         self.planet_args["W"] = W.n
         self.planet_args["W_fit"] = True
-        self.planet_args["W_bounds"] = (
+        self.planet_args["W_bounds"] = [
             0.5 * W.n,
             1.5 * W.n,
-        )
+        ]
         self.planet_args["W_user_data"] = W
 
         ecc = ufloat(0.0, 0.0)
@@ -310,17 +314,19 @@ class ReadFile:
         w_r = w * cst.deg2rad
         f_c = se * um.cos(w_r)
         f_s = se * um.sin(w_r)
-        self.planet_args["ecc"] = ecc
+        self.planet_args["ecc"] = ecc.n
         self.planet_args["w"] = w
-        self.planet_args["f_c"] = f_c
+        self.planet_args["f_c"] = f_c.n
         self.planet_args["f_c_fit"] = False
-        self.planet_args["f_c_bounds"] = (-np.inf, np.inf)
+        self.planet_args["f_c_bounds"] = [-np.inf, np.inf]
         self.planet_args["f_c_user_data"] = None
 
-        self.planet_args["f_s"] = f_s
+        self.planet_args["f_s"] = f_s.n
         self.planet_args["f_s_fit"] = False
-        self.planet_args["f_s_bounds"] = (-np.inf, np.inf)
+        self.planet_args["f_s_bounds"] = [-np.inf, np.inf]
         self.planet_args["f_s_user_data"] = None
+
+        self.planet_args["T_0_user_data"] = None
 
         if self.visit_args["shape"] == "fix":
             self.planet_args["D_fit"] = False

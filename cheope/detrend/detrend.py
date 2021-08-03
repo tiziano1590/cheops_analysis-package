@@ -80,7 +80,6 @@ class SingleBayes:
             "f_s",
             "f_c",
             "logrho",
-            "c",
         ]
 
     def run(self):
@@ -307,6 +306,7 @@ class SingleBayes:
         in_par = Parameters()
 
         for key in self.input_pars:
+            print(key)
             cat = category_args(key)
             if key in ["D", "W", "b"]:
                 # Randomize here
@@ -323,11 +323,12 @@ class SingleBayes:
                 vary=cat[key + "_fit"],
                 min=cat[key + "_bounds"][0],
                 max=cat[key + "_bounds"][1],
-                user_data=cat[
-                    key + "_user_data"
-                ],  # TODO Exception has occurred: TypeError
+                user_data=cat[key + "_user_data"],
+                # TODO Exception has occurred: TypeError
                 # loop of ufunc does not support argument 0 of type AffineScalarFunc which has no callable arcsin method
             )
+            # if key == 'b':
+            #     break
 
         # Treat "c" separately
         in_par["c"] = Parameter(
