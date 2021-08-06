@@ -609,7 +609,10 @@ def get_full_model(dataset, params_in=None, time=None):
 
 # =====================================================================
 
-def binned_rms(stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o GP)", olog=None):
+
+def binned_rms(
+    stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o GP)", olog=None
+):
     rms_unbin = np.std(residuals, ddof=1) * 1.0e6
     for binw in rms_time_in:
         if binw >= 1.0:
@@ -618,7 +621,9 @@ def binned_rms(stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o 
             binw_str = "{:2.0f}min".format(binw * 60.0)
         nrms = 1
         try:
-            _, _, e_bin, n_bin = lcbin(t_lc, residuals, binwidth=binw * cst.hour2day) # returns: t_bin, f_bin, e_bin, n_bin
+            _, _, e_bin, n_bin = lcbin(
+                t_lc, residuals, binwidth=binw * cst.hour2day
+            )  # returns: t_bin, f_bin, e_bin, n_bin
             rms_bin = e_bin * np.sqrt(n_bin - 1)
             nrms = len(rms_bin)
             if nrms > 1:
@@ -652,6 +657,7 @@ def binned_rms(stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o 
             nrms,
         ]
     return
+
 
 # COMPUTE RMS FOR A SINGLE DATASET FOR GIVEN PARAMS
 def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None):
@@ -5884,7 +5890,7 @@ class FITSDataset(Dataset):
             key_flux_err = "SAP_FLUX_ERR"
 
         # CHECK IF key_flux_err in the data keyword, if not it means we are probably using HLSP/QPL lc.
-        if(key_flux_err not in transit.keys()):
+        if key_flux_err not in transit["data"].keys():
             key_flux = "KSPSAP_FLUX"
             key_flux_err = "KSPSAP_FLUX_ERR"
 
@@ -5914,7 +5920,7 @@ class FITSDataset(Dataset):
         flux = data_ok[key_flux]
         flux_err = data_ok[key_flux_err]
 
-        if("KSP" in key_flux):
+        if "KSP" in key_flux:
             centroid_x, centroid_y = data_ok["SAP_X"], data_ok["SAP_Y"]
             xoff = centroid_x - np.median(centroid_x)
             yoff = centroid_y - np.median(centroid_y)

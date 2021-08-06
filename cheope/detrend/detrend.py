@@ -203,6 +203,10 @@ class SingleBayes:
             logrho = um.log10(rho_star)
             star.logrho = logrho
             printlog("logrho = {}".format(logrho), olog=olog)
+        # star_args["logrho"] = star.logrho.n
+        # star_args["logrho_fit"] = True
+        # star_args["logrho_bounds"] = [-9, 6]
+        # star_args["logrho_user_data"] = star.logrho
 
         printlog("rho    = {} rho_sun".format(10 ** star.logrho), olog=olog)
 
@@ -1836,6 +1840,18 @@ class MultivisitAnalysis:
 class SingleBayesKeplerTess:
     def __init__(self, input_file):
         self.input_file = input_file
+        self.input_pars = [
+            "P",
+            "T_0",
+            "D",
+            "W",
+            "b",
+            "h_1",
+            "h_2",
+            "f_s",
+            "f_c",
+            "logrho",
+        ]
 
     def check_yaml_keyword(self, keyword, yaml_input, olog=None):
 
@@ -1952,7 +1968,11 @@ class SingleBayesKeplerTess:
                         co = 0
                     visit_args[key] = co
                 except:
-                    read_file_status.append("{} must be a positive integer. Set to 5-sigma clip by default.".format(key))
+                    read_file_status.append(
+                        "{} must be a positive integer. Set to 5-sigma clip by default.".format(
+                            key
+                        )
+                    )
 
             # -- star_args
             star_yaml = yaml_input["star"]
@@ -2113,8 +2133,17 @@ class SingleBayesKeplerTess:
             emcee_args["nsteps"] = 1024
             emcee_args["nburn"] = 0
             emcee_args["nthin"] = 1
+            emcee_args["nthreads"] = 1
             emcee_args["progress"] = True
-            for key in ["nwalkers", "nprerun", "nsteps", "nburn", "nthin", "progress"]:
+            for key in [
+                "nwalkers",
+                "nprerun",
+                "nsteps",
+                "nburn",
+                "nthin",
+                "nthreads",
+                "progress",
+            ]:
                 if key in emcee_yaml:
                     emcee_args[key] = emcee_yaml[key]
 
@@ -2230,7 +2259,9 @@ class SingleBayesKeplerTess:
                 bjdref = int(np.min(tra["data"]["TIME"]) + btjd)
                 tra["bjdref"] = bjdref
                 Tlin = bjd_lin - bjdref
-                tra["T_0"] = (Tlin - 0.5 * Wd.n, Tlin, Tlin + 0.5 * Wd.n)
+                tra["T_0"] = Tlin
+                tra["T_0_bounds"] = [Tlin - 0.5 * Wd.n, Tlin + 0.5 * Wd.n]
+                tra["T_0_user_data"] = ufloat(Tlin, 0.5 * Wd.n)
                 transits.append(tra)
             else:
                 printlog("Not enough points for lc fit.", olog=olog)
@@ -2244,11 +2275,21 @@ class SingleBayesKeplerTess:
         info,
         star,
         visit_args,
+        star_args,
         planet_args,
         emcee_args,
         epoch_folder,
         olog=None,
     ):
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                self.read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
 
         epoch_name = os.path.basename(epoch_folder)
 
@@ -2289,6 +2330,11 @@ class SingleBayesKeplerTess:
 
         T_0 = transit["T_0"]
 
+        planet_args["T_0"] = transit["T_0"]
+        planet_args["T_0_fit"] = True
+        planet_args["T_0_bounds"] = transit["T_0_bounds"]
+        planet_args["T_0_user_data"] = transit["T_0_user_data"]
+
         # # RV SEMI-AMPLITUDE IN m/s NEEDED TO USE MASSRADIUS FUNCTION
         # Kms = planet_args['Kms']
 
@@ -2306,91 +2352,122 @@ class SingleBayesKeplerTess:
         printlog("w    = {}".format(w), olog=olog)
         printlog("f_c  = {}".format(f_c), olog=olog)
         printlog("f_s  = {}".format(f_s), olog=olog)
-        printlog("T_0  = {}\n".format(T_0), olog=olog)
+        printlog("T_0  = {}\n".format(transit["T_0_user_data"]), olog=olog)
 
         # determine the out-of-transit lc for initial guess of c based on T_0 min/max
-        oot = np.logical_or(t < T_0[0], t > T_0[2])
+        oot = np.logical_or(t < transit["T_0_bounds"][0], t > transit["T_0_bounds"][1])
 
         # DEFINE HERE HOW TO USE THE PARAMETERS,
         # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
+
+        # TODO logrho seems to be broken when passing from the old way to read data to the new one
         in_par = Parameters()
-        in_par["P"] = Parameter(
-            "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["T_0"] = Parameter(
-            "T_0", value=T_0[1], vary=True, min=T_0[0], max=T_0[2], user_data=None
-        )
 
-        # I will randomize only fitting parameters...
-        in_par["D"] = Parameter(
-            "D",
-            value=np.abs(np.random.normal(loc=D.n, scale=D.s)),
-            vary=True,
-            min=0.5 * D.n,
-            max=1.5 * D.n,
-            user_data=D,
-        )
-        in_par["W"] = Parameter(
-            "W",
-            value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
-            vary=True,
-            min=0.5 * W.n,
-            max=1.5 * W.n,
-            user_data=W,
-        )
-        in_par["b"] = Parameter(
-            "b",
-            value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
-            vary=True,
-            min=0.0,
-            max=1.5,
-            user_data=b,
-        )
+        for key in self.input_pars:
+            print(key)
+            cat = category_args(key)
+            if key in ["D", "W", "b"]:
+                # Randomize here
+                val = np.abs(
+                    np.random.normal(
+                        loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                    )
+                )
+            else:
+                val = cat[key]
+            in_par[key] = Parameter(
+                key,
+                value=val,
+                vary=cat[key + "_fit"],
+                min=cat[key + "_bounds"][0],
+                max=cat[key + "_bounds"][1],
+                user_data=cat[key + "_user_data"],
+            )
 
-        if visit_args["shape"] == "fix":
-            for n in ["D", "W", "b"]:
-                in_par[n].vary = False
-            in_par["D"].value = D.n
-            in_par["W"].value = W.n
-            in_par["b"].value = b.n
+        # in_par = Parameters()
+        # in_par["P"] = Parameter(
+        #     "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        # )
+        # in_par["T_0"] = Parameter(
+        #     "T_0",
+        #     value=T_0,
+        #     vary=True,
+        #     min=planet_args["T_0_bounds"][0],
+        #     max=planet_args["T_0_bounds"][1],
+        #     user_data=None,
+        # )
 
-        in_par["h_1"] = Parameter(
-            "h_1",
-            value=star.h_1.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_1.n, 0.1),
-        )
-        in_par["h_2"] = Parameter(
-            "h_2",
-            value=star.h_2.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_2.n, 0.1),
-        )
+        # # I will randomize only fitting parameters...
+        # in_par["D"] = Parameter(
+        #     "D",
+        #     value=np.abs(np.random.normal(loc=D.n, scale=D.s)),
+        #     vary=True,
+        #     min=0.5 * D.n,
+        #     max=1.5 * D.n,
+        #     user_data=D,
+        # )
+        # in_par["W"] = Parameter(
+        #     "W",
+        #     value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
+        #     vary=True,
+        #     min=0.5 * W.n,
+        #     max=1.5 * W.n,
+        #     user_data=W,
+        # )
+        # in_par["b"] = Parameter(
+        #     "b",
+        #     value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
+        #     vary=True,
+        #     min=0.0,
+        #     max=1.5,
+        #     user_data=b,
+        # )
 
+        # if visit_args["shape"] == "fix":
+        #     for n in ["D", "W", "b"]:
+        #         in_par[n].vary = False
+        #     in_par["D"].value = D.n
+        #     in_par["W"].value = W.n
+        #     in_par["b"].value = b.n
 
-        in_par["f_s"] = Parameter(
-            "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["f_c"] = Parameter(
-            "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
+        # in_par["h_1"] = Parameter(
+        #     "h_1",
+        #     value=star.h_1.n,
+        #     vary=True,
+        #     min=0.0,
+        #     max=1.0,
+        #     user_data=ufloat(star.h_1.n, 0.1),
+        # )
+        # in_par["h_2"] = Parameter(
+        #     "h_2",
+        #     value=star.h_2.n,
+        #     vary=True,
+        #     min=0.0,
+        #     max=1.0,
+        #     user_data=ufloat(star.h_2.n, 0.1),
+        # )
 
-        in_par["logrho"] = Parameter(
-            "logrho",
-            value=star.logrho.n,
-            vary=True,
-            min=-9,
-            max=6,
-            user_data=star.logrho,
-        )
+        # in_par["f_s"] = Parameter(
+        #     "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        # )
+        # in_par["f_c"] = Parameter(
+        #     "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
+        # )
+
+        # # logrho calculated separately
+        # in_par["logrho"] = Parameter(
+        #     "logrho",
+        #     value=star.logrho.n,
+        #     vary=True,
+        #     min=-9,
+        #     max=6,
+        #     user_data=star.logrho,
+        # )
+
+        # c calculated separately
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
-        
 
         ### *** 1) FIT TRANSIT MODEL ONLY WITH LMFIT
         det_par = {
@@ -2413,7 +2490,7 @@ class SingleBayesKeplerTess:
             "glint_scale": None,
         }
 
-        t_exp_s = info["EXP_TIME"]*cst.day2sec
+        t_exp_s = info["EXP_TIME"] * cst.day2sec
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
@@ -2447,7 +2524,7 @@ class SingleBayesKeplerTess:
             dfdcos3phi=det_par["dfdcos3phi"],
             ramp=det_par["ramp"],
             glint_scale=det_par["glint_scale"],
-            t_exp_s=t_exp_s
+            t_exp_s=t_exp_s,
         )
 
         lmfit0_rep = dataset.lmfit_report(min_correl=0.5)
@@ -2470,34 +2547,28 @@ class SingleBayesKeplerTess:
         # input params plot
 
         k = "t_exp"
-        in_par[k] = Parameter(k, 
-            value=lmfit0.params[k].value, 
-            vary=False
-        )
+        in_par[k] = Parameter(k, value=lmfit0.params[k].value, vary=False)
         k = "n_over"
-        in_par[k] = Parameter(k, 
-            value=lmfit0.params[k].value, 
-            vary=False
-        )
+        in_par[k] = Parameter(k, value=lmfit0.params[k].value, vary=False)
 
         fig, _ = pyca.model_plot_fit(
             dataset,
             in_par,
-            par_type='input',
+            par_type="input",
             nsamples=0,
             flatchains=None,
-            model_filename=os.path.join(epoch_folder, '00_lc_0_input.dat')
+            model_filename=os.path.join(epoch_folder, "00_lc_0_input.dat"),
         )
         for ext in fig_ext:
             fig.savefig(
-                os.path.join(epoch_folder, '00_lc_0_input.{}'.format(ext)),
-                bbox_inches='tight'
+                os.path.join(epoch_folder, "00_lc_0_input.{}".format(ext)),
+                bbox_inches="tight",
             )
         plt.close(fig)
         pyca.quick_save_params(
             os.path.join(epoch_folder, "00_params_0_input.dat"),
             in_par,
-            dataset.lc["bjd_ref"]
+            dataset.lc["bjd_ref"],
         )
 
         # best-fit plot
@@ -2587,7 +2658,7 @@ class SingleBayesKeplerTess:
                 dfdcos3phi=det_par["dfdcos3phi"],
                 ramp=det_par["ramp"],
                 glint_scale=det_par["glint_scale"],
-                t_exp_s=info["EXP_TIME"]*cst.day2sec
+                t_exp_s=info["EXP_TIME"] * cst.day2sec,
             )
             printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
             printlog("", olog=olog)
@@ -2693,6 +2764,7 @@ class SingleBayesKeplerTess:
         nsteps = emcee_args["nsteps"]
         nburn = emcee_args["nburn"]
         nthin = emcee_args["nthin"]
+        nthreads = emcee_args["nthreads"]
         progress = emcee_args["progress"]
 
         # Run emcee from last best fit
@@ -2702,6 +2774,7 @@ class SingleBayesKeplerTess:
         printlog(" nsteps   = {}".format(nsteps), olog=olog)
         printlog(" nburn    = {}".format(nburn), olog=olog)
         printlog(" nthin    = {}".format(nthin), olog=olog)
+        printlog("nthreads  = {}".format(nthreads), olog=olog)
         printlog("", olog=olog)
 
         # EMCEE-------------------------------------------------------------
@@ -3089,14 +3162,23 @@ class SingleBayesKeplerTess:
         # ======================================================================
         # CONFIGURATION
         # ======================================================================
+        inpars = ReadFile(self.input_file)
 
-        (
-            visit_args,
-            star_args,
-            planet_args,
-            emcee_args,
-            read_file_status,
-        ) = self.read_file()
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
+
+        # (
+        #     visit_args,
+        #     star_args,
+        #     planet_args,
+        #     emcee_args,
+        #     read_file_status,
+        # ) = self.read_file()
 
         # seed = 42
         seed = visit_args["seed"]
@@ -3104,11 +3186,10 @@ class SingleBayesKeplerTess:
 
         passband = visit_args["passband"]
         aperture = visit_args["aperture"]
-        shape    = visit_args["shape"]
+        shape = visit_args["shape"]
         file_fits = visit_args["file_fits"]
-        file_name = os.path.basename(file_fits).replace(".fits", "_{}_{}".format(
-            aperture, shape
-            )
+        file_name = os.path.basename(file_fits).replace(
+            ".fits", "_{}_{}".format(aperture, shape)
         )
 
         logs_folder = os.path.join(visit_args["main_folder"], "logs")
@@ -3179,6 +3260,12 @@ class SingleBayesKeplerTess:
 
         printlog("STAR INFORMATION", olog=olog)
         printlog(star, olog=olog)
+
+        star_args["logrho"] = star.logrho.n
+        star_args["logrho_fit"] = True
+        star_args["logrho_bounds"] = [-9, 6]
+        star_args["logrho_user_data"] = star.logrho
+
         if star.logrho is None:
             printlog("logrho not available from sweetcat...computed:", olog=olog)
             rho_star = Mstar / (Rstar ** 3)
@@ -3240,6 +3327,7 @@ class SingleBayesKeplerTess:
                 fits_info,
                 star,
                 visit_args,
+                star_args,
                 planet_args,
                 emcee_args,
                 epoch_folder,

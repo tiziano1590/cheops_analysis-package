@@ -56,6 +56,19 @@ class ReadFile:
         if os.path.exists(input_file) and os.path.isfile(input_file):
             with open(input_file) as in_f:
                 self.yaml_input = yaml.load(in_f, Loader=yaml.FullLoader)
+
+            # merge list keys with a unique set of values
+            self.visit_keys = list(set(self.visit_keys + list(self.yaml_input.keys())))
+            self.star_keys = list(
+                set(self.star_keys + list(self.yaml_input["star"].keys()))
+            )
+            self.planet_keys = list(
+                set(self.planet_keys + list(self.yaml_input["planet"].keys()))
+            )
+            self.emcee_keys = list(
+                set(self.emcee_keys + list(self.yaml_input["emcee"].keys()))
+            )
+
         else:
             self.read_file_status.append(f"NOT VALID INPUT FILE:\n{input_file}")
 
@@ -184,6 +197,19 @@ class ReadFile:
         self.visit_args["glint_type"] = self.visit_args["glint_type"].strip().lower()
         if not self.visit_args["glint_type"] in glints:
             self.visit_args["glint_type"] = False
+
+        # clip_outliers
+        self.visit_args["clip_outliers"] = 5
+
+        try:
+            co = round(self.yaml_input["clip_outliers"])
+            if co < 1:
+                co = 0
+            self.visit_args["clip_outliers"] = co
+        except:
+            self.read_file_status.append(
+                "clip_outliers must be a positive integer. Set to 5-sigma clip by default."
+            )
 
     def apply_star_conditions(self):
 
@@ -348,6 +374,6 @@ class ReadFile:
             "glint_type",
             "clipping",
         ]:
-            return f"ERROR: keyword {keyword} not in input file. Set to None."
+            return f"keyword {keyword} not in input file. Set to None."
         else:
             return ""
