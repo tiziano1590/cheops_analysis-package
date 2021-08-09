@@ -77,7 +77,7 @@ class ReadFile:
         for key in self.star_keys:
             inval = self.yaml_input["star"].get(key)  # get the input value
 
-            if isinstance(inval, str):
+            if (inval is None) or isinstance(inval, str):
                 self.star_args[key] = inval
             elif isinstance(inval, list):
                 self.star_args[key] = ufloat(inval[0], inval[1])
@@ -107,7 +107,7 @@ class ReadFile:
 
         for key in self.planet_keys:
             inval = self.yaml_input["planet"].get(key)  # get the input value
-            if isinstance(inval, str):
+            if (inval is None) or isinstance(inval, str):
                 self.planet_args[key] = inval
             elif isinstance(inval, list):
                 self.planet_args[key] = ufloat(inval[0], inval[1])
@@ -197,8 +197,8 @@ class ReadFile:
         )
 
         if (
-            self.yaml_input["star"].get("h_1") == None
-            or self.yaml_input["star"].get("h_2") == None
+            self.yaml_input["star"].get("h_1") is None
+            or self.yaml_input["star"].get("h_2") is None
         ):
             self.star_args["h_1"] = star.h_1.n
             self.star_args["h_2"] = star.h_2.n
@@ -209,7 +209,7 @@ class ReadFile:
             self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 10 * star.h_1.s)
             self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 10 * star.h_2.s)
 
-        if self.yaml_input["star"].get("logrho") == None:
+        if self.yaml_input["star"].get("logrho") is None:
             self.star_args["logrho"] = star.logrho.n
             self.star_args["logrho_fit"] = True
             self.star_args["logrho_bounds"] = [-9, 6]
@@ -344,9 +344,11 @@ class ReadFile:
             )
 
     def err_msg(self, keyword, dictionary):
-        if dictionary.get(keyword) == None and keyword not in [
+        if dictionary.get(keyword) is None and keyword not in [
             "glint_type",
             "clipping",
+            "h_1", "h_2", # case: h_1/2 not as input, but guessed from StarProperties
+            "D" # case: using k=Rp/Rs instead of D, is not here the code returns error
         ]:
             return f"ERROR: keyword {keyword} not in input file. Set to None."
         else:
