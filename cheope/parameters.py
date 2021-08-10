@@ -348,7 +348,8 @@ class ReadFile:
             "glint_type",
             "clipping",
             "h_1", "h_2", # case: h_1/2 not as input, but guessed from StarProperties
-            "D" # case: using k=Rp/Rs instead of D, is not here the code returns error
+            "D", # case: using k=Rp/Rs instead of D, is not here the code returns error
+            "inc" #another case...needed to rethink err_msg
         ]:
             return f"ERROR: keyword {keyword} not in input file. Set to None."
         else:
