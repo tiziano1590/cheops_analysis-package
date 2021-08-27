@@ -1853,306 +1853,6 @@ class SingleBayesKeplerTess:
             "logrho",
         ]
 
-    def check_yaml_keyword(self, keyword, yaml_input, olog=None):
-
-        l = ""
-        if keyword not in yaml_input:
-            l = "ERROR: needed keyword {} not in input file".format(keyword)
-
-        return l
-
-    # ======================================================================
-    def read_file(self):
-
-        yaml_file_in = self.input_file
-        read_file_status = []
-
-        visit_args = {}
-        star_args = {}
-        planet_args = {}
-        emcee_args = {}
-
-        if os.path.exists(yaml_file_in) and os.path.isfile(yaml_file_in):
-            with open(yaml_file_in) as in_f:
-                yaml_input = yaml.load(in_f, Loader=yaml.FullLoader)
-
-            # -- visit_args
-            key = "main_folder"
-            ck = self.check_yaml_keyword(key, yaml_input)
-            if "ERROR" in ck:
-                visit_args[key] = None
-                sys.exit(ck)
-            else:
-                visit_args[key] = os.path.abspath(yaml_input[key])
-            read_file_status.append(ck)
-
-            # fake
-            key = "visit_number"
-            visit_args[key] = None
-
-            # fake
-            key = "file_key"
-            visit_args[key] = None
-
-            key = "file_fits"
-            ck = self.check_yaml_keyword(key, yaml_input)
-            if "ERROR" in ck:
-                visit_args[key] = None
-            else:
-                visit_args[key] = os.path.abspath(yaml_input[key].strip())
-            read_file_status.append(ck)
-
-            key = "passband"
-            ck = self.check_yaml_keyword(key, yaml_input)
-            if "ERROR" in ck:
-                visit_args[key] = None
-            else:
-                pb = yaml_input[key].lower()
-                filter = ["kepler", "tess"]
-                check_kepler = pb in [
-                    filter[0][:ik] for ik in range(1, len(filter[0]) + 1)
-                ]
-                check_tess = pb in [
-                    filter[1][:ik] for ik in range(1, len(filter[1]) + 1)
-                ]
-                if check_tess:
-                    visit_args[key] = "TESS"
-                elif check_kepler:
-                    visit_args[key] = "Kepler"
-                else:
-                    visit_args[key] = None
-                    read_file_status.append(
-                        "ERROR: missing passband. Provide TESS or Kepler"
-                    )
-
-            # fake
-            key = "aperture"
-            visit_args[key] = "sap"
-            if key in yaml_input:
-                tmp = str(yaml_input[key]).lower()
-                if tmp in ["sap", "pdc"]:
-                    visit_args[key] = tmp
-                else:
-                    visit_args[key] = None
-                    read_file_status.append("ERROR: wrong aperture. Provide SAP or PDC")
-
-            key = "shape"
-            visit_args[key] = "fit"
-            if key in yaml_input:
-                tmp = yaml_input[key].strip().lower()
-                if tmp in ["fit", "fix"]:
-                    visit_args[key] = tmp
-                else:
-                    read_file_status.append("{} set to default: fit".format(key))
-
-            key = "seed"
-            visit_args[key] = 42
-            if key in yaml_input:
-                tmp = yaml_input[key]
-                try:
-                    visit_args[key] = int(tmp)
-                except:
-                    read_file_status.append("{} must be a positive integer".format(key))
-
-            key = "single_duration_hour"
-            visit_args[key] = None
-            if key in yaml_input:
-                visit_args[key] = yaml_input[key]
-
-            key = "clip_outliers"
-            visit_args[key] = 5
-            if key in yaml_input:
-                try:
-                    co = round(yaml_input[key])
-                    if co < 1:
-                        co = 0
-                    visit_args[key] = co
-                except:
-                    read_file_status.append(
-                        "{} must be a positive integer. Set to 5-sigma clip by default.".format(
-                            key
-                        )
-                    )
-
-            # -- star_args
-            star_yaml = yaml_input["star"]
-
-            key = "star_name"
-            ck = self.check_yaml_keyword(key, star_yaml)
-            if "ERROR" in ck:
-                star_args[key] = None
-            else:
-                star_args[key] = star_yaml[key]
-            read_file_status.append(ck)
-
-            key = "Rstar"
-            ck = self.check_yaml_keyword(key, star_yaml)
-            if "ERROR" in ck:
-                star_args[key] = None
-            else:
-                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
-            read_file_status.append(ck)
-
-            key = "Mstar"
-            ck = self.check_yaml_keyword(key, star_yaml)
-            if "ERROR" in ck:
-                star_args[key] = None
-            else:
-                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
-            read_file_status.append(ck)
-
-            key = "teff"
-            star_args[key] = None
-            if key in star_yaml:
-                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
-
-            key = "logg"
-            star_args[key] = None
-            if key in star_yaml:
-                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
-
-            key = "feh"
-            star_args[key] = None
-            if key in star_yaml:
-                star_args[key] = ufloat(star_yaml[key][0], star_yaml[key][1])
-
-            # -- planet_args
-            planet_yaml = yaml_input["planet"]
-
-            key = "T_ref"
-            ck = self.check_yaml_keyword(key, planet_yaml)
-            if "ERROR" in ck:
-                planet_args[key] = None
-            else:
-                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
-            read_file_status.append(ck)
-
-            key = "P"
-            ck = self.check_yaml_keyword(key, planet_yaml)
-            if "ERROR" in ck:
-                planet_args[key] = None
-            else:
-                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
-            read_file_status.append(ck)
-
-            if "D" in planet_yaml:
-                D = ufloat(planet_yaml["D"][0], planet_yaml["D"][1])
-                k = um.sqrt(D)
-            elif "k" in planet_yaml:
-                k = ufloat(planet_yaml["k"][0], planet_yaml["k"][1])
-                D = k ** 2
-            elif "Rp" in planet_yaml:
-                Rp = ufloat(planet_yaml["Rp"][0], planet_yaml["Rp"][1]) * cst.Rears
-                k = Rp / star_args["Rstar"]
-                D = k ** 2
-            else:
-                read_file_status.append(
-                    "ERROR: missing needed planet keyword: D or k or Rp (Rearth)"
-                )
-                # sys.exit()
-            planet_args["D"] = D
-            planet_args["k"] = k
-
-            if "inc" in planet_yaml and "aRs" in planet_yaml and "b" in planet_yaml:
-                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
-                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
-                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
-            elif "inc" in planet_yaml and "aRs" in planet_yaml:
-                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
-                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
-                b = aRs * um.cos(inc * cst.deg2rad)
-            elif "b" in planet_yaml and "aRs" in planet_yaml:
-                aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
-                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
-                inc = um.acos(b / aRs) * cst.rad2deg
-            elif "b" in planet_yaml and "inc" in planet_yaml:
-                b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
-                inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
-                aRs = b / um.cos(inc * cst.deg2rad)
-            else:
-                read_file_status.append(
-                    "ERROR: missing needed one of these pairs/combinations: (inc, aRs) or (b, aRs) or (b, inc) or (inc, aRs, b)"
-                )
-                inc, aRs, b = 90.0, 1.0, 0.0
-                # sys.exit()
-            planet_args["inc"] = inc
-            planet_args["aRs"] = aRs
-            planet_args["b"] = b
-
-            if "T14" in planet_yaml:
-                if planet_args["P"] is None:
-                    W = None
-                else:
-                    W = (
-                        ufloat(planet_yaml["T14"][0], planet_yaml["T14"][1])
-                        / planet_args["P"]
-                    )
-            else:
-                W = um.sqrt((1 + k) ** 2 - b ** 2) / np.pi / aRs
-            planet_args["W"] = W
-
-            ecc = ufloat(0.0, 0.0)
-            if "ecc" in planet_yaml:
-                # print('planet_yaml["ecc"]', planet_yaml['ecc'])
-                if str(planet_yaml["ecc"]).lower() != "none":
-                    try:
-                        ecc = ufloat(planet_yaml["ecc"][0], planet_yaml["ecc"][1])
-                    except:
-                        read_file_status.append("wrong ecc format: setting to 0+/-0")
-                        ecc = ufloat(0.0, 0.0)
-            se = um.sqrt(ecc)
-            w = ufloat(90.0, 0.0)
-            if "w" in planet_yaml:
-                # print('planet_yaml["w"]', planet_yaml['w'])
-                if str(planet_yaml["w"]).lower() != "none":
-                    try:
-                        w = ufloat(planet_yaml["w"][0], planet_yaml["w"][1])
-                    except:
-                        read_file_status.append("wrong w format: setting to 90+/-0 deg")
-                        w = ufloat(90.0, 0.0)
-            w_r = w * cst.deg2rad
-            f_c = se * um.cos(w_r)
-            f_s = se * um.sin(w_r)
-            planet_args["ecc"] = ecc
-            planet_args["w"] = w
-            planet_args["f_c"] = f_c
-            planet_args["f_s"] = f_s
-
-            key = "Kms"
-            ck = self.check_yaml_keyword(key, planet_yaml)
-            if "ERROR" in ck:
-                planet_args[key] = None
-            else:
-                planet_args[key] = ufloat(planet_yaml[key][0], planet_yaml[key][1])
-            read_file_status.append(ck)
-
-            # -- emcee_args
-            emcee_yaml = yaml_input["emcee"]
-            emcee_args["nwalkers"] = 256
-            emcee_args["nprerun"] = 512
-            emcee_args["nsteps"] = 1024
-            emcee_args["nburn"] = 0
-            emcee_args["nthin"] = 1
-            emcee_args["nthreads"] = 1
-            emcee_args["progress"] = True
-            for key in [
-                "nwalkers",
-                "nprerun",
-                "nsteps",
-                "nburn",
-                "nthin",
-                "nthreads",
-                "progress",
-            ]:
-                if key in emcee_yaml:
-                    emcee_args[key] = emcee_yaml[key]
-
-        else:
-            read_file_status.append("NOT VALID INPUT FILE:\n{}".format(yaml_file_in))
-            # sys.exit()
-
-        return visit_args, star_args, planet_args, emcee_args, read_file_status
-
     # =============================================================================
 
     def load_fits_file(self, file_fits, olog=None):
@@ -2199,7 +1899,7 @@ class SingleBayesKeplerTess:
     def get_transit_epochs(self, data, info, visit_args, planet_args, olog=None):
 
         T_ref = planet_args["T_ref"]
-        P = planet_args["P"]
+        P = planet_args["P_user_data"]
         Wd = planet_args["W"] * P
         vdurh = visit_args["single_duration_hour"]
         if vdurh is None:
@@ -2423,12 +2123,12 @@ class SingleBayesKeplerTess:
         #     user_data=b,
         # )
 
-        # if visit_args["shape"] == "fix":
-        #     for n in ["D", "W", "b"]:
-        #         in_par[n].vary = False
-        #     in_par["D"].value = D.n
-        #     in_par["W"].value = W.n
-        #     in_par["b"].value = b.n
+        if visit_args["shape"] == "fix":
+            for n in ["D", "W", "b"]:
+                in_par[n].vary = False
+            in_par["D"].value = D.n
+            in_par["W"].value = W.n
+            in_par["b"].value = b.n
 
         # in_par["h_1"] = Parameter(
         #     "h_1",
@@ -2774,7 +2474,7 @@ class SingleBayesKeplerTess:
         printlog(" nsteps   = {}".format(nsteps), olog=olog)
         printlog(" nburn    = {}".format(nburn), olog=olog)
         printlog(" nthin    = {}".format(nthin), olog=olog)
-        printlog("nthreads  = {}".format(nthreads), olog=olog)
+        printlog(" nthreads = {}".format(nthreads), olog=olog)
         printlog("", olog=olog)
 
         # EMCEE-------------------------------------------------------------

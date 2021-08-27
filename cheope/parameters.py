@@ -354,6 +354,8 @@ class ReadFile:
 
         self.planet_args["T_0_user_data"] = None
 
+        self.planet_args["P"] = self.planet_args["P"].n
+
         if self.visit_args["shape"] == "fix":
             self.planet_args["D_fit"] = False
             self.planet_args["W_fit"] = False
@@ -373,8 +375,9 @@ class ReadFile:
         if dictionary.get(keyword) is None and keyword not in [
             "glint_type",
             "clipping",
-            "h_1", "h_2", # case: h_1/2 not as input, but guessed from StarProperties
-            "D" # case: using k=Rp/Rs instead of D, is not here the code returns error
+            "h_1",
+            "h_2",  # case: h_1/2 not as input, but guessed from StarProperties
+            "D",  # case: using k=Rp/Rs instead of D, is not here the code returns error
         ]:
             return f"keyword {keyword} not in input file. Set to None."
         else:
