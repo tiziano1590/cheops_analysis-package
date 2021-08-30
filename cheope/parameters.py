@@ -354,7 +354,8 @@ class ReadFile:
 
         self.planet_args["T_0_user_data"] = None
 
-        self.planet_args["P"] = self.planet_args["P"].n
+        if type(self.planet_args["P"]) is not float:
+            self.planet_args["P"] = self.planet_args["P"].n
 
         if self.visit_args["shape"] == "fix":
             self.planet_args["D_fit"] = False
