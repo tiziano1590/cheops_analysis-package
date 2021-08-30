@@ -11,13 +11,14 @@ import cheope.pyconstants as cst
 
 
 class ReadFile:
-    def __init__(self, input_file):
+    def __init__(self, input_file, multivisit=False):
         self.visit_args = {}
         self.star_args = {}
         self.planet_args = {}
         self.emcee_args = {}
         self.read_file_status = []
         self.yaml_input = {}
+        self.multivisit = multivisit
 
         self.visit_keys = [
             "main_folder",
@@ -28,10 +29,14 @@ class ReadFile:
             "seed",
             "glint_type",
             "clipping",
+            "unroll",
+            "nroll",
+            "GP",
         ]
 
         self.star_keys = [
             "star_name",
+            "dace",
             "Rstar",
             "Mstar",
             "teff",
@@ -90,7 +95,7 @@ class ReadFile:
         for key in self.star_keys:
             inval = self.yaml_input["star"].get(key)  # get the input value
 
-            if (inval is None) or isinstance(inval, str):
+            if (inval is None) or isinstance(inval, str) or isinstance(inval, bool):
                 self.star_args[key] = inval
             elif isinstance(inval, list):
                 self.star_args[key] = ufloat(inval[0], inval[1])
@@ -144,7 +149,8 @@ class ReadFile:
 
             self.read_file_status.append(self.err_msg(key, self.yaml_input["planet"]))
 
-        self.apply_planet_conditions()
+        if not self.multivisit:
+            self.apply_planet_conditions()
 
     def emcee_pars(self):
 

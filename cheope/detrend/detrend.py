@@ -1239,13 +1239,23 @@ class MultivisitAnalysis:
         # CONFIGURATION
         # ======================================================================
 
-        (
-            visit_args,
-            star_args,
-            planet_args,
-            emcee_args,
-            read_file_status,
-        ) = self.read_file()
+        inpars = ReadFile(self.input_file, multivisit=True)
+
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
+
+        # (
+        #     visit_args,
+        #     star_args,
+        #     planet_args,
+        #     emcee_args,
+        #     read_file_status,
+        # ) = self.read_file()
 
         # seed = 42
         seed = visit_args["seed"]
