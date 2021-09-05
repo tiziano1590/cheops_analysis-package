@@ -46,7 +46,7 @@ class ReadFile:
             "h_2",
         ]
 
-        self.planet_keys = ["P", "D", "inc", "aRs", "ecc", "w", "T_0", "Kms"]
+        self.planet_keys = ["P", "D", "inc", "aRs", "ecc", "w", "T_0", "Kms", "W", "b"]
 
         self.emcee_keys = [
             "nwalkers",
@@ -127,9 +127,10 @@ class ReadFile:
             inval = self.yaml_input["planet"].get(key)  # get the input value
             if (inval is None) or isinstance(inval, str):
                 self.planet_args[key] = inval
+                self.planet_args[key + "_fit"] = True
             elif isinstance(inval, list):
                 self.planet_args[key] = ufloat(inval[0], inval[1])
-                self.planet_args[key + "_fit"] = False
+                self.planet_args[key + "_fit"] = True
                 self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
                 self.planet_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):

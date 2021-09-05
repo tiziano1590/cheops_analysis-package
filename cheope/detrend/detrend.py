@@ -1058,6 +1058,16 @@ class MultivisitAnalysis:
             inpars.read_file_status,
         )
 
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
+
         seed = visit_args["seed"]
         np.random.seed(seed)
 
@@ -1150,8 +1160,14 @@ class MultivisitAnalysis:
                     pxuser = px.user_data
             par = np.array(par)
             par_mean = np.mean(par)
+            cat = category_args(p)
             new_params[p] = Parameter(
-                p, value=par_mean, vary=True, min=pxmin, max=pxmax, user_data=pxuser
+                p,
+                value=par_mean,
+                vary=cat[p + "_fit"],
+                min=pxmin,
+                max=pxmax,
+                user_data=pxuser,
             )
             printlog(
                 "{:15s} ==> {:.6f} bounds = ( {:.6f} , {:.6f}) priors = {:.6f} vary: {}".format(
@@ -1791,13 +1807,15 @@ class SingleBayesKeplerTess:
         epoch_folder,
         olog=None,
     ):
+        read_file_status = []
+
         def category_args(par):
             if par in star_args.keys():
                 return star_args
             elif par in planet_args.keys():
                 return planet_args
             else:
-                self.read_file_status.append(
+                read_file_status.append(
                     f"ERROR: {par} is not defined in neither the star or planet arguments"
                 )
 
