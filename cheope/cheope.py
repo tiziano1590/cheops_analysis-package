@@ -20,6 +20,7 @@ def main():
         SingleCheck,
         MultivisitAnalysis,
     )
+    from cheope.taste import TasteLC
 
     parser = argparse.ArgumentParser(description="Cheope")
 
@@ -70,6 +71,14 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--taste",
+        dest="taste",
+        default=False,
+        help="It fits a lightcurve from the TASTE telescope",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -89,6 +98,10 @@ def main():
     if args.multivisit:
         multi = MultivisitAnalysis(args.input_file)
         multi.run()
+
+    if args.taste:
+        taste = TasteLC(args.input_file)
+        taste.fitLC()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 

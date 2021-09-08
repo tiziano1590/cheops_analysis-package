@@ -77,6 +77,10 @@ class ReadFile:
         else:
             self.read_file_status.append(f"NOT VALID INPUT FILE:\n{input_file}")
 
+        self.planet_keys += list(self.yaml_input["planet"].keys())
+        self.star_keys += list(self.yaml_input["star"].keys())
+        self.emcee_keys += list(self.yaml_input["emcee"].keys())
+
         self.visit_pars()
         self.star_pars()
         self.planet_pars()
@@ -97,6 +101,8 @@ class ReadFile:
 
             if (inval is None) or isinstance(inval, str) or isinstance(inval, bool):
                 self.star_args[key] = inval
+            elif isinstance(inval, float) or isinstance(inval, int):
+                self.planet_args[key] = inval
             elif isinstance(inval, list):
                 self.star_args[key] = ufloat(inval[0], inval[1])
                 self.star_args[key + "_fit"] = False
@@ -128,6 +134,8 @@ class ReadFile:
             if (inval is None) or isinstance(inval, str):
                 self.planet_args[key] = inval
                 self.planet_args[key + "_fit"] = True
+            elif isinstance(inval, float) or isinstance(inval, int):
+                self.planet_args[key] = inval
             elif isinstance(inval, list):
                 self.planet_args[key] = ufloat(inval[0], inval[1])
                 self.planet_args[key + "_fit"] = True
