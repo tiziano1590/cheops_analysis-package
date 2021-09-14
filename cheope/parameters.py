@@ -239,8 +239,10 @@ class ReadFile:
             self.star_args["h_2_fit"] = True
             self.star_args["h_1_bounds"] = [0, 1]
             self.star_args["h_2_bounds"] = [0, 1]
-            self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 10 * star.h_1.s)
-            self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 10 * star.h_2.s)
+            # self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 10 * star.h_1.s)
+            # self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 10 * star.h_2.s)
+            self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 0.1)
+            self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 0.1)
 
         if self.yaml_input["star"].get("logrho") is None:
             self.star_args["logrho"] = star.logrho.n
