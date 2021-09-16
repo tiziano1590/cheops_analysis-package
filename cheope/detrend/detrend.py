@@ -1127,17 +1127,17 @@ class MultivisitAnalysis:
         # default in pycheops MultiVisit
         # T_0   = ufloat(M.tzero(T_ref, P_ref), T_ref.s)  # Time of mid-transit closest to middle of datasets
         # LBo: using input ephemeris
-        # T_0 = T_ref - 2457000
+        # T_0 = T_ref - cst.btjd
         # LBo: pycheops-like but propagating error on linear ephemeris
         t_mid = np.median([np.median(d.lc["time"]) for d in M.datasets])
-        epo = np.rint((t_mid + 2457000 - T_ref.n) / P_ref.n)
-        T_0 = T_ref + epo * P_ref - 2457000
+        epo = np.rint((t_mid + cst.btjd - T_ref.n) / P_ref.n)
+        T_0 = T_ref + epo * P_ref - cst.btjd
         printlog(
             "median times: {}".format([np.median(d.lc["time"]) for d in M.datasets]),
             olog=olog,
         )
         printlog("t_mid = {} => epo = {}".format(t_mid, epo), olog=olog)
-        printlog("T_ref = {:.5f} ({:.5f})".format(T_ref, T_ref.n - 2457000), olog=olog)
+        printlog("T_ref = {:.5f} ({:.5f})".format(T_ref, T_ref.n - cst.btjd), olog=olog)
         printlog("P_ref = {:.5f}".format(P_ref), olog=olog)
         printlog("T_0   = {:.5f}".format(T_0), olog=olog)
         printlog("", olog=olog)
@@ -1297,8 +1297,8 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_lin.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        # pyca.quick_save_params(os.path.join(main_folder, "params_med_lin.dat"), par_med, T_ref.nominal_value)
-        # pyca.quick_save_params(os.path.join(main_folder, "params_mle_lin.dat"), par_mle, T_ref.nominal_value)
+        pyca.quick_save_params(os.path.join(main_folder, "params_med_lin.dat"), par_med, bjd_ref=cst.btjd)
+        pyca.quick_save_params(os.path.join(main_folder, "params_mle_lin.dat"), par_mle, bjd_ref=cst.btjd)
 
         # bin30m_ph = bin30m/result_lin.params['P'].value
         bin30m_ph = False
@@ -1429,8 +1429,8 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_fit.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        # pyca.quick_save_params(os.path.join(main_folder, "params_med_fit.dat"), par_med)
-        # pyca.quick_save_params(os.path.join(main_folder, "params_mle_fit.dat"), par_mle)
+        pyca.quick_save_params(os.path.join(main_folder, "params_med_fit.dat"), par_med, bjd_ref=cst.btjd)
+        pyca.quick_save_params(os.path.join(main_folder, "params_mle_fit.dat"), par_mle, bjd_ref=cst.btjd)
 
         printlog("LC no-detrend plot", olog=olog)
         fig = M.plot_fit(
@@ -1510,7 +1510,7 @@ class MultivisitAnalysis:
             printlog("massradius error: to be investigated", olog=olog)
         sys.stdout.flush()
 
-        bjdc = 2457000
+        bjdc = cst.btjd
         printlog("\nTTV SUMMARY", olog=olog)
         # extract single visit T_0
         printlog("Input linear ephem: {} + N x {}".format(T_ref, P_ref), olog=olog)
@@ -1689,15 +1689,15 @@ class SingleBayesKeplerTess:
         # load fits file and extract needed data and header keywords
         with fits.open(file_fits) as hdul:
             hdul.info()
-            btjd = hdul[1].header["BJDREFI"]
+            cst.btjd = hdul[1].header["BJDREFI"]
             data_raw = hdul[1].data
             exp_time = hdul[1].header["TIMEDEL"]
 
-        info["BTJD"] = btjd
+        info["cst.btjd"] = cst.btjd
         info["EXP_TIME"] = exp_time
 
         printlog(
-            "Time ref. = {} and exposure time {} in days.".format(btjd, exp_time),
+            "Time ref. = {} and exposure time {} in days.".format(cst.btjd, exp_time),
             olog=olog,
         )
         nraw = np.shape(data_raw)
@@ -1734,17 +1734,17 @@ class SingleBayesKeplerTess:
         hdur = 0.5 * vdur
         vdur_co = vdur * cst.day2min / CHEOPS_ORBIT_MINUTES
 
-        btjd = info["BTJD"]
+        cst.btjd = info["cst.btjd"]
 
         printlog("Computing feasible epochs", olog=olog)
-        t = data["TIME"] + btjd
+        t = data["TIME"] + cst.btjd
         emin = np.rint((np.min(t) - T_ref.n) / P.n)
         x = T_ref.n + P.n * emin
         if x < np.min(t):
             emin += 1
         emax = np.rint((np.max(t) - T_ref.n) / P.n)
         x = T_ref.n + P.n * emax
-        if x < np.max(t):
+        if x > np.max(t):
             emax -= 1
         printlog("epoch min = {} max = {}".format(emin, emax), olog=olog)
         epochs = np.arange(emin, emax + 1, 1)
@@ -1774,7 +1774,7 @@ class SingleBayesKeplerTess:
 
             sel = np.logical_and(t >= bjd_lin - hdur, t < bjd_lin + hdur)
             nsel = np.sum(sel)
-            wsel = np.logical_and(t >= bjd_lin - Wd.n * 0.5, t > bjd_lin + Wd.n * 0.5)
+            wsel = np.logical_and(t >= bjd_lin - Wd.n * 0.5, t < bjd_lin + Wd.n * 0.5)
             nwsel = np.sum(wsel)
             if nsel > 0 and nwsel > 3:
                 tra = {}
@@ -1782,7 +1782,7 @@ class SingleBayesKeplerTess:
                 tra["data"] = {}
                 for k, v in data.items():
                     tra["data"][k] = v[sel]
-                bjdref = int(np.min(tra["data"]["TIME"]) + btjd)
+                bjdref = int(np.min(tra["data"]["TIME"]) + cst.btjd)
                 tra["bjdref"] = bjdref
                 Tlin = bjd_lin - bjdref
                 tra["T_0"] = Tlin
