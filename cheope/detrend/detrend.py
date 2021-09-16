@@ -1689,15 +1689,15 @@ class SingleBayesKeplerTess:
         # load fits file and extract needed data and header keywords
         with fits.open(file_fits) as hdul:
             hdul.info()
-            cst.btjd = hdul[1].header["BJDREFI"]
+            btjd = hdul[1].header["BJDREFI"]
             data_raw = hdul[1].data
             exp_time = hdul[1].header["TIMEDEL"]
 
-        info["cst.btjd"] = cst.btjd
+        info["BTJD"] = btjd
         info["EXP_TIME"] = exp_time
 
         printlog(
-            "Time ref. = {} and exposure time {} in days.".format(cst.btjd, exp_time),
+            "Time ref. = {} and exposure time {} in days.".format(btjd, exp_time),
             olog=olog,
         )
         nraw = np.shape(data_raw)
@@ -1734,10 +1734,10 @@ class SingleBayesKeplerTess:
         hdur = 0.5 * vdur
         vdur_co = vdur * cst.day2min / CHEOPS_ORBIT_MINUTES
 
-        cst.btjd = info["cst.btjd"]
+        btjd = info["BTJD"]
 
         printlog("Computing feasible epochs", olog=olog)
-        t = data["TIME"] + cst.btjd
+        t = data["TIME"] + btjd
         emin = np.rint((np.min(t) - T_ref.n) / P.n)
         x = T_ref.n + P.n * emin
         if x < np.min(t):
@@ -1782,7 +1782,7 @@ class SingleBayesKeplerTess:
                 tra["data"] = {}
                 for k, v in data.items():
                     tra["data"][k] = v[sel]
-                bjdref = int(np.min(tra["data"]["TIME"]) + cst.btjd)
+                bjdref = int(np.min(tra["data"]["TIME"]) + btjd)
                 tra["bjdref"] = bjdref
                 Tlin = bjd_lin - bjdref
                 tra["T_0"] = Tlin

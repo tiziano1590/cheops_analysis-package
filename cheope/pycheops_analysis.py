@@ -30,7 +30,7 @@ from pathlib import Path
 from os.path import getmtime
 from time import localtime, mktime
 
-import corner
+# import corner
 
 try:
     import pickle5 as pickle
