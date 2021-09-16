@@ -32,6 +32,7 @@ class ReadFile:
             "unroll",
             "nroll",
             "GP",
+            "single_duration_hour"
         ]
 
         self.star_keys = [

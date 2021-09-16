@@ -228,6 +228,7 @@ params_units["e"] = "-"
 params_units["q_1"] = "-"
 params_units["q_2"] = "-"
 params_units["log_sigma"] = "-"
+params_units["log_sigma_w"] = "-"
 params_units["sigma_w"] = "flux"
 params_units["inc"] = "deg"
 params_units["LD_c"] = "-"
@@ -7115,12 +7116,15 @@ def quick_save_params(out_file, params, bjd_ref):
         stderr = params[p].stderr
         if stderr is None:
             stderr = 0.0
-        if p[0] in ["d", "r", "g"]:
-            unit = params_units["det"]
-        else:
-            unit = params_units[p]
-            if p == "T_0":
-                unit = "{}{}".format(unit, bjd_ref)
+        try:
+            if p[0] in ["d", "r", "g"]:
+                unit = params_units["det"]
+            else:
+                unit = params_units[p]
+                if p == "T_0":
+                    unit = "{}{}".format(unit, bjd_ref)
+        except:
+            unit = "-"
         line = "{:20s} {:20.10f} {:20.10f} {:6s} {:>20s}\n".format(
             p, params[p].value, stderr, str(params[p].vary), unit
         )

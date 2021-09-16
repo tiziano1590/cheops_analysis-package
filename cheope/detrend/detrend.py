@@ -1297,8 +1297,12 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_lin.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        pyca.quick_save_params(os.path.join(main_folder, "params_med_lin.dat"), par_med, bjd_ref=cst.btjd)
-        pyca.quick_save_params(os.path.join(main_folder, "params_mle_lin.dat"), par_mle, bjd_ref=cst.btjd)
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_med_lin.dat"), par_med, bjd_ref=cst.btjd
+        )
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_mle_lin.dat"), par_mle, bjd_ref=cst.btjd
+        )
 
         # bin30m_ph = bin30m/result_lin.params['P'].value
         bin30m_ph = False
@@ -1429,8 +1433,12 @@ class MultivisitAnalysis:
         M.result.params = par_med.copy()
         result_fit.parbest = par_mle.copy()
         M.result.parbest = par_mle.copy()
-        pyca.quick_save_params(os.path.join(main_folder, "params_med_fit.dat"), par_med, bjd_ref=cst.btjd)
-        pyca.quick_save_params(os.path.join(main_folder, "params_mle_fit.dat"), par_mle, bjd_ref=cst.btjd)
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_med_fit.dat"), par_med, bjd_ref=cst.btjd
+        )
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_mle_fit.dat"), par_mle, bjd_ref=cst.btjd
+        )
 
         printlog("LC no-detrend plot", olog=olog)
         fig = M.plot_fit(
@@ -1705,9 +1713,15 @@ class SingleBayesKeplerTess:
         data_keys = []
         ok = np.ones(nraw).astype(bool)
         for k in names:
-            if "PSF" not in k:
+            # if ("PSF" not in k) or ("SAP_FLUX" not in k):
+            if "PSF" in k:
+                pass
+            elif "SAP_FLUX" in k:
+                data_keys.append(k)
+            else:
                 nan = np.isnan(data_raw[k])
-                # nnan = np.sum(nan)
+                nnan = np.sum(nan)
+                printlog("{} ==> n(NaN) = {}".format(k, nnan), olog=olog)
                 ok = np.logical_and(ok, ~nan)
                 data_keys.append(k)
         nok = np.sum(ok)
@@ -1766,16 +1780,24 @@ class SingleBayesKeplerTess:
 
             bjd_lin = T_ref.n + P.n * epo
             printlog(
-                "Epoch = {:.0f} ==> T_0 = {:.5f} BJD_TDB [{:.5f} , {:.5f}]".format(
-                    epo, bjd_lin, bjd_lin - hdur, bjd_lin + hdur
+                "Epoch = {:.0f} ==> T_0 = {:.5f} BJD_TDB [{:.5f} , {:.5f}] [[{:.5f} , {:.5f}]]".format(
+                    epo,
+                    bjd_lin,
+                    bjd_lin - hdur,
+                    bjd_lin + hdur,
+                    bjd_lin - (Wd.n * 0.5),
+                    bjd_lin + (Wd.n * 0.5),
                 ),
                 olog=olog,
             )
 
             sel = np.logical_and(t >= bjd_lin - hdur, t < bjd_lin + hdur)
             nsel = np.sum(sel)
-            wsel = np.logical_and(t >= bjd_lin - Wd.n * 0.5, t < bjd_lin + Wd.n * 0.5)
+            wsel = np.logical_and(
+                t >= bjd_lin - (Wd.n * 0.5), t < bjd_lin + (Wd.n * 0.5)
+            )
             nwsel = np.sum(wsel)
+            printlog("nsel = {:d} nwsel = {:d}".format(nsel, nwsel), olog=olog)
             if nsel > 0 and nwsel > 3:
                 tra = {}
                 tra["epoch"] = epo
@@ -2134,9 +2156,20 @@ class SingleBayesKeplerTess:
             "Assign prior ufloat(0,sigma_0) to all the detrending parameters", olog=olog
         )
         for k in det_par.keys():
-            if k not in ["dfdcontam", "dfdsmear", "ramp", "glint_scale"]:
+            # if (
+            #     (k not in ["dfdcontam", "dfdsmear", "ramp", "glint_scale"])
+            #     or ("dfdcos" not in k)
+            #     or ("dfdsin" not in k)
+            # ):  # phi not in Kepler/TESS
+            if (
+                (k in ["dfdcontam", "dfdsmear", "ramp", "glint_scale"])
+                or ("dfdcos" in k)
+                or ("dfdsin" in k)
+            ):
+                pass
+            else:
                 det_par[k] = dprior
-            # printlog("{:20s} = {:.6f}".format(k, det_par[k]), olog=olog)
+            printlog("{:20s} = {}".format(k, det_par[k]), olog=olog)
         printlog(
             "dfdt and d2fdt2 will have a prior of kind N(0, sigma_0/dt),\nwhere dt=max(t)-min(t)",
             olog=olog,
