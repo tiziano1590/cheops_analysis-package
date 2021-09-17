@@ -17,6 +17,7 @@ def main():
     from cheope.detrend import (
         SingleBayes,
         SingleBayesKeplerTess,
+        SingleBayesASCII,
         SingleCheck,
         MultivisitAnalysis,
     )
@@ -70,6 +71,15 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "-a",
+        "--ascii",
+        dest="ascii",
+        default=False,
+        help="When set, runs an analysis from a generic ascii files containing the flux",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -88,6 +98,10 @@ def main():
 
     if args.multivisit:
         multi = MultivisitAnalysis(args.input_file)
+        multi.run()
+
+    if args.ascii:
+        multi = SingleBayesASCII(args.input_file)
         multi.run()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
