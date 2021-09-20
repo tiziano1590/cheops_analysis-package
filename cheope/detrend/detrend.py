@@ -2921,6 +2921,18 @@ class SingleBayesKeplerTess:
 class SingleBayesASCII:
     def __init__(self, input_file):
         self.input_file = input_file
+        self.input_pars = [
+            "P",
+            "T_0",
+            "D",
+            "W",
+            "b",
+            "h_1",
+            "h_2",
+            "f_s",
+            "f_c",
+            "logrho",
+        ]
 
     def get_ld_h1h2(self, visit_args):
 
@@ -2966,7 +2978,7 @@ class SingleBayesASCII:
     def single_Bayes_ASCII(
         self,
         ascii_data,
-        star,
+        star_args,
         visit_args,
         planet_args,
         emcee_args,
@@ -2974,6 +2986,15 @@ class SingleBayesASCII:
         olog=None,
         n_threads=1,
     ):
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                self.read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
 
         epoch_name = os.path.basename(epoch_folder)
 
@@ -2981,7 +3002,7 @@ class SingleBayesASCII:
         # fake dataset
         dataset = pyca.AsciiDataset(
             file_key="CH_PR100015_TG006701_V0200",  # fake file_key
-            target=star.identifier,
+            target=star_args["star_name"],
             download_all=True,
             view_report_on_download=False,
             n_threads=n_threads,
@@ -3044,7 +3065,11 @@ class SingleBayesASCII:
         epo = np.rint((dataset.lc["bjd_ref"] - Tref.n) / P)
         Tlin = Tref.n + epo * P - dataset.lc["bjd_ref"]
 
-        T_0 = (Tlin - W * 0.5, Tlin, Tlin + W * 0.5)
+        planet_args["T_0"] = Tlin
+        planet_args["T_0_bounds"] = [Tlin - W * 0.5, Tlin + W * 0.5]
+        planet_args["T_0_user_data"] = ufloat(Tlin, max(planet_args["T_0_bounds"]))
+
+        # T_0 = (Tlin - W * 0.5, Tlin, Tlin + W * 0.5)
 
         # # RV SEMI-AMPLITUDE IN m/s NEEDED TO USE MASSRADIUS FUNCTION
         # Kms = planet_args['Kms']
@@ -3063,79 +3088,39 @@ class SingleBayesASCII:
         printlog("w    = {}".format(w), olog=olog)
         printlog("f_c  = {}".format(f_c), olog=olog)
         printlog("f_s  = {}".format(f_s), olog=olog)
-        printlog("T_0  = {}\n".format(T_0), olog=olog)
+        printlog("T_0  = {}\n".format(planet_args["T_0_user_data"]), olog=olog)
 
         # determine the out-of-transit lc for initial guess of c based on T_0 min/max
-        oot = np.logical_or(t < T_0[0], t > T_0[2])
+        oot = np.logical_or(
+            t < planet_args["T_0_bounds"][0], t > planet_args["T_0_bounds"][1]
+        )
 
         # DEFINE HERE HOW TO USE THE PARAMETERS,
         # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
         in_par = Parameters()
-        in_par["P"] = Parameter(
-            "P", value=P, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["T_0"] = Parameter(
-            "T_0", value=T_0[1], vary=True, min=T_0[0], max=T_0[2], user_data=None
-        )
 
-        # I will randomize only fitting parameters...
-        in_par["D"] = Parameter(
-            "D",
-            value=np.abs(np.random.normal(loc=D, scale=planet_args["D_user_data"].s)),
-            vary=True,
-            min=0.5 * D,
-            max=1.5 * D,
-            user_data=planet_args["D_user_data"],
-        )
-        in_par["W"] = Parameter(
-            "W",
-            value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
-            vary=True,
-            min=0.5 * W.n,
-            max=1.5 * W.n,
-            user_data=W,
-        )
-        in_par["b"] = Parameter(
-            "b",
-            value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
-            vary=True,
-            min=0.0,
-            max=1.5,
-            user_data=b,
-        )
+        for key in self.input_pars:
+            print(key)
+            cat = category_args(key)
+            if key in ["D", "W", "b"]:
+                # Randomize here
+                val = np.abs(
+                    np.random.normal(
+                        loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                    )
+                )
+            else:
+                val = cat[key]
+            in_par[key] = Parameter(
+                key,
+                value=val,
+                vary=cat[key + "_fit"],
+                min=cat[key + "_bounds"][0],
+                max=cat[key + "_bounds"][1],
+                user_data=cat[key + "_user_data"],
+            )
 
-        in_par["h_1"] = Parameter(
-            "h_1",
-            value=star.h_1.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_1.n, 0.1),
-        )
-        in_par["h_2"] = Parameter(
-            "h_2",
-            value=star.h_2.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_2.n, 0.1),
-        )
-
-        in_par["f_s"] = Parameter(
-            "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["f_c"] = Parameter(
-            "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-
-        in_par["logrho"] = Parameter(
-            "logrho",
-            value=star.logrho.n,
-            vary=True,
-            min=-9,
-            max=6,
-            user_data=star.logrho,
-        )
+        # c parameter treated separately
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
@@ -3897,7 +3882,7 @@ class SingleBayesASCII:
             params_gp,
         ) = self.single_Bayes_ASCII(
             ascii_data,
-            star,
+            star_args,
             visit_args,
             planet_args,
             emcee_args,
