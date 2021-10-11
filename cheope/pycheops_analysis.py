@@ -30,6 +30,8 @@ from pathlib import Path
 from os.path import getmtime
 from time import localtime, mktime
 
+from cryptography.fernet import Fernet
+
 # import corner
 
 try:
@@ -7154,3 +7156,11 @@ def q1q2_to_u1u2(q1, q2):
     u2 = sq1 * (1.0 - twoq2)
 
     return u1, u2
+
+
+def generate_private_key(path):
+    key = Fernet.generate_key()
+    path = os.path.join(path, "")
+
+    with open(path + "private", "wb") as private:
+        private.write(key)

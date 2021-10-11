@@ -21,6 +21,7 @@ def main():
         SingleCheck,
         MultivisitAnalysis,
     )
+    from cheope.dace import DACESearch
 
     parser = argparse.ArgumentParser(description="Cheope")
 
@@ -80,6 +81,14 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--selenium",
+        dest="selenium",
+        default=False,
+        help="search automatically the latest information for the target",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -103,6 +112,10 @@ def main():
     if args.ascii:
         multi = SingleBayesASCII(args.input_file)
         multi.run()
+
+    if args.selenium:
+        search = DACESearch(args.input_file)
+        search.get_observations()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 
