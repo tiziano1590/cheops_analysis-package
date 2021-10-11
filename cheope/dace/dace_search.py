@@ -5,6 +5,9 @@ import time
 from cryptography.fernet import Fernet
 import numpy as np
 import os
+import glob
+import tarfile
+import shutil
 
 
 class DACESearch:
@@ -119,3 +122,68 @@ class DACESearch:
         )
         object_equals.send_keys(self.visit_args["object_name"] + Keys.ENTER)
         object_equals.click()
+
+        time.sleep(2)
+
+        actions = self.driver.find_element_by_xpath(
+            "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div"
+        )
+        actions.click()
+
+        time.sleep(1)
+
+        select_all = self.driver.find_element_by_xpath(
+            "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div/ul/li[3]/ul/li[1]"
+        )
+        select_all.click()
+
+        time.sleep(1)
+
+        # actions.click()
+
+        # time.sleep(1)
+
+        download_all = self.driver.find_element_by_link_text("Fullarray")
+        download_all.click()
+
+        time.sleep(10)
+
+        list_of_files = glob.glob(
+            os.path.join(self.visit_args["download_path"], "*")
+        )  # * means all if need specific format then *.csv
+        latest_file = max(list_of_files, key=os.path.getctime)
+        print(latest_file)
+
+        path = os.path.join(self.visit_args["download_path"], "newly_extracted")
+
+        if os.path.exists(path):
+            shutil.rmtree(path)
+
+        if latest_file.endswith("tar.gz"):
+            tar = tarfile.open(latest_file, "r:gz")
+            tar.extractall(path=path)
+            tar.close()
+        elif latest_file.endswith("tar"):
+            tar = tarfile.open(latest_file, "r:")
+            tar.extractall(path=path)
+            tar.close()
+
+        all_downloaded = glob.glob(
+            os.path.join(self.visit_args["download_path"], "newly_extracted/*")
+        )
+        print(all_downloaded)
+
+        for folder in all_downloaded:
+            keyword = folder.split("/")[-1]
+
+            tar = tarfile.open(
+                f"{os.path.join(self.visit_args['pycheops_path'], '')}/CH_{keyword}.tgz",
+                "w:gz",
+            )
+            tar.add(folder, arcname=f"{keyword}")
+            tar.close()
+
+        if os.path.exists(path):
+            shutil.rmtree(path)
+
+        print("End of File")
