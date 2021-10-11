@@ -185,5 +185,3 @@ class DACESearch:
 
         if os.path.exists(path):
             shutil.rmtree(path)
-
-        print("End of File")

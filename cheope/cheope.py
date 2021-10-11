@@ -89,6 +89,14 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--add-single-bayes",
+        dest="add_sb",
+        default=False,
+        help="add Single Bayes analysis for each of the new observations",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -116,6 +124,10 @@ def main():
     if args.selenium:
         search = DACESearch(args.input_file)
         search.get_observations()
+
+        if args.add_sb:
+            sb = SingleBayes(args.input_file)
+            sb.run()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 
