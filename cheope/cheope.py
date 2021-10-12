@@ -123,7 +123,9 @@ def main():
 
     if args.selenium:
         search = DACESearch(args.input_file)
-        search.get_observations()
+        keywords = search.get_observations()
+        for keyword in keywords:
+            search.substitute_file_key(keywords)
 
         if args.add_sb:
             sb = SingleBayes(args.input_file)

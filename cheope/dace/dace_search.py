@@ -15,6 +15,8 @@ class DACESearch:
         """
         Setup all the input parameters
         """
+        self.input_file = input_file
+
         inpars = ReadFile(input_file)
 
         (
@@ -90,7 +92,7 @@ class DACESearch:
         time.sleep(2)
 
         userid = self.driver.find_element_by_id("loginUserField")
-        userid.send_keys("tiziano.zingales@unipd.it")
+        userid.send_keys(self.visit_args["login_dace"])
 
         userpass = self.driver.find_element_by_id("loginPassField")
         userpass.send_keys(decMessage)
@@ -139,10 +141,6 @@ class DACESearch:
 
         time.sleep(1)
 
-        # actions.click()
-
-        # time.sleep(1)
-
         download_all = self.driver.find_element_by_link_text("Fullarray")
         download_all.click()
 
@@ -171,13 +169,28 @@ class DACESearch:
         all_downloaded = glob.glob(
             os.path.join(self.visit_args["download_path"], "newly_extracted/*")
         )
-        print(all_downloaded)
 
+        pycheops_path = os.path.join(self.visit_args["pycheops_path"], "")
+        analysis_path = os.path.join(self.visit_args["main_folder"], "")
+
+        keywords_list = []
         for folder in all_downloaded:
+            keyword = folder.split("/")[-1]
+            keywords_list.append(keyword)
+
+        newly_downloaded = []
+
+        for analysis in glob.glob(pycheops_path + "*"):
+            for folder in all_downloaded:
+                keyword = folder.split("/")[-1]
+                if keyword in analysis:
+                    newly_downloaded.append(folder)
+
+        for folder in newly_downloaded:
             keyword = folder.split("/")[-1]
 
             tar = tarfile.open(
-                f"{os.path.join(self.visit_args['pycheops_path'], '')}/CH_{keyword}.tgz",
+                f"{pycheops_path}/CH_{keyword}.tgz",
                 "w:gz",
             )
             tar.add(folder, arcname=f"{keyword}")
@@ -185,3 +198,22 @@ class DACESearch:
 
         if os.path.exists(path):
             shutil.rmtree(path)
+
+        return keywords_list
+
+    def substitute_file_key(self, keyword):
+
+        print(self.input_file)
+
+        with open(self.input_file) as input_file:
+
+            file_list = input_file.readlines()
+
+        new_file = []
+        for line in file_list:
+            if "file_key" in line:
+                line = f"file_key: CH_{keyword}"
+
+            new_file.append(line)
+
+        print("End of the file")
