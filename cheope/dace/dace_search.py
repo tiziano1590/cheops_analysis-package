@@ -195,15 +195,22 @@ class DACESearch:
         def download_all():
             return self.driver.find_element_by_link_text("Fullarray")
 
+        print("Downloading updated catalogue...")
         download_all()
 
         time.sleep(10)
+
+        while os.path.exists(os.path.join(self.visit_args["download_path"], "*.part")):
+            time.sleep(1)
+
+        print("Download finished!")
 
         list_of_files = glob.glob(
             os.path.join(self.visit_args["download_path"], "*")
         )  # * means all if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
-        print(latest_file)
+
+        print(f"Last file is {latest_file}")
 
         path = os.path.join(self.visit_args["download_path"], "newly_extracted")
 
@@ -233,11 +240,14 @@ class DACESearch:
 
         newly_downloaded = []
 
-        for analysis in glob.glob(pycheops_path + "*"):
-            for folder in all_downloaded:
-                keyword = folder.split("/")[-1]
-                if keyword in analysis:
-                    newly_downloaded.append(folder)
+        for folder in all_downloaded:
+            keyword = folder.split("/")[-1]
+            if f"{pycheops_path}CH_{keyword}.tgz" not in glob.glob(
+                os.path.join(self.visit_args["pycheops_path"], "*")
+            ):
+                newly_downloaded.append(folder)
+
+        newly_downloaded = set(newly_downloaded)
 
         for folder in newly_downloaded:
             keyword = folder.split("/")[-1]
@@ -251,6 +261,8 @@ class DACESearch:
 
         if os.path.exists(path):
             shutil.rmtree(path)
+
+        print("End of File")
 
         return keywords_list
 
