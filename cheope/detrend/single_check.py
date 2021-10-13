@@ -35,6 +35,7 @@ import yaml
 
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
+from cheope.parameters import ReadFile
 
 # matplotlib rc params
 my_dpi = 192
@@ -188,7 +189,15 @@ class SingleCheck:
         # CONFIGURATION
         # ======================================================================
 
-        visit_args, star_args, read_file_status = self.read_file(self.input_file)
+        inpars = ReadFile(self.input_file)
+
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
 
         # seed = 42
         seed = visit_args["seed"]

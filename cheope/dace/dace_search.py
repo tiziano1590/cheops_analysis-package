@@ -193,7 +193,7 @@ class DACESearch:
 
         @_wait_browser_and_click
         def download_all():
-            return self.driver.find_element_by_link_text("Fullarray")
+            return self.driver.find_element_by_link_text("Light curves")
 
         print("Downloading updated catalogue...")
         download_all()
@@ -261,24 +261,31 @@ class DACESearch:
 
         if os.path.exists(path):
             shutil.rmtree(path)
-
-        print("End of File")
+        if os.path.exists(latest_file):
+            os.remove(latest_file)
 
         return keywords_list
 
-    def substitute_file_key(self, keyword):
-
-        print(self.input_file)
+    def substitute_file_key(self, keyword, visit_number):
 
         with open(self.input_file) as input_file:
 
             file_list = input_file.readlines()
 
+        split_name = self.input_file.split("/")[:-1]
+        new_file_name = (
+            "/".join(split_name) + f"/V{visit_number}_CH_{keyword}_selenium.yml"
+        )
+
         new_file = []
         for line in file_list:
             if "file_key" in line:
-                line = f"file_key: CH_{keyword}.tgz"
+                line = f"file_key: CH_{keyword}.tgz\n"
 
             new_file.append(line)
 
-        print("End of the file")
+        with open(new_file_name, "w") as parfile:
+            for line in new_file:
+                parfile.write(line)
+
+        return new_file_name

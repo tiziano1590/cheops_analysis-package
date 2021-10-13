@@ -90,6 +90,14 @@ def main():
     )
 
     parser.add_argument(
+        "--add-single-check",
+        dest="add_sc",
+        default=False,
+        help="add Single Check for each of the new observations",
+        action="store_true",
+    )
+
+    parser.add_argument(
         "--add-single-bayes",
         dest="add_sb",
         default=False,
@@ -124,12 +132,16 @@ def main():
     if args.selenium:
         search = DACESearch(args.input_file)
         keywords = search.get_observations()
-        for keyword in keywords:
-            search.substitute_file_key(keywords)
+        for i, keyword in enumerate(keywords):
+            infile = search.substitute_file_key(keyword, i + 1)
 
-        if args.add_sb:
-            sb = SingleBayes(args.input_file)
-            sb.run()
+            if args.add_sc:
+                sb = SingleCheck(infile)
+                sb.run()
+
+            if args.add_sb:
+                sb = SingleBayes(infile)
+                sb.run()
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 
