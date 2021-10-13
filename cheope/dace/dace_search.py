@@ -1,4 +1,10 @@
+from re import L
 from selenium import webdriver
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    ElementClickInterceptedException,
+)
+
 from selenium.webdriver.common.keys import Keys
 from cheope.parameters import ReadFile
 import time
@@ -8,6 +14,39 @@ import os
 import glob
 import tarfile
 import shutil
+import functools
+
+LIMIT_TIME = 30
+
+## Define useful decorators
+def _wait_browser_and_click(foo):
+    def wait():
+        i = 0
+        while True and i < LIMIT_TIME:
+            try:
+                obj = foo()
+                obj.click()
+                break
+            except (NoSuchElementException, ElementClickInterceptedException):
+                time.sleep(2)
+                i += 1
+
+    return wait
+
+
+def _wait_browser_and_send_keys(foo):
+    def wait(ref):
+        i = 0
+        while True and i < LIMIT_TIME:
+            try:
+                obj = foo(ref)
+                obj.send_keys(ref)
+                break
+            except (NoSuchElementException, ElementClickInterceptedException):
+                time.sleep(2)
+                i += 1
+
+    return wait
 
 
 class DACESearch:
@@ -84,65 +123,79 @@ class DACESearch:
 
         self.driver.get("https://dace.unige.ch/dashboard/index.html")
 
-        time.sleep(10)
+        @_wait_browser_and_click
+        def signin():
+            return self.driver.find_element_by_link_text("Sign in / Create account")
 
-        signin = self.driver.find_element_by_link_text("Sign in / Create account")
-        signin.click()
+        signin()
 
-        time.sleep(2)
+        @_wait_browser_and_send_keys
+        def userid(ref):
+            return self.driver.find_element_by_id("loginUserField")
 
-        userid = self.driver.find_element_by_id("loginUserField")
-        userid.send_keys(self.visit_args["login_dace"])
+        userid(self.visit_args["login_dace"])
 
-        userpass = self.driver.find_element_by_id("loginPassField")
-        userpass.send_keys(decMessage)
+        @_wait_browser_and_send_keys
+        def userpass(ref):
+            return self.driver.find_element_by_id("loginPassField")
 
-        login = self.driver.find_element_by_css_selector("button.popup_login_row")
-        login.click()
+        userpass(decMessage)
 
-        time.sleep(2)
+        @_wait_browser_and_click
+        def login():
+            return self.driver.find_element_by_css_selector("button.popup_login_row")
 
-        cheops_polygon = self.driver.find_element_by_id("cheops_polygon")
-        cheops_polygon.click()
+        login()
 
-        time.sleep(3)
+        @_wait_browser_and_click
+        def cheops_polygon():
+            return self.driver.find_element_by_id("cheops_polygon")
 
-        observations_data = self.driver.find_element_by_css_selector(
-            ".col-lg-9 > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) > div:nth-child(1)"
-        )
-        observations_data.click()
+        cheops_polygon()
 
-        time.sleep(5)
+        @_wait_browser_and_click
+        def observations_data():
+            return self.driver.find_element_by_css_selector(
+                ".col-lg-9 > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) > div:nth-child(1)"
+            )
 
-        object_search = self.driver.find_element_by_css_selector("span.fa-search")
-        object_search.click()
+        observations_data()
 
-        time.sleep(2)
+        @_wait_browser_and_click
+        def object_search():
+            return self.driver.find_element_by_css_selector("span.fa-search")
 
-        object_equals = self.driver.find_element_by_xpath(
-            "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[2]/th[3]/span/div/ul/li/form/div/input[1]"
-        )
-        object_equals.send_keys(self.visit_args["object_name"] + Keys.ENTER)
-        object_equals.click()
+        object_search()
 
-        time.sleep(2)
+        @_wait_browser_and_send_keys
+        def object_equals(ref):
+            return self.driver.find_element_by_xpath(
+                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[2]/th[3]/span/div/ul/li/form/div/input[1]"
+            )
 
-        actions = self.driver.find_element_by_xpath(
-            "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div"
-        )
-        actions.click()
+        object_equals(self.visit_args["object_name"] + Keys.ENTER)
 
-        time.sleep(1)
+        @_wait_browser_and_click
+        def actions():
+            return self.driver.find_element_by_xpath(
+                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div"
+            )
 
-        select_all = self.driver.find_element_by_xpath(
-            "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div/ul/li[3]/ul/li[1]"
-        )
-        select_all.click()
+        actions()
 
-        time.sleep(1)
+        @_wait_browser_and_click
+        def select_all():
+            return self.driver.find_element_by_xpath(
+                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div/ul/li[3]/ul/li[1]"
+            )
 
-        download_all = self.driver.find_element_by_link_text("Fullarray")
-        download_all.click()
+        select_all()
+
+        @_wait_browser_and_click
+        def download_all():
+            return self.driver.find_element_by_link_text("Fullarray")
+
+        download_all()
 
         time.sleep(10)
 
@@ -212,7 +265,7 @@ class DACESearch:
         new_file = []
         for line in file_list:
             if "file_key" in line:
-                line = f"file_key: CH_{keyword}"
+                line = f"file_key: CH_{keyword}.tgz"
 
             new_file.append(line)
 
