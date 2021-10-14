@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.common.exceptions import (
     NoSuchElementException,
     ElementClickInterceptedException,
+    StaleElementReferenceException,
 )
 
 from selenium.webdriver.common.keys import Keys
@@ -27,7 +28,11 @@ def _wait_browser_and_click(foo):
                 obj = foo()
                 obj.click()
                 break
-            except (NoSuchElementException, ElementClickInterceptedException):
+            except (
+                NoSuchElementException,
+                ElementClickInterceptedException,
+                StaleElementReferenceException,
+            ):
                 time.sleep(2)
                 i += 1
 
@@ -42,7 +47,11 @@ def _wait_browser_and_send_keys(foo):
                 obj = foo(ref)
                 obj.send_keys(ref)
                 break
-            except (NoSuchElementException, ElementClickInterceptedException):
+            except (
+                NoSuchElementException,
+                ElementClickInterceptedException,
+                StaleElementReferenceException,
+            ):
                 time.sleep(2)
                 i += 1
 
@@ -282,6 +291,8 @@ class DACESearch:
         for line in file_list:
             if "file_key" in line:
                 line = f"file_key: CH_{keyword}.tgz\n"
+            if "visit_number" in line:
+                line = f"visit_number: {visit_number}\n"
 
             new_file.append(line)
 
