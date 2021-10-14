@@ -23,6 +23,9 @@ def main():
         MultivisitAnalysis,
     )
     from cheope.dace import DACESearch
+    from cheope.tess import TESSSearch
+
+    global check_gen_file
 
     parser = argparse.ArgumentParser(description="Cheope")
 
@@ -83,10 +86,10 @@ def main():
     )
 
     parser.add_argument(
-        "--selenium",
-        dest="selenium",
+        "--selenium-dace",
+        dest="selenium_dace",
         default=False,
-        help="search automatically the latest information for the target",
+        help="search automatically the latest information for the target from CHEOPS",
         action="store_true",
     )
 
@@ -98,13 +101,22 @@ def main():
         action="store_true",
     )
 
-    # parser.add_argument(
-    #     "--add-single-bayes",
-    #     dest="add_sb",
-    #     default=False,
-    #     help="add Single Bayes analysis for each of the new observations",
-    #     action="store_true",
-    # )
+    parser.add_argument(
+        "--selenium-tess",
+        dest="selenium_tess",
+        default=False,
+        help="search automatically the latest information for the target from TESS",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "-add-skt",
+        "--add-single-kepler-tess",
+        dest="add_skt",
+        default=False,
+        help="add Single Bayes analysis for each of the new observations",
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
@@ -130,11 +142,9 @@ def main():
         multi = SingleBayesASCII(args.input_file)
         multi.run()
 
-    if args.selenium:
+    if args.selenium_dace:
         search = DACESearch(args.input_file)
         keywords = search.get_observations()
-        # for i, keyword in enumerate(keywords):
-        global check_gen_file
 
         def check_gen_file(num, keyword):
             infile = search.substitute_file_key(keyword, num + 1)
@@ -146,6 +156,34 @@ def main():
         process_pool = Pool()
         data = list(enumerate(keywords))
         process_pool.starmap(check_gen_file, data)
+
+    if args.selenium_tess:
+        search = TESSSearch(args.input_file)
+        keywords = search.get_observations()
+
+        def check_gen_file(num, keyword):
+            infile = search.substitute_file_key(keyword, num + 1)
+
+            if args.add_skt:
+                sb = SingleBayesKeplerTess(infile)
+                sb.run()
+
+        process_pool = Pool()
+        data = list(enumerate(keywords))
+        process_pool.starmap(check_gen_file, data)
+
+        # global check_gen_file
+
+        # def check_gen_file(num, keyword):
+        #     infile = search.substitute_file_key(keyword, num + 1)
+
+        #     if args.add_sc:
+        #         sb = SingleCheck(infile)
+        #         sb.run()
+
+        # process_pool = Pool()
+        # data = list(enumerate(keywords))
+        # process_pool.starmap(check_gen_file, data)
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 

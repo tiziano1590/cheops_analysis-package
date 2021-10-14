@@ -1,4 +1,3 @@
-from re import L
 from selenium import webdriver
 from selenium.common.exceptions import (
     NoSuchElementException,
