@@ -14,6 +14,7 @@ def main():
     import numpy as np
     import glob
     import matplotlib.pyplot as plt
+    from multiprocessing.pool import Pool
     from cheope.detrend import (
         SingleBayes,
         SingleBayesKeplerTess,
@@ -97,13 +98,13 @@ def main():
         action="store_true",
     )
 
-    parser.add_argument(
-        "--add-single-bayes",
-        dest="add_sb",
-        default=False,
-        help="add Single Bayes analysis for each of the new observations",
-        action="store_true",
-    )
+    # parser.add_argument(
+    #     "--add-single-bayes",
+    #     dest="add_sb",
+    #     default=False,
+    #     help="add Single Bayes analysis for each of the new observations",
+    #     action="store_true",
+    # )
 
     args = parser.parse_args()
 
@@ -132,16 +133,19 @@ def main():
     if args.selenium:
         search = DACESearch(args.input_file)
         keywords = search.get_observations()
-        for i, keyword in enumerate(keywords):
-            infile = search.substitute_file_key(keyword, i + 1)
+        # for i, keyword in enumerate(keywords):
+        global check_gen_file
+
+        def check_gen_file(num, keyword):
+            infile = search.substitute_file_key(keyword, num + 1)
 
             if args.add_sc:
                 sb = SingleCheck(infile)
                 sb.run()
 
-            if args.add_sb:
-                sb = SingleBayes(infile)
-                sb.run()
+        process_pool = Pool()
+        data = list(enumerate(keywords))
+        process_pool.starmap(check_gen_file, data)
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 

@@ -16,7 +16,7 @@ import tarfile
 import shutil
 import functools
 
-LIMIT_TIME = 30
+LIMIT_TIME = 60
 
 ## Define useful decorators
 def _wait_browser_and_click(foo):
@@ -274,7 +274,8 @@ class DACESearch:
 
         split_name = self.input_file.split("/")[:-1]
         new_file_name = (
-            "/".join(split_name) + f"/V{visit_number}_CH_{keyword}_selenium.yml"
+            "/".join(split_name)
+            + f"/{self.visit_args['object_name']}_V{visit_number}_CH_{keyword}_selenium.yml"
         )
 
         new_file = []
