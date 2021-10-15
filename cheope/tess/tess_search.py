@@ -152,7 +152,8 @@ class TESSSearch:
                         f"tesscurl_sector_{sector}_lc.sh"
                     )
 
-                download_getfile()
+                downfile = download_getfile()
+                downfile.click()
                 print(f"Downloading .sh sector {sector} file.")
 
                 time.sleep(5)
@@ -207,5 +208,3 @@ class TESSSearch:
                 parfile.write(line)
 
         return new_file_name
-
-        print("End of File")

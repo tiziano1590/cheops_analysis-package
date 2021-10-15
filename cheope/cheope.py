@@ -13,6 +13,7 @@ def main():
     import time
     import numpy as np
     import glob
+    import matplotlib
     import matplotlib.pyplot as plt
     from multiprocessing.pool import Pool
     from cheope.detrend import (
@@ -23,7 +24,9 @@ def main():
         MultivisitAnalysis,
     )
     from cheope.dace import DACESearch
-    from cheope.tess import TESSSearch
+    from cheope.tess import TESSSearch, ReadFits
+
+    matplotlib.use("TkAgg")
 
     global check_gen_file
 
@@ -118,6 +121,14 @@ def main():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--read-fits",
+        dest="read_fits",
+        default=False,
+        help="Read input TESS lightcurve",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
@@ -157,7 +168,28 @@ def main():
         data = list(enumerate(keywords))
         process_pool.starmap(check_gen_file, data)
 
-    if args.selenium_tess:
+    if args.selenium_tess and args.read_fits:
+        fits = ReadFits(args.input_file)
+        example = fits.load_fits_file()
+
+        (_, caps, _) = plt.errorbar(
+            example[0]["TIME"],
+            example[0]["SAP_FLUX"],
+            yerr=example[0]["SAP_FLUX_ERR"],
+            fmt="o",
+            markersize=0.3,
+            capsize=0.2,
+            color="k",
+            ecolor="gray",
+        )
+
+        for cap in caps:
+            cap.set_markeredgewidth(0.2)
+        plt.show()
+
+        print("End of the selection")
+
+    elif args.selenium_tess:
         search = TESSSearch(args.input_file)
         keywords = search.get_observations()
 
