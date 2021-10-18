@@ -172,7 +172,7 @@ def main():
         fits = ReadFits(args.input_file)
         example = fits.load_fits_file()
 
-        (_, caps, _) = plt.errorbar(
+        markers, caps, bars = plt.errorbar(
             example[0]["TIME"],
             example[0]["SAP_FLUX"],
             yerr=example[0]["SAP_FLUX_ERR"],
@@ -181,10 +181,16 @@ def main():
             capsize=0.2,
             color="k",
             ecolor="gray",
+            elinewidth=0.2,
         )
 
         for cap in caps:
-            cap.set_markeredgewidth(0.2)
+            cap.set_markeredgewidth(0.3)
+
+        [bar.set_alpha(0.5) for bar in bars]
+        [cap.set_alpha(0.5) for cap in caps]
+        plt.xlabel("Time (BTJD - 2457000)")
+        plt.ylabel("$F_*$")
         plt.show()
 
         print("End of the selection")

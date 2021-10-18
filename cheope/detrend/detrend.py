@@ -1669,6 +1669,25 @@ class MultivisitAnalysis:
                 printlog(l, olog=olog)
                 f.write(l + "\n")
 
+        print("Plotting O-C...")
+        file = np.genfromtxt(t0_file)
+
+        epochs = file[:, 1]
+
+        ocs = file[:, 14]
+        ocs_err = file[:, 15]
+
+        plt.errorbar(
+            epochs,
+            ocs,
+            yerr=ocs_err,
+            fmt="ko",
+        )
+        plt.axhline(0, color="firebrick", linestyle="--", linewidth=2)
+        plt.xlabel("BJD_TDB - 2457000")
+        plt.ylabel("O - C (s)")
+        plt.savefig(os.path.join(main_folder, "OC_plot.pdf"))
+
         return M, result_lin, result_fit
 
 
