@@ -114,68 +114,71 @@ class TESSSearch:
             options=options,
         )
 
-    def get_observations(self):
-        self.driver.get("https://heasarc.gsfc.nasa.gov/cgi-bin/tess/webtess/wtv.py")
+    def get_observations(self, download=True):
 
-        @_wait_browser_and_send_keys
-        def search(ref):
-            return self.driver.find_element_by_id("entry")
+        if download:
+            self.driver.get("https://heasarc.gsfc.nasa.gov/cgi-bin/tess/webtess/wtv.py")
 
-        search(str(self.visit_args["object_name"]) + Keys.ENTER)
+            @_wait_browser_and_send_keys
+            def search(ref):
+                return self.driver.find_element_by_id("entry")
 
-        @_wait_browser
-        def sector_selection():
-            return self.driver.find_element_by_css_selector(
-                ".entry-content > pre:nth-child(3)"
+            search(str(self.visit_args["object_name"]) + Keys.ENTER)
+
+            @_wait_browser
+            def sector_selection():
+                return self.driver.find_element_by_css_selector(
+                    ".entry-content > pre:nth-child(3)"
+                )
+
+            selection = sector_selection().text
+            split = selection.split("\n")
+
+            sectors = []
+            for line in split:
+                if "observed in camera" in line:
+                    sectors.append(int(line[7:9]))
+
+            self.driver.get(
+                "https://archive.stsci.edu/tess/bulk_downloads/bulk_downloads_ffi-tp-lc-dv.html"
             )
 
-        selection = sector_selection().text
-        split = selection.split("\n")
+            time.sleep(5)
 
-        sectors = []
-        for line in split:
-            if "observed in camera" in line:
-                sectors.append(int(line[7:9]))
+            cmd_dwn_tess_lcs = []
+            for sector in sectors:
+                try:
+                    # @_wait_browser_and_click
+                    def download_getfile():
+                        return self.driver.find_element_by_link_text(
+                            f"tesscurl_sector_{sector}_lc.sh"
+                        )
 
-        self.driver.get(
-            "https://archive.stsci.edu/tess/bulk_downloads/bulk_downloads_ffi-tp-lc-dv.html"
-        )
+                    downfile = download_getfile()
+                    downfile.click()
+                    print(f"Downloading .sh sector {sector} file.")
 
-        time.sleep(5)
+                    time.sleep(5)
 
-        cmd_dwn_tess_lcs = []
-        for sector in sectors:
-            try:
-                # @_wait_browser_and_click
-                def download_getfile():
-                    return self.driver.find_element_by_link_text(
-                        f"tesscurl_sector_{sector}_lc.sh"
-                    )
+                    while os.path.exists(
+                        os.path.join(self.visit_args["download_path"], "*.part")
+                    ):
+                        time.sleep(1)
 
-                downfile = download_getfile()
-                downfile.click()
-                print(f"Downloading .sh sector {sector} file.")
+                    with open(
+                        os.path.join(self.visit_args["download_path"], "")
+                        + f"tesscurl_sector_{sector}_lc.sh"
+                    ) as tesscurl:
+                        all_lines = tesscurl.readlines()
+                    for line in all_lines:
+                        if str(self.visit_args["object_name"]) in line:
+                            cmd_dwn_tess_lcs.append(line.strip())
 
-                time.sleep(5)
+                except NoSuchElementException:
+                    pass
 
-                while os.path.exists(
-                    os.path.join(self.visit_args["download_path"], "*.part")
-                ):
-                    time.sleep(1)
-
-                with open(
-                    os.path.join(self.visit_args["download_path"], "")
-                    + f"tesscurl_sector_{sector}_lc.sh"
-                ) as tesscurl:
-                    all_lines = tesscurl.readlines()
-                for line in all_lines:
-                    if str(self.visit_args["object_name"]) in line:
-                        cmd_dwn_tess_lcs.append(line.strip())
-
-            except NoSuchElementException:
-                pass
-
-        print("All downloads finished!")
+            print("All downloads finished!")
+            self.driver.quit()
 
         os.chdir(os.path.join(self.visit_args["main_folder"], "") + "data/TESS_DATA")
         for cmd in cmd_dwn_tess_lcs:

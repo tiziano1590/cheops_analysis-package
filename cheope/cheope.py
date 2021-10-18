@@ -113,6 +113,14 @@ def main():
     )
 
     parser.add_argument(
+        "--download",
+        dest="download",
+        default=False,
+        help="if called, ti navigate through the TESS viewing tool to download all the target lightcurves",
+        action="store_true",
+    )
+
+    parser.add_argument(
         "-add-skt",
         "--add-single-kepler-tess",
         dest="add_skt",
@@ -155,7 +163,7 @@ def main():
 
     if args.selenium_dace:
         search = DACESearch(args.input_file)
-        keywords = search.get_observations()
+        keywords = search.get_observations(download=args.download)
 
         def check_gen_file(num, keyword):
             infile = search.substitute_file_key(keyword, num + 1)
