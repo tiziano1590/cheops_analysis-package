@@ -209,6 +209,7 @@ class DACESearch:
         time.sleep(10)
 
         while os.path.exists(os.path.join(self.visit_args["download_path"], "*.part")):
+            print("Still downloading...")
             time.sleep(1)
 
         print("Download finished!")

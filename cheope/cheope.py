@@ -26,7 +26,7 @@ def main():
     from cheope.dace import DACESearch
     from cheope.tess import TESSSearch, ReadFits
 
-    matplotlib.use("TkAgg")
+    matplotlib.use("Agg")
 
     global check_gen_file
 
@@ -163,7 +163,7 @@ def main():
 
     if args.selenium_dace:
         search = DACESearch(args.input_file)
-        keywords = search.get_observations(download=args.download)
+        keywords = search.get_observations()
 
         def check_gen_file(num, keyword):
             infile = search.substitute_file_key(keyword, num + 1)
@@ -205,7 +205,7 @@ def main():
 
     elif args.selenium_tess:
         search = TESSSearch(args.input_file)
-        keywords = search.get_observations()
+        keywords = search.get_observations(download=args.download)
 
         def check_gen_file(num, keyword):
             infile = search.substitute_file_key(keyword, num + 1)
