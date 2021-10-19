@@ -237,7 +237,6 @@ class ReadFile:
             dace=False,
         )
 
-        # TODO for loop on h1, h2 if None go in default (già sotto), altrimenti guarda la issue
         if (self.star_args["h_1_fit"] == False) or (self.star_args["h_2_fit"] == False):
             if (
                 self.yaml_input["star"].get("h_1") is None
@@ -260,11 +259,16 @@ class ReadFile:
                 self.star_args["h_2"] = star.h_2.n
                 self.star_args["h_1_fit"] = True
                 self.star_args["h_2_fit"] = True
-                self.star_args["h_1_bounds"] = [star.h_1.-star.h_1.s, star.h_1.n+star.h_1.s]
-                self.star_args["h_2_bounds"] = [star.h_2.-star.h_2.s, star.h_2.n+star.h_2.s]
+                self.star_args["h_1_bounds"] = [
+                    star.h_1.n - star.h_1.s,
+                    star.h_1.n + star.h_1.s,
+                ]
+                self.star_args["h_2_bounds"] = [
+                    star.h_2.n - star.h_2.s,
+                    star.h_2.n + star.h_2.s,
+                ]
                 self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
                 self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
-
 
         if self.yaml_input["star"].get("logrho") is None:
             self.star_args["logrho"] = star.logrho.n
