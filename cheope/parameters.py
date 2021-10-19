@@ -32,7 +32,7 @@ class ReadFile:
             "unroll",
             "nroll",
             "GP",
-            "single_duration_hour"
+            "single_duration_hour",
         ]
 
         self.star_keys = [
@@ -106,10 +106,16 @@ class ReadFile:
             elif isinstance(inval, dict):
                 val = inval.get("value")
                 fit = inval.get("fit")
-                self.star_args[key] = ufloat(val[0], val[1]).n
+                if val != None:
+                    self.star_args[key] = ufloat(val[0], val[1]).n
+                else:
+                    self.star_args[key] = None
                 self.star_args[key + "_fit"] = fit
                 self.star_args[key + "_bounds"] = inval.get("bounds", [-np.inf, np.inf])
-                self.star_args[key + "_user_data"] = ufloat(val[0], val[1])
+                if val != None:
+                    self.star_args[key + "_user_data"] = ufloat(val[0], val[1])
+                else:
+                    self.star_args[key + "_user_data"] = None
                 # if key == "h_1":
                 #     print("HAHA")
                 #     break
@@ -230,20 +236,21 @@ class ReadFile:
             dace=False,
         )
 
+        # TODO for loop on h1, h2 if None go in default (già sotto), altrimenti guarda la issue
         if (
             self.yaml_input["star"].get("h_1") is None
             or self.yaml_input["star"].get("h_2") is None
         ):
             self.star_args["h_1"] = star.h_1.n
             self.star_args["h_2"] = star.h_2.n
-            self.star_args["h_1_fit"] = True
-            self.star_args["h_2_fit"] = True
+            self.star_args["h_1_fit"] = False
+            self.star_args["h_2_fit"] = False
             self.star_args["h_1_bounds"] = [0, 1]
             self.star_args["h_2_bounds"] = [0, 1]
-            # self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 10 * star.h_1.s)
-            # self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 10 * star.h_2.s)
-            self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 0.1)
-            self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 0.1)
+            self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
+            self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
+            # self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 0.1)
+            # self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 0.1)
 
         if self.yaml_input["star"].get("logrho") is None:
             self.star_args["logrho"] = star.logrho.n

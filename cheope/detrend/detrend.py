@@ -570,6 +570,7 @@ class SingleBayes:
                         olog=olog,
                     )
                     det_par[k] = None
+                    ##TODO if k == 'glint_scale': remove/set to none the variable of pycheops add_glint
 
                 while_cnt += 1
 
