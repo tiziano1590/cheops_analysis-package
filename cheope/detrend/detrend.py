@@ -332,6 +332,7 @@ class SingleBayes:
                 # TODO Exception has occurred: TypeError
                 # loop of ufunc does not support argument 0 of type AffineScalarFunc which has no callable arcsin method
             )
+            print(in_par[key])
             # if key == 'b':
             #     break
 
@@ -363,6 +364,11 @@ class SingleBayes:
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
+        #
+        # set fixed LD parameters
+        in_par["h_1"].vary = False
+        in_par["h_2"].vary = False
+        #
         # Fit with lmfit
         lmfit0 = dataset.lmfit_transit(
             P=in_par["P"],
@@ -639,6 +645,13 @@ class SingleBayes:
         printlog(" nthreads = {}".format(nthreads), olog=olog)
         printlog(" nthin    = {}".format(nthin), olog=olog)
         printlog("", olog=olog)
+
+        # set the LD to proper fit or fix
+        keys = ["h_1", "h_2"]
+        for key in keys:
+            cat = category_args(key)
+            params_lm_loop[key] = in_par[key]
+            params_lm_loop[key].vary = cat[key + "_fit"]
 
         # EMCEE-------------------------------------------------------------
         result = dataset.emcee_sampler(
