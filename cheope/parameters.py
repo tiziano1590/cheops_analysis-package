@@ -98,6 +98,7 @@ class ReadFile:
 
             if (inval is None) or isinstance(inval, str) or isinstance(inval, bool):
                 self.star_args[key] = inval
+                self.star_args[key + "_fit"] = False
             elif isinstance(inval, list):
                 self.star_args[key] = ufloat(inval[0], inval[1])
                 self.star_args[key + "_fit"] = False
@@ -237,20 +238,33 @@ class ReadFile:
         )
 
         # TODO for loop on h1, h2 if None go in default (già sotto), altrimenti guarda la issue
-        if (
-            self.yaml_input["star"].get("h_1") is None
-            or self.yaml_input["star"].get("h_2") is None
-        ):
-            self.star_args["h_1"] = star.h_1.n
-            self.star_args["h_2"] = star.h_2.n
-            self.star_args["h_1_fit"] = False
-            self.star_args["h_2_fit"] = False
-            self.star_args["h_1_bounds"] = [0, 1]
-            self.star_args["h_2_bounds"] = [0, 1]
-            self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
-            self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
-            # self.star_args["h_1_user_data"] = ufloat(star.h_1.n, 0.1)
-            # self.star_args["h_2_user_data"] = ufloat(star.h_2.n, 0.1)
+        if (self.star_args["h_1_fit"] == False) or (self.star_args["h_2_fit"] == False):
+            if (
+                self.yaml_input["star"].get("h_1") is None
+                or self.yaml_input["star"].get("h_2") is None
+            ):
+                self.star_args["h_1"] = star.h_1.n
+                self.star_args["h_2"] = star.h_2.n
+                self.star_args["h_1_fit"] = False
+                self.star_args["h_2_fit"] = False
+                self.star_args["h_1_bounds"] = [0, 1]
+                self.star_args["h_2_bounds"] = [0, 1]
+                self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
+                self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
+        else:
+            if (
+                self.yaml_input["star"].get("h_1") is None
+                or self.yaml_input["star"].get("h_2") is None
+            ):
+                self.star_args["h_1"] = star.h_1.n
+                self.star_args["h_2"] = star.h_2.n
+                self.star_args["h_1_fit"] = True
+                self.star_args["h_2_fit"] = True
+                self.star_args["h_1_bounds"] = [star.h_1.-star.h_1.s, star.h_1.n+star.h_1.s]
+                self.star_args["h_2_bounds"] = [star.h_2.-star.h_2.s, star.h_2.n+star.h_2.s]
+                self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
+                self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
+
 
         if self.yaml_input["star"].get("logrho") is None:
             self.star_args["logrho"] = star.logrho.n
