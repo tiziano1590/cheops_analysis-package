@@ -178,30 +178,7 @@ def main():
 
     if args.selenium_tess and args.read_fits:
         fits = ReadFits(args.input_file)
-        example = fits.load_fits_file()
-
-        markers, caps, bars = plt.errorbar(
-            example[0]["TIME"],
-            example[0]["SAP_FLUX"],
-            yerr=example[0]["SAP_FLUX_ERR"],
-            fmt="o",
-            markersize=0.3,
-            capsize=0.2,
-            color="k",
-            ecolor="gray",
-            elinewidth=0.2,
-        )
-
-        for cap in caps:
-            cap.set_markeredgewidth(0.3)
-
-        [bar.set_alpha(0.5) for bar in bars]
-        [cap.set_alpha(0.5) for cap in caps]
-        plt.xlabel("Time (BTJD - 2457000)")
-        plt.ylabel("$F_*$")
-        plt.show()
-
-        print("End of the selection")
+        fits.plot_lightcurve()
 
     elif args.selenium_tess:
         search = TESSSearch(args.input_file)
