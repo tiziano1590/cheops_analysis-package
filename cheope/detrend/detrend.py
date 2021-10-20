@@ -3115,7 +3115,7 @@ class SingleBayesASCII:
         Tlin = Tref.n + epo * P - dataset.lc["bjd_ref"]
 
         planet_args["T_0"] = Tlin
-        planet_args["T_0_bounds"] = [Tlin - W * 0.5, Tlin + W * 0.5]
+        planet_args["T_0_bounds"] = [Tlin - W * P * 0.5, Tlin + W * P * 0.5]
         planet_args["T_0_user_data"] = ufloat(Tlin, max(planet_args["T_0_bounds"]))
 
         # T_0 = (Tlin - W * 0.5, Tlin, Tlin + W * 0.5)
