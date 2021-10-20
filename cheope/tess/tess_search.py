@@ -180,9 +180,11 @@ class TESSSearch:
             print("All downloads finished!")
             self.driver.quit()
 
-        os.chdir(os.path.join(self.visit_args["main_folder"], "") + "data/TESS_DATA")
-        for cmd in cmd_dwn_tess_lcs:
-            os.system(cmd)
+            os.chdir(
+                os.path.join(self.visit_args["main_folder"], "") + "data/TESS_DATA"
+            )
+            for cmd in cmd_dwn_tess_lcs:
+                os.system(cmd)
 
         all_lcs = glob.glob("./*")
         keywords = [lc[2:-5] for lc in all_lcs]

@@ -3074,6 +3074,22 @@ class SingleBayesASCII:
             )
         plt.close(fig)
 
+        # from WG TS3
+        Rstar = star_args["Rstar"]
+        Mstar = star_args["Mstar"]
+        teff = star_args["teff"]
+        logg = star_args["logg"]
+        feh = star_args["feh"]
+
+        star = StarProperties(
+            star_args["star_name"],
+            match_arcsec=None,
+            teff=teff,
+            logg=logg,
+            metal=feh,
+            dace=False,
+        )
+
         # TO clip or not to clip
         printlog("Clip outliers", olog=olog)
         t, f, ef = dataset.clip_outliers(verbose=True)

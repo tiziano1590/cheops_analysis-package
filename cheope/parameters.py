@@ -271,7 +271,10 @@ class ReadFile:
                 self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
 
         if self.yaml_input["star"].get("logrho") is None:
-            self.star_args["logrho"] = star.logrho.n
+            try:
+                self.star_args["logrho"] = star.logrho.n
+            except AttributeError:
+                self.star_args["logrho"] = star.logrho
             self.star_args["logrho_fit"] = True
             self.star_args["logrho_bounds"] = [-9, 6]
             self.star_args["logrho_user_data"] = star.logrho
