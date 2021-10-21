@@ -3959,7 +3959,7 @@ class SingleBayesASCII:
         head = "{0:s} err_T0_s_{1:s}".format(head, "GP")
 
         Tref = planet_args["T_ref"]
-        P = planet_args["P"]
+        P = planet_args["P_user_data"]
         bjd_ref = int(ascii_data["time"][0])
         epo = np.rint((bjd_ref - Tref.n) / P.n)
         line = "{:04.0f}".format(epo)
