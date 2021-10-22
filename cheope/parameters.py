@@ -24,6 +24,7 @@ class ReadFile:
             "main_folder",
             "visit_number",
             "file_key",
+            "passband",
             "aperture",
             "shape",
             "seed",
@@ -185,7 +186,7 @@ class ReadFile:
         self.visit_args["file_key"] = self.visit_args["file_key"].strip()
 
         # aperture
-        apertures = ["DEFAULT", "OPTIMAL", "RINF", "RSUP"]
+        apertures = ["DEFAULT", "OPTIMAL", "RINF", "RSUP", "SAP", "PDC"]
         self.visit_args["aperture"] = self.visit_args["aperture"].strip().upper()
         if not self.visit_args["aperture"] in apertures:
             self.visit_args["aperture"] = "DEFAULT"

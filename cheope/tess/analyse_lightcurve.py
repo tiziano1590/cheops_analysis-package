@@ -107,11 +107,16 @@ class ReadFits:
     def plot_lightcurve(self):
         matplotlib.use("TkAgg")
         example = self.load_fits_file()
+        print(f"Aperture is: {self.visit_args['aperture']}")
 
+        if self.visit_args["aperture"].lower() == "sap":
+            flux_lab = "SAP_FLUX"
+        elif self.visit_args["aperture"].lower() == "pdc":
+            flux_lab = "PDCSAP_FLUX"
         markers, caps, bars = plt.errorbar(
             example[0]["TIME"],
-            example[0]["SAP_FLUX"],
-            yerr=example[0]["SAP_FLUX_ERR"],
+            example[0][flux_lab],
+            yerr=example[0][f"{flux_lab}_ERR"],
             fmt="o",
             markersize=0.3,
             capsize=0.2,
