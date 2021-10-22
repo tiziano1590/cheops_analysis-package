@@ -2783,7 +2783,10 @@ class SingleBayesKeplerTess:
         printlog("STAR INFORMATION", olog=olog)
         printlog(star, olog=olog)
 
-        star_args["logrho"] = star.logrho.n
+        try:
+            star_args["logrho"] = star.logrho.n
+        except AttributeError:
+            star_args["logrho"] = star.logrho
         star_args["logrho_fit"] = True
         star_args["logrho_bounds"] = [-9, 6]
         star_args["logrho_user_data"] = star.logrho
