@@ -4,10 +4,14 @@ import matplotlib.pyplot as plt
 
 from astropy.io import fits
 
+from uncertainties import ufloat, UFloat
+
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
 import cheope.linear_ephemeris as lep
 from cheope.parameters import ReadFile
+
+from pycheops.instrument import CHEOPS_ORBIT_MINUTES
 
 # matplotlib rc params
 my_dpi = 192
@@ -106,17 +110,78 @@ class ReadFits:
 
     def plot_lightcurve(self):
         matplotlib.use("TkAgg")
-        example = self.load_fits_file()
+
+        example, info = self.load_fits_file()
+
+        T_ref = self.planet_args["T_ref"]
+        P = self.planet_args["P_user_data"]
+        Wd = self.planet_args["W"] * P
+        vdurh = self.visit_args["single_duration_hour"]
+        if vdurh is None:
+            vdurh = 1.5 * Wd.n * cst.day2hour + 3.0 * CHEOPS_ORBIT_MINUTES * cst.min2day
+        vdur = vdurh / cst.day2hour
+        hdur = 0.5 * vdur
+        vdur_co = vdur * cst.day2min / CHEOPS_ORBIT_MINUTES
+
+        btjd = info["BTJD"]
+
+        t = example["TIME"] + btjd
+        emin = np.rint((np.min(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emin
+        if x < np.min(t):
+            emin += 1
+        emax = np.rint((np.max(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emax
+        if x > np.max(t):
+            emax -= 1
+        epochs = np.arange(emin, emax + 1, 1)
+
+        # printlog("t min: {:.5f}".format(np.min(t)))
+        # printlog("t max: {:.5f}".format(np.max(t)))
+
+        transits = []
+        t0s = []
+        for i_epo, epo in enumerate(epochs):
+
+            bjd_lin = T_ref.n + P.n * epo
+
+            sel = np.logical_and(t >= bjd_lin - hdur, t < bjd_lin + hdur)
+            nsel = np.sum(sel)
+            wsel = np.logical_and(
+                t >= bjd_lin - (Wd.n * 0.5), t < bjd_lin + (Wd.n * 0.5)
+            )
+            nwsel = np.sum(wsel)
+            if nsel > 0 and nwsel > 3:
+                tra = {}
+                tra["epoch"] = epo
+                tra["data"] = {}
+                for k, v in example.items():
+                    tra["data"][k] = v[sel]
+                bjdref = int(np.min(tra["data"]["TIME"]) + btjd)
+                tra["bjdref"] = bjdref
+                Tlin = bjd_lin - bjdref
+                tra["T_0"] = Tlin
+                tra["T_0_bounds"] = [Tlin - 0.5 * Wd.n, Tlin + 0.5 * Wd.n]
+                tra["T_0_user_data"] = ufloat(Tlin, 0.5 * Wd.n)
+                transits.append(tra)
+            else:
+                pass
+
+            t0s.append(tra["bjdref"])
+
+        t0s = np.array(t0s) - 2457000
         print(f"Aperture is: {self.visit_args['aperture']}")
+        # print(t0s)
 
         if self.visit_args["aperture"].lower() == "sap":
             flux_lab = "SAP_FLUX"
         elif self.visit_args["aperture"].lower() == "pdc":
             flux_lab = "PDCSAP_FLUX"
+
         markers, caps, bars = plt.errorbar(
-            example[0]["TIME"],
-            example[0][flux_lab],
-            yerr=example[0][f"{flux_lab}_ERR"],
+            example["TIME"],
+            example[flux_lab],
+            yerr=example[f"{flux_lab}_ERR"],
             fmt="o",
             markersize=0.3,
             capsize=0.2,
@@ -125,11 +190,24 @@ class ReadFits:
             elinewidth=0.2,
         )
 
+        plt.vlines(
+            t0s,
+            ymin=0,
+            ymax=10 * max(example[flux_lab]),
+            color="firebrick",
+            linewidth=0.5,
+            linestyles="dashed",
+        )
+
         for cap in caps:
             cap.set_markeredgewidth(0.3)
 
         [bar.set_alpha(0.5) for bar in bars]
         [cap.set_alpha(0.5) for cap in caps]
+        plt.ylim(
+            min(example[flux_lab]) - max(example[f"{flux_lab}_ERR"]),
+            max(example[flux_lab] + max(example[f"{flux_lab}_ERR"])),
+        )
         plt.xlabel("Time (BTJD - 2457000)")
         plt.ylabel("Flux")
         plt.show()
