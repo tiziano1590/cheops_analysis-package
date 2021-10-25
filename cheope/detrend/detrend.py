@@ -655,8 +655,8 @@ class SingleBayes:
             params_lm_loop[key] = in_par[key]
             params_lm_loop[key].vary = cat[key + "_fit"]
 
-        # EMCEE-------------------------------------------------------------
-        result = dataset.emcee_sampler(
+        # Ultranest-------------------------------------------------------------
+        result = dataset.ultranest_sampler(
             params=params_lm_loop,
             nwalkers=nwalkers,
             burn=nprerun,
