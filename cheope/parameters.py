@@ -16,6 +16,7 @@ class ReadFile:
         self.star_args = {}
         self.planet_args = {}
         self.emcee_args = {}
+        self.ultranest_args = {}
         self.read_file_status = []
         self.yaml_input = {}
         self.multivisit = multivisit
@@ -60,6 +61,13 @@ class ReadFile:
             "nthreads",
         ]
 
+        self.ultranest_keys = [
+            "live_points",
+            "tol",
+            "cluster_num_live_points",
+            "resume",
+        ]
+
         if os.path.exists(input_file) and os.path.isfile(input_file):
             with open(input_file) as in_f:
                 self.yaml_input = yaml.load(in_f, Loader=yaml.FullLoader)
@@ -76,6 +84,10 @@ class ReadFile:
                 set(self.emcee_keys + list(self.yaml_input["emcee"].keys()))
             )
 
+            self.ultranest_keys = list(
+                set(self.ultranest_keys + list(self.yaml_input["ultranest"].keys()))
+            )
+
         else:
             self.read_file_status.append(f"NOT VALID INPUT FILE:\n{input_file}")
 
@@ -83,6 +95,7 @@ class ReadFile:
         self.star_pars()
         self.planet_pars()
         self.emcee_pars()
+        self.ultranest_pars()
 
     def visit_pars(self):
         # -- visit_args
@@ -170,11 +183,22 @@ class ReadFile:
         self.emcee_args["nburn"] = 256
         self.emcee_args["nthin"] = 1
         self.emcee_args["nthreads"] = 1
-        self.emcee_args["progress"] = False
+        self.emcee_args["progress"] = "overwrite"
 
         for key in self.emcee_keys:
             self.emcee_args[key] = self.yaml_input["emcee"].get(
                 key, self.emcee_args[key]
+            )
+
+    def ultranest_pars(self):
+        self.ultranest_args["live_points"] = 500
+        self.ultranest_args["tol"] = 0.5
+        self.ultranest_args["cluster_num_live_points"] = 40
+        self.ultranest_args["resume"] = False
+
+        for key in self.ultranest_keys:
+            self.ultranest_args[key] = self.yaml_input["ultranest"].get(
+                key, self.ultranest_args[key]
             )
 
     def apply_visit_conditions(self):

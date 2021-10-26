@@ -94,11 +94,19 @@ class SingleBayes:
         # CONFIGURATION
         # ======================================================================
 
-        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+        (
+            visit_args,
+            star_args,
+            planet_args,
+            emcee_args,
+            ultranest_args,
+            read_file_status,
+        ) = (
             inpars.visit_args,
             inpars.star_args,
             inpars.planet_args,
             inpars.emcee_args,
+            inpars.ultranest_args,
             inpars.read_file_status,
         )
 
@@ -333,7 +341,7 @@ class SingleBayes:
                 # TODO Exception has occurred: TypeError
                 # loop of ufunc does not support argument 0 of type AffineScalarFunc which has no callable arcsin method
             )
-            print(in_par[key])
+            # print(in_par[key])
             # if key == 'b':
             #     break
 
@@ -627,27 +635,6 @@ class SingleBayes:
             dataset.lc["bjd_ref"],
         )
 
-        ### *** ==============================================================
-        ### *** ===== EMCEE ==================================================
-
-        nwalkers = emcee_args["nwalkers"]
-        nprerun = emcee_args["nprerun"]
-        nsteps = emcee_args["nsteps"]
-        nburn = emcee_args["nburn"]
-        nthin = emcee_args["nthin"]
-        nthreads = emcee_args["nthreads"]
-        progress = emcee_args["progress"]
-
-        # Run emcee from last best fit
-        printlog("\n-Run emcee from last best fit with:", olog=olog)
-        printlog(" nwalkers = {}".format(nwalkers), olog=olog)
-        printlog(" nprerun  = {}".format(nprerun), olog=olog)
-        printlog(" nsteps   = {}".format(nsteps), olog=olog)
-        printlog(" nburn    = {}".format(nburn), olog=olog)
-        printlog(" nthreads = {}".format(nthreads), olog=olog)
-        printlog(" nthin    = {}".format(nthin), olog=olog)
-        printlog("", olog=olog)
-
         # set the LD to proper fit or fix
         keys = ["h_1", "h_2"]
         for key in keys:
@@ -655,16 +642,71 @@ class SingleBayes:
             params_lm_loop[key] = in_par[key]
             params_lm_loop[key].vary = cat[key + "_fit"]
 
-        # Ultranest-------------------------------------------------------------
-        result = dataset.ultranest_sampler(
-            params=params_lm_loop,
-            nwalkers=nwalkers,
-            burn=nprerun,
-            steps=nsteps,
-            thin=nthin,
-            add_shoterm=False,
-            progress=progress,
-        )
+        if visit_args["optimizer"].lower() == "ultranest":
+            ### *** ===== Ultranest ==================================================
+
+            live_points = ultranest_args["live_points"]
+            tolerance = ultranest_args["tol"]
+            cluster_num_live_points = ultranest_args["cluster_num_live_points"]
+            logdir = os.path.join(visit_args["main_folder"], "ultranest")
+            resume = ultranest_args["resume"]
+
+            # Run emcee from last best fit
+            printlog("\n-Run Ultranest from last best fit with:", olog=olog)
+            printlog(" live_points              = {}".format(live_points), olog=olog)
+            printlog(" tolerance                = {}".format(tolerance), olog=olog)
+            printlog(
+                " cluster_num_live_points  = {}".format(cluster_num_live_points),
+                olog=olog,
+            )
+            printlog(
+                " logdir                   = {}".format(logdir),
+                olog=olog,
+            )
+            printlog(
+                " resume                   = {}".format(resume),
+                olog=olog,
+            )
+            printlog("", olog=olog)
+            result = dataset.ultranest_sampler(
+                params=params_lm_loop,
+                live_points=live_points,
+                tol=tolerance,
+                cluster_num_live_points=cluster_num_live_points,
+                logdir=logdir,
+                resume=resume,
+                add_shoterm=False,
+            )
+        else:
+            ### *** ===== EMCEE ==================================================
+
+            nwalkers = emcee_args["nwalkers"]
+            nprerun = emcee_args["nprerun"]
+            nsteps = emcee_args["nsteps"]
+            nburn = emcee_args["nburn"]
+            nthin = emcee_args["nthin"]
+            nthreads = emcee_args["nthreads"]
+            progress = emcee_args["progress"]
+
+            # Run emcee from last best fit
+            printlog("\n-Run emcee from last best fit with:", olog=olog)
+            printlog(" nwalkers = {}".format(nwalkers), olog=olog)
+            printlog(" nprerun  = {}".format(nprerun), olog=olog)
+            printlog(" nsteps   = {}".format(nsteps), olog=olog)
+            printlog(" nburn    = {}".format(nburn), olog=olog)
+            printlog(" nthreads = {}".format(nthreads), olog=olog)
+            printlog(" nthin    = {}".format(nthin), olog=olog)
+            printlog("", olog=olog)
+            # Run default optimizer EMCEE
+            result = dataset.emcee_sampler(
+                params=params_lm_loop,
+                nwalkers=nwalkers,
+                burn=nprerun,
+                steps=nsteps,
+                thin=nthin,
+                add_shoterm=False,
+                progress=progress,
+            )
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
 
