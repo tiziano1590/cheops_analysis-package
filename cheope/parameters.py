@@ -66,6 +66,7 @@ class ReadFile:
             "tol",
             "cluster_num_live_points",
             "resume",
+            "adaptive_nsteps",
         ]
 
         if os.path.exists(input_file) and os.path.isfile(input_file):
@@ -195,6 +196,7 @@ class ReadFile:
         self.ultranest_args["tol"] = 0.5
         self.ultranest_args["cluster_num_live_points"] = 40
         self.ultranest_args["resume"] = False
+        self.ultranest_args["adaptive_nsteps"] = False
 
         for key in self.ultranest_keys:
             self.ultranest_args[key] = self.yaml_input["ultranest"].get(

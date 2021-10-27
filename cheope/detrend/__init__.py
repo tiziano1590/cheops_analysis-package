@@ -4,4 +4,7 @@ from .detrend import (
     SingleBayesKeplerTess,
     SingleBayesASCII,
 )
+
+from .optimizers import Optimizers
+
 from .single_check import SingleCheck
