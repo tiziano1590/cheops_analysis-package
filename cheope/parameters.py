@@ -356,6 +356,7 @@ class ReadFile:
             # sys.exit()
         self.planet_args["inc"] = inc.n
         self.planet_args["aRs"] = aRs.n
+        self.planet_args["aRs_bounds"] = [1.0, 1e6]
         self.planet_args["b"] = b.n
         self.planet_args["b_fit"] = True
         self.planet_args["b_bounds"] = [
