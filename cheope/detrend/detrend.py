@@ -645,41 +645,15 @@ class SingleBayes:
 
         if visit_args["optimizer"].lower() == "ultranest":
             ### *** ===== Ultranest ==================================================
+            optimizer = Optimizers()
+            optimizer.ultranest(
+                inpars=inpars,
+                dataset=dataset,
+                olog=olog,
+                params_lm_loop=params_lm_loop,
+                star=star,
+            )
 
-            live_points = ultranest_args["live_points"]
-            tolerance = ultranest_args["tol"]
-            cluster_num_live_points = ultranest_args["cluster_num_live_points"]
-            logdir = os.path.join(visit_args["main_folder"], "ultranest")
-            resume = ultranest_args["resume"]
-            adaptive_nsteps = ultranest_args["adaptive_nsteps"]
-
-            # Run emcee from last best fit
-            printlog("\n-Run Ultranest from last best fit with:", olog=olog)
-            printlog(" live_points              = {}".format(live_points), olog=olog)
-            printlog(" tolerance                = {}".format(tolerance), olog=olog)
-            printlog(
-                " cluster_num_live_points  = {}".format(cluster_num_live_points),
-                olog=olog,
-            )
-            printlog(
-                " logdir                   = {}".format(logdir),
-                olog=olog,
-            )
-            printlog(
-                " resume                   = {}".format(resume),
-                olog=olog,
-            )
-            printlog("", olog=olog)
-            result = dataset.ultranest_sampler(
-                params=params_lm_loop,
-                live_points=live_points,
-                tol=tolerance,
-                cluster_num_live_points=cluster_num_live_points,
-                logdir=logdir,
-                resume=resume,
-                adaptive_nsteps=adaptive_nsteps,
-                add_shoterm=False,
-            )
         else:
             ### *** ===== EMCEE ==================================================
             optimizer = Optimizers()

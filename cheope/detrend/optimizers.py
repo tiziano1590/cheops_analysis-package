@@ -22,7 +22,7 @@ class Optimizers:
     """
 
     def __init__(self):
-        self.optimizers = ["emcee", "ultranest"]
+        self.optimizers_list = ["emcee", "ultranest"]
 
     def emcee(
         self,
@@ -469,3 +469,84 @@ class Optimizers:
             dataset, visit_folder.resolve(), star_name, file_key, gp=True
         )
         printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+    def ultranest(
+        self,
+        inpars=None,
+        dataset=None,
+        olog=None,
+        params_lm_loop=None,
+        star=None,
+    ):
+
+        (
+            visit_args,
+            star_args,
+            planet_args,
+            emcee_args,
+            ultranest_args,
+            read_file_status,
+        ) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.ultranest_args,
+            inpars.read_file_status,
+        )
+
+        aperture = visit_args["aperture"]
+
+        # =====================
+        # name of the file in pycheops_data
+        file_key = visit_args["file_key"]
+
+        # visit_folder
+        main_folder = visit_args["main_folder"]
+        visit_number = visit_args["visit_number"]
+        shape = visit_args["shape"]
+
+        # visit_folder = Path('/home/borsato/Dropbox/Research/exoplanets/objects/KELT/KELT-6/data/CHEOPS_DATA/pycheops_analysis/visit_01/')
+        visit_name = "visit_{:02d}_{:s}_{:s}_shape_ap{:s}_BF".format(
+            visit_number, file_key, shape.lower(), aperture.upper()
+        )
+        visit_folder = Path(os.path.join(main_folder, visit_name))
+
+        logs_folder = os.path.join(main_folder, "logs")
+
+        star_name = star_args["star_name"]
+
+        live_points = ultranest_args["live_points"]
+        tolerance = ultranest_args["tol"]
+        cluster_num_live_points = ultranest_args["cluster_num_live_points"]
+        logdir = os.path.join(visit_args["main_folder"], "ultranest")
+        resume = ultranest_args["resume"]
+        adaptive_nsteps = ultranest_args["adaptive_nsteps"]
+
+        # Run emcee from last best fit
+        printlog("\n-Run Ultranest from last best fit with:", olog=olog)
+        printlog(" live_points              = {}".format(live_points), olog=olog)
+        printlog(" tolerance                = {}".format(tolerance), olog=olog)
+        printlog(
+            " cluster_num_live_points  = {}".format(cluster_num_live_points),
+            olog=olog,
+        )
+        printlog(
+            " logdir                   = {}".format(logdir),
+            olog=olog,
+        )
+        printlog(
+            " resume                   = {}".format(resume),
+            olog=olog,
+        )
+        printlog("", olog=olog)
+        result = dataset.ultranest_sampler(
+            params=params_lm_loop,
+            live_points=live_points,
+            tol=tolerance,
+            cluster_num_live_points=cluster_num_live_points,
+            logdir=logdir,
+            resume=resume,
+            adaptive_nsteps=adaptive_nsteps,
+            add_shoterm=False,
+        )
