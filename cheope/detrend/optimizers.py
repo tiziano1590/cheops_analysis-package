@@ -519,7 +519,7 @@ class Optimizers:
         live_points = ultranest_args["live_points"]
         tolerance = ultranest_args["tol"]
         cluster_num_live_points = ultranest_args["cluster_num_live_points"]
-        logdir = os.path.join(visit_args["main_folder"], "ultranest")
+        logdir = os.path.join(visit_folder.resolve(), "ultranest")
         resume = ultranest_args["resume"]
         adaptive_nsteps = ultranest_args["adaptive_nsteps"]
 

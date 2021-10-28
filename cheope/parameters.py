@@ -420,6 +420,8 @@ class ReadFile:
 
         self.planet_args["T_0_user_data"] = None
 
+        self.planet_args["P_bounds"] = [0, 500]
+
         if type(self.planet_args["P"]) is not float:
             self.planet_args["P"] = self.planet_args["P"].n
 

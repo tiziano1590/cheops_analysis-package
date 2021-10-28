@@ -75,6 +75,7 @@ class SingleBayes:
         self.input_pars = [
             "P",
             "T_0",
+            "aRs",
             "D",
             "W",
             "b",
