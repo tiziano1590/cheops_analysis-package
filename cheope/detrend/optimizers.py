@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cheope.pycheops_analysis as pyca
 import os
+import json
 from pathlib import Path
 from uncertainties import ufloat
 
@@ -519,7 +520,7 @@ class Optimizers:
         live_points = ultranest_args["live_points"]
         tolerance = ultranest_args["tol"]
         cluster_num_live_points = ultranest_args["cluster_num_live_points"]
-        logdir = os.path.join(visit_folder.resolve(), "ultranest")
+        logdir = os.path.join(visit_folder.resolve(), "02_ultranest")
         resume = ultranest_args["resume"]
         adaptive_nsteps = ultranest_args["adaptive_nsteps"]
 
@@ -540,7 +541,7 @@ class Optimizers:
             olog=olog,
         )
         printlog("", olog=olog)
-        result = dataset.ultranest_sampler(
+        sampler = dataset.ultranest_sampler(
             params=params_lm_loop,
             live_points=live_points,
             tol=tolerance,
@@ -550,3 +551,70 @@ class Optimizers:
             adaptive_nsteps=adaptive_nsteps,
             add_shoterm=False,
         )
+
+        printlog("Plotting run", olog=olog)
+        sampler.plot_run()
+
+        printlog("Plotting traces", olog=olog)
+        sampler.plot_trace()
+
+        printlog("Generating corner plot", olog=olog)
+        sampler.plot_corner()
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+
+        result_json_path = os.path.join(logdir, "info/results.json")
+        result = json.load(open(result_json_path))
+
+        params_med, _, params_mle, stats_mle = pyca.get_best_parameters_ultra(
+            result, dataset, dataset_type="visit", update_dataset=True
+        )
+        # update emcee.params -> median and emcee.params_mle -> mle
+        for p in dataset.emcee.params:
+            dataset.emcee.params[p] = params_med[p]
+            dataset.emcee.params_best[p] = params_mle[p]
+
+        printlog("MEDIAN PARAMETERS", olog=olog)
+        for p in params_med:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med[p].value, params_med[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(visit_folder.resolve(), "02_params_emcee_median.dat"),
+            params_med,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(dataset, params_best=params_med, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med,
+            par_type="median",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "02_lc_emcee_median.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_lc_emcee_median.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_fft_emcee_median.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)

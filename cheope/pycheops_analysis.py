@@ -1331,6 +1331,290 @@ def get_best_parameters(
 
 
 # =====================================================================
+# GET THE BEST PARAMETERS FROM ULTRANEST ANALYSIS WITH PYCHEOPS FOR ONE LC
+def get_best_parameters_ultra(
+    result, dataset, dataset_type="visit", update_dataset=False
+):
+
+    _, pnames, _ = get_fitting_parameters(result.params)
+    #   print(pnames)
+
+    if "multi" in dataset_type.lower():
+
+        flatchain = dataset.sampler.get_chain(flat=True, discard=nburn)
+        lnprob = dataset.sampler.get_log_prob(flat=True, discard=0)
+
+        if update_dataset:
+            print("Updating result.flatchain and result.lnprob")
+            result.chain = flatchain.copy()
+            result.lnprob = lnprob.copy()
+
+        par_mle = result.parbest.copy()
+
+    else:  # single visit dataset
+
+        if nburn > 0:
+            flatchain = dataset.sampler.get_chain(flat=True, discard=nburn)
+            lnprob = dataset.sampler.get_log_prob(flat=True, discard=nburn)
+            print("Updating result.flatchain and result.lnprob")
+            result.chain = flatchain
+            result.lnprob = lnprob
+        else:
+            flatchain = result.chain
+            lnprob = result.lnprob
+
+        par_mle = result.params_best.copy()
+
+    pmed = np.percentile(flatchain, 50, interpolation="midpoint", axis=0)
+    par_med = result.params.copy()
+
+    idx_mle = np.argmax(lnprob)
+    pmle = flatchain[idx_mle, :]
+
+    # assign stderr = 0 if not fitted
+    for p in par_med:
+        if not par_med[p].vary:
+            par_med[p].stderr = 0.0
+            par_mle[p].stderr = 0.0
+
+    for n in pnames:
+
+        i_n = pnames.index(n)
+        schain = flatchain[:, i_n]
+        low, upp = high_posterior_density(schain)
+        err = 0.5 * (upp - low)
+
+        par_med[n].value = pmed[i_n]
+        par_med[n].stderr = err
+
+        par_mle[n].value = pmle[i_n]
+        par_mle[n].stderr = err
+
+        if "multi" in dataset_type.lower():
+            # update also the dataset.result.params values!!
+            dataset.result.params[n].value = pmed[i_n]
+            dataset.result.params[n].stderr = err
+
+            # update also the dataset.result.parbest values!!
+            dataset.result.parbest[n].value = pmle[i_n]
+            dataset.result.parbest[n].stderr = err
+
+        else:
+            # update also the dataset.emcee.params values!!
+            dataset.emcee.params[n].value = pmed[i_n]
+            dataset.emcee.params[n].stderr = err
+
+            # update also the dataset.emcee.params_best values!!
+            dataset.emcee.params_best[n].value = pmle[i_n]
+            dataset.emcee.params_best[n].stderr = err
+
+    # if(np.any([l1 in pnames for l1 in ['D', 'W', 'b']])):
+    if "D" in pnames:
+        D = flatchain[:, pnames.index("D")]
+        k = np.sqrt(D)
+        low, upp = high_posterior_density(k)
+        err = 0.5 * (upp - low)
+        par_med["k"].value = np.percentile(D, 50, interpolation="midpoint", axis=0)
+        par_med["k"].stderr = err
+        par_mle["k"].value = k[idx_mle]
+        par_mle["k"].stderr = err
+    else:
+        k = par_med["k"].value
+
+    if "W" in pnames:
+        W = flatchain[:, pnames.index("W")]
+    else:
+        W = par_med["W"].value
+
+    if "b" in pnames:
+        b = flatchain[:, pnames.index("b")]
+    else:
+        b = par_med["b"].value
+
+    aRs = np.sqrt((1 + k) ** 2 - b ** 2) / W / np.pi
+    if np.any([l1 in pnames for l1 in ["D", "W", "b"]]):
+        low, upp = high_posterior_density(aRs)
+        err = 0.5 * (upp - low)
+        aRs_med = np.percentile(aRs, 50, interpolation="midpoint", axis=0)
+        aRs_mle = aRs[idx_mle]
+    else:
+        aRs_med = aRs
+        aRs_mle = aRs
+        err = 0.0
+    par_med["aR"].value = aRs_med
+    par_med["aR"].stderr = err
+    par_mle["aR"].value = aRs_mle
+    par_mle["aR"].stderr = err
+
+    sini = np.sqrt(1 - (b / aRs) ** 2)
+    if np.any([l1 in pnames for l1 in ["D", "W", "b"]]):
+        low, upp = high_posterior_density(sini)
+        err = 0.5 * (upp - low)
+        sini_med = np.percentile(sini, 50, interpolation="midpoint", axis=0)
+        sini_mle = sini[idx_mle]
+    else:
+        sini_med = sini
+        sini_mle = sini
+        err = 0.0
+    par_med["sini"].value = sini_med
+    par_med["sini"].stderr = err
+    par_mle["sini"].value = sini_mle
+    par_mle["sini"].stderr = err
+
+    inc = np.arcsin(sini) * cst.rad2deg
+    if np.any([l1 in pnames for l1 in ["D", "W", "b"]]):
+        low, upp = high_posterior_density(inc)
+        err = 0.5 * (upp - low)
+        inc_med = np.percentile(inc, 50, interpolation="midpoint", axis=0)
+        inc_mle = inc[idx_mle]
+    else:
+        inc_med = inc
+        inc_mle = inc
+        err = 0.0
+    par_med["inc"] = Parameter("inc", value=inc_med, vary=False, min=0.0, max=180.0)
+    par_med["inc"].stderr = err
+    par_mle["inc"] = Parameter("inc", value=inc_mle, vary=False, min=0.0, max=180.0)
+    par_mle["inc"].stderr = err
+
+    if "log_sigma" in pnames:
+        lsigma = flatchain[:, pnames.index("log_sigma")]
+        sigmaw = np.exp(lsigma) * 1.0e6
+        low, upp = high_posterior_density(sigmaw)
+        err = 0.5 * (upp - low)
+        par_med["sigma_w"].value = np.percentile(
+            sigmaw, 50, interpolation="midpoint", axis=0
+        )
+        par_med["sigma_w"].stderr = err
+        par_mle["sigma_w"].value = sigmaw[idx_mle]
+        par_mle["sigma_w"].stderr = err
+
+    if "f_c" in pnames or "f_s" in pnames:
+        if "f_c" in pnames:
+            f_c = flatchain[:, pnames.index("f_c")]
+        else:
+            f_c = par_med["f_c"]
+        if "f_s" in pnames:
+            f_s = flatchain[:, pnames.index("f_s")]
+        else:
+            f_s = par_med["f_s"]
+        ecc = f_c ** 2 + f_s ** 2
+        low, upp = high_posterior_density(ecc)
+        err = 0.5 * (upp - low)
+        par_med["e"].value = np.percentile(ecc, 50, interpolation="midpoint", axis=0)
+        par_med["e"].stderr = err
+        par_mle["e"].value = ecc[idx_mle]
+        par_mle["e"].stderr = err
+
+        w_1 = np.arctan2(f_s, f_c) * cst.rad2deg
+        w_2 = w_1 % 360.0
+        std1 = np.std(w_1, ddof=1)
+        std2 = np.std(w_2, ddof=1)
+        if std1 >= std2:
+            w = w_2
+        else:
+            w = w_1
+        low, upp = high_posterior_density(w)
+        err = 0.5 * (upp - low)
+        par_med["argp"] = Parameter(
+            "argp",
+            value=np.percentile(w, 50, interpolation="midpoint", axis=0),
+            vary=False,
+            min=0.0,
+            max=360.0,
+        )
+        par_med["argp"].stderr = err
+        par_mle["argp"] = Parameter(
+            "argp", value=w[idx_mle], vary=False, min=0.0, max=180.0
+        )
+        par_mle["argp"].stderr = err
+
+    if "h_1" in pnames or "h_2" in pnames:
+        if "h_1" in pnames:
+            h_1 = flatchain[:, pnames.index("h_1")]
+        else:
+            h_1 = par_med["h_1"].value
+        if "h_2" in pnames:
+            h_2 = flatchain[:, pnames.index("h_2")]
+        else:
+            h_2 = par_med["h_2"].value
+
+        # c, alpha power-2 law
+        c, alpha = h1h2_to_ca(h_1, h_2)
+
+        low, upp = high_posterior_density(c)
+        err = 0.5 * (upp - low)
+        par_med["LD_c"] = Parameter(
+            "LD_c",
+            value=np.percentile(c, 50, interpolation="midpoint", axis=0),
+            vary=False,
+        )
+        par_med["LD_c"].stderr = err
+        par_mle["LD_c"] = Parameter("LD_c", value=c[idx_mle], vary=False)
+        par_mle["LD_c"].stderr = err
+
+        low, upp = high_posterior_density(alpha)
+        err = 0.5 * (upp - low)
+        par_med["LD_alpha"] = Parameter(
+            "LD_alpha",
+            value=np.percentile(alpha, 50, interpolation="midpoint", axis=0),
+            vary=False,
+        )
+        par_med["LD_alpha"].stderr = err
+        par_mle["LD_alpha"] = Parameter("LD_alpha", value=alpha[idx_mle], vary=False)
+        par_mle["LD_alpha"].stderr = err
+
+        # q1, q2
+        q1, q2 = h1h2_to_q1q2(h_1, h_2)
+
+        low, upp = high_posterior_density(q1)
+        err = 0.5 * (upp - low)
+        par_med["q_1"] = Parameter(
+            "q_1",
+            value=np.percentile(q1, 50, interpolation="midpoint", axis=0),
+            vary=False,
+        )
+        par_med["q_1"].stderr = err
+        par_mle["q_1"] = Parameter("q_1", value=q1[idx_mle], vary=False)
+        par_mle["q_1"].stderr = err
+
+        low, upp = high_posterior_density(q2)
+        err = 0.5 * (upp - low)
+        par_med["q_2"] = Parameter(
+            "q_2",
+            value=np.percentile(q2, 50, interpolation="midpoint", axis=0),
+            vary=False,
+        )
+        par_med["q_2"].stderr = err
+        par_mle["q_2"] = Parameter("q_2", value=q2[idx_mle], vary=False)
+        par_mle["q_2"].stderr = err
+
+    if "glint_scale" in par_med:
+        glint = True
+    else:
+        glint = False
+
+    print("PARAMS: MEDIAN")
+    par_med.pretty_print(
+        colwidth=20, precision=8, columns=["value", "stderr", "vary", "expr"]
+    )
+    if "multi" in dataset_type.lower():
+        stats_med = None
+    else:
+        stats_med = computes_rms(dataset, params_best=par_med, glint=glint)
+    print()
+    print("PARAMS: BEST <-> MAX lnL")
+    par_mle.pretty_print(
+        colwidth=20, precision=8, columns=["value", "stderr", "vary", "expr"]
+    )
+    if "multi" in dataset_type.lower():
+        stats_mle = None
+    else:
+        stats_mle = computes_rms(dataset, params_best=par_mle, glint=glint)
+
+    return par_med, stats_med, par_mle, stats_mle
+
+
+# =====================================================================
 # FROM PARAMETER SET COMPUTES MODEL AND PLOT EVERITHING IN ONE FIG
 def model_plot_fit(
     dataset,
@@ -7111,6 +7395,33 @@ class CustomStarProperties(object):
 
 # ======================================================================
 def quick_save_params(out_file, params, bjd_ref):
+
+    of = open(out_file, "w")
+    of.write("# param value error vary unit\n")
+    for p in params:
+        stderr = params[p].stderr
+        if stderr is None:
+            stderr = 0.0
+        try:
+            if p[0] in ["d", "r", "g"]:
+                unit = params_units["det"]
+            else:
+                unit = params_units[p]
+                if p == "T_0":
+                    unit = "{}{}".format(unit, bjd_ref)
+        except:
+            unit = "-"
+        line = "{:20s} {:20.10f} {:20.10f} {:6s} {:>20s}\n".format(
+            p, params[p].value, stderr, str(params[p].vary), unit
+        )
+        of.write(line)
+    of.close()
+
+    return
+
+
+# ======================================================================
+def quick_save_params_ultra(out_file, params, bjd_ref):
 
     of = open(out_file, "w")
     of.write("# param value error vary unit\n")
