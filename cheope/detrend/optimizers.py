@@ -552,6 +552,14 @@ class Optimizers:
             add_shoterm=False,
         )
 
+        # TODO use params_lm_loop to update and create params_med and params_mle, the
+        # update is going to use the info/result.json file]
+
+        # print(sampler.paramnames)
+        # print(type(sampler.paramnames))
+        # print(sampler.derivedparamnames)
+        # print(type(sampler.derivedparamnames))
+
         printlog("Plotting run", olog=olog)
         sampler.plot_run()
 
@@ -566,28 +574,16 @@ class Optimizers:
         )
 
         result_json_path = os.path.join(logdir, "info/results.json")
-        result = json.load(open(result_json_path))
+        results = json.load(open(result_json_path))
 
-        params_med, _, params_mle, stats_mle = pyca.get_best_parameters_ultra(
-            result, dataset, dataset_type="visit", update_dataset=True
-        )
-        # update emcee.params -> median and emcee.params_mle -> mle
-        for p in dataset.emcee.params:
-            dataset.emcee.params[p] = params_med[p]
-            dataset.emcee.params_best[p] = params_mle[p]
-
-        printlog("MEDIAN PARAMETERS", olog=olog)
-        for p in params_med:
-            printlog(
-                "{:20s} = {:20.12f} +/- {:20.12f}".format(
-                    p, params_med[p].value, params_med[p].stderr
-                ),
-                olog=olog,
-            )
-        pyca.quick_save_params(
-            os.path.join(visit_folder.resolve(), "02_params_emcee_median.dat"),
-            params_med,
+        printlog("Saving MEDIAN PARAMETERS", olog=olog)
+        pyca.quick_save_params_ultra(
+            os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
+            planet_args,
+            star_args,
+            results,
             dataset.lc["bjd_ref"],
+            mod="median",
         )
 
         _ = pyca.computes_rms(dataset, params_best=params_med, glint=False, olog=olog)
