@@ -879,6 +879,222 @@ def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=N
 
     return statistics
 
+def computes_rms_ultra(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None):
+
+    lc = dataset.lc
+    t, f, ef = lc["time"], lc["flux"], lc["flux_err"]
+
+    if params_best is None:
+        try:
+            parbest = dataset.emcee.params_best
+        except:
+            print("emcee params_best not found...using lmfit")
+            try:
+                parbest = dataset.lmfit.params_best
+            except:
+                print("lmfit params_best not found...exiting")
+                return
+    else:
+        parbest = params_best
+
+    nfit = np.sum([parbest[p].vary for p in parbest])
+    if "log_S0" in parbest and "log_omega0" in parbest:
+        ngpfit = 3  # log_sigma in the kernel
+    else:
+        ngpfit = 0
+    ndata = len(t)
+
+    lnpr = 0.0
+    for k in parbest:
+        v = parbest[k].value
+        u = parbest[k].user_data
+        if isinstance(u, UFloat):
+            lnpr += -0.5 * ((u.n - v) / u.s) ** 2
+    lnpr += _log_prior(parbest["D"], parbest["W"], parbest["b"])
+
+    try:
+        j2 = np.exp(parbest["log_sigma"]) ** 2
+    except:
+        j2 = 0.0
+    ef2 = ef ** 2
+    err2 = ef2 + j2
+
+    # fbest = dataset.model.eval(parbest, t=t)
+    mfit = get_full_model(dataset, parbest)
+    fbest = mfit.all_nogp
+
+    statistics = {}
+
+    printlog("", olog=olog)
+    printlog("=================", olog=olog)
+    printlog("flux-all (w/o GP)", olog=olog)
+
+    res = f - fbest
+    # stats
+    chisquare = np.sum(res * res / ef2)
+    chisquare_red = chisquare / (ndata - nfit)
+    lnL = -0.5 * np.sum((res * res / err2) + np.log(2.0 * np.pi * err2))
+    lnP = lnL + lnpr
+    bic = -2.0 * lnL + (nfit - ngpfit) * np.log(ndata)
+    aic = -2.0 * lnL + 2.0 * nfit
+    printlog(
+        "dof = ndata ({}) - nfit ({}) = {} (ngpfit = {})".format(
+            ndata, nfit - ngpfit, ndata - nfit - ngpfit, ngpfit
+        ),
+        olog=olog,
+    )
+
+    statistics["flux-all (w/o GP)"] = {}
+    statistics["flux-all (w/o GP)"]["ChiSqr"] = chisquare
+    statistics["flux-all (w/o GP)"]["Red. ChiSqr"] = chisquare_red
+    statistics["flux-all (w/o GP)"]["lnL"] = lnL
+    statistics["flux-all (w/o GP)"]["lnP"] = lnP
+    statistics["flux-all (w/o GP)"]["BIC"] = bic
+    statistics["flux-all (w/o GP)"]["AIC"] = aic
+    statistics["flux-all (w/o GP)"]["ndata"] = ndata
+    statistics["flux-all (w/o GP)"]["nfit"] = nfit
+    statistics["flux-all (w/o GP)"]["ngpfit"] = ngpfit
+    statistics["flux-all (w/o GP)"]["dof"] = ndata - nfit - ngpfit
+
+    printlog("ChiSqr         = {}".format(chisquare), olog=olog)
+    printlog("Red. ChiSqr    = {}".format(chisquare_red), olog=olog)
+    printlog("lnL            = {}".format(lnL), olog=olog)
+    printlog("lnP            = {}".format(lnP), olog=olog)
+    printlog("BIC            = {}".format(bic), olog=olog)
+    printlog("AIC            = {}".format(aic), olog=olog)
+
+    rms_unbin = np.std(res, ddof=1) * 1.0e6
+    printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
+    statistics["flux-all (w/o GP)"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
+
+    if do_rms_bin:
+        binned_rms(statistics, t, res, rms_time, keyword="flux-all (w/o GP)")
+    printlog("", olog=olog)
+
+    printlog("GP status: {}".format(dataset.gp), olog=olog)
+    if dataset.gp is not None and dataset.gp is not False:
+        printlog("=================", olog=olog)
+        printlog("flux-all (w/ GP)", olog=olog)
+        mu0 = mfit.gp
+        # if(module_celerite2):
+        #   kernel = terms.SHOTerm(
+        #                 S0=np.exp(parbest['log_S0'].value),
+        #                 Q=1/np.sqrt(2),
+        #                 w0=np.exp(parbest['log_omega0'].value)
+        #                 )
+        #   gp = GP(kernel, mean=0)
+        #   gp.compute(t, diag=err2, quiet=True)
+        #   mu0 = gp.predict(res, t, return_cov=False, return_var=False)
+        # else:
+        #   dataset.gp.set_parameter('kernel:terms[0]:log_S0',     parbest['log_S0'])
+        #   dataset.gp.set_parameter('kernel:terms[0]:log_omega0', parbest['log_omega0'])
+        #   dataset.gp.set_parameter('kernel:terms[1]:log_sigma',  parbest['log_sigma'])
+        #   # lnL = dataset.gp.log_likelihood(res)
+        #   mu0 = dataset.gp.predict(res, t, return_cov=False, return_var=False)
+
+        res = res - mu0
+        # stats
+        chisquare = np.sum(res * res / ef2)
+        chisquare_red = chisquare / (ndata - nfit)
+        # lnL          += lnp
+        lnL = -0.5 * np.sum((res * res / err2) + np.log(2.0 * np.pi * err2))
+        lnP = lnL + lnpr
+        bic = -2.0 * lnL + nfit * np.log(ndata)
+        aic = -2.0 * lnL + 2.0 * nfit
+        printlog(
+            "dof = ndata ({}) - nfit ({}) = {} (ngpfit = {})".format(
+                ndata, nfit, ndata - nfit, ngpfit
+            ),
+            olog=olog,
+        )
+
+        statistics["flux-all (w/ GP)"] = {}
+        statistics["flux-all (w/ GP)"]["ChiSqr"] = chisquare
+        statistics["flux-all (w/ GP)"]["Red. ChiSqr"] = chisquare_red
+        statistics["flux-all (w/ GP)"]["lnL"] = lnL
+        statistics["flux-all (w/ GP)"]["lnP"] = lnP
+        statistics["flux-all (w/ GP)"]["BIC"] = bic
+        statistics["flux-all (w/ GP)"]["AIC"] = aic
+        statistics["flux-all (w/ GP)"]["ndata"] = ndata
+        statistics["flux-all (w/ GP)"]["nfit"] = nfit
+        statistics["flux-all (w/ GP)"]["ngpfit"] = ngpfit
+        statistics["flux-all (w/ GP)"]["dof"] = ndata - nfit - ngpfit
+
+        printlog("ChiSqr         = {}".format(chisquare), olog=olog)
+        printlog("Red. ChiSqr    = {}".format(chisquare_red), olog=olog)
+        printlog("lnL            = {}".format(lnL), olog=olog)
+        printlog("BIC            = {}".format(bic), olog=olog)
+        printlog("AIC            = {}".format(aic), olog=olog)
+
+        rms_unbin = np.std(res, ddof=1) * 1.0e6
+        printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
+        statistics["flux-all (w/ GP)"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
+        if do_rms_bin:
+            binned_rms(statistics, t, res, rms_time, keyword="flux-all (w/ GP)")
+            # for binw in rms_time:
+            #     _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
+            #     rms_bin = e_bin * np.sqrt(n_bin - 1)
+            #     nrms = len(rms_bin)
+            #     rms = np.mean(rms_bin) * 1.0e6
+            #     std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
+            #     if binw >= 1.0:
+            #         binw_str = "{:1.0f}hr".format(binw)
+            #     else:
+            #         binw_str = "{:2.0f}min".format(binw * 60.0)
+            #     printlog(
+            #         "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
+            #             binw_str, rms, std, nrms
+            #         ),
+            #         olog=olog,
+            #     )
+            #     statistics["flux-all (w/ GP)"]["RMS ({:8s})".format(binw_str)] = [
+            #         rms,
+            #         std,
+            #         nrms,
+            #     ]
+        printlog("", olog=olog)
+
+    printlog("=================", olog=olog)
+    printlog("flux-transit", olog=olog)
+    # without trend/glint/etc
+    # if(glint):
+    #   ftra = dataset.model.left.left.eval(parbest, t=t)
+    # else:
+    #   ftra  = dataset.model.left.eval(parbest, t=t)
+    ftra = mfit.tra
+    res = f - ftra
+
+    statistics["flux-transit"] = {}
+    rms_unbin = np.std(res, ddof=1) * 1.0e6
+    printlog("RMS ({:8s}) = {:8.2f}".format("unbinned", rms_unbin), olog=olog)
+    statistics["flux-transit"]["RMS (unbinned)"] = [rms_unbin, 0.0, 1]
+    if do_rms_bin:
+        binned_rms(statistics, t, res, rms_time, keyword="flux-transit")
+        # for binw in rms_time:
+        #     _, _, e_bin, n_bin = lcbin(t, res, binwidth=binw * cst.hour2day)
+        #     rms_bin = e_bin * np.sqrt(n_bin - 1)
+        #     nrms = len(rms_bin)
+        #     rms = np.mean(rms_bin) * 1.0e6
+        #     std = np.std(rms_bin, ddof=1) * 1.0e6 / np.sqrt(nrms - 1)
+        #     if binw >= 1.0:
+        #         binw_str = "{:1.0f}hr".format(binw)
+        #     else:
+        #         binw_str = "{:2.0f}min".format(binw * 60.0)
+        #     printlog(
+        #         "RMS ({:8s}) = {:8.2f} +/- {:6.2f} (n_bin = {})".format(
+        #             binw_str, rms, std, nrms
+        #         ),
+        #         olog=olog,
+        #     )
+        #     statistics["flux-transit"]["RMS ({:8s})".format(binw_str)] = [
+        #         rms,
+        #         std,
+        #         nrms,
+        #     ]
+    printlog("", olog=olog)
+
+    return statistics
+
 
 # =====================================================================
 # PLOT EACH RAW LC AND CLIP OUTLIERS
@@ -7468,7 +7684,7 @@ def quick_save_params_ultra(
     for p in parlist:
         params[p] = {}
         if p in results["paramnames"]:
-            res_idx = results["paramames"].index(p)
+            res_idx = results["paramnames"].index(p)
             params[p]["value"] = results["posterior"][mod][res_idx]
             params[p]["vary"] = True
             params[p]["err_mean"] = (

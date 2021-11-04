@@ -586,7 +586,9 @@ class Optimizers:
             mod="median",
         )
 
-        _ = pyca.computes_rms(dataset, params_best=params_med, glint=False, olog=olog)
+        # _ = pyca.computes_rms_ultra(
+        #     dataset, params_best=params_med, glint=False, olog=olog
+        # )
         fig, _ = pyca.model_plot_fit(
             dataset,
             params_med,
