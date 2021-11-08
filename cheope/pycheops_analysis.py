@@ -1570,7 +1570,7 @@ def get_best_parameters_ultranest(result, params, sampler, dataset_type="visit")
         par_med[name].stderr = stdev
         par_mle[name].stderr = stdev
 
-        print(par_med[name].stderr, par_med[name].value)
+        # print(par_med[name].stderr, par_med[name].value)
         # exit(0)
 
     if "D" in fitted_paramnames:
@@ -7716,7 +7716,6 @@ def quick_save_params_ultranest(out_file, params, bjd_ref):
                     unit = "{}{}".format(unit, bjd_ref)
         except:
             unit = "-"
-        print(params[p])
         line = "{:20s} {:20.10f} {:20.10f} {:6s} {:>20s}\n".format(
             p, params[p].value, stderr, str(params[p].vary), unit
         )

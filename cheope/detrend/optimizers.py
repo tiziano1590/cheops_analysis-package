@@ -580,8 +580,12 @@ class Optimizers:
             results, params_lm_loop, sampler, dataset_type="visit"
         )
 
-        # for params in params_med:
-        #     print(params)
+        printlog("MEDIAN PARAMETERS", olog=olog)
+        for p in params_med:
+            printlog(
+                "{} = {} +/- {}".format(p, params_med[p].value, params_med[p].stderr),
+                olog=olog,
+            )
 
         pyca.quick_save_params_ultranest(
             os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
@@ -589,51 +593,26 @@ class Optimizers:
             dataset.lc["bjd_ref"],
         )
 
-        pyca.quick_save_params_ultranest(
-            os.path.join(visit_folder.resolve(), "02_params_ultranest_mle.dat"),
-            params_mle,
-            dataset.lc["bjd_ref"],
-        )
-
-        printlog("MEDIAN PARAMETERS", olog=olog)
-        for p in params_med:
-            printlog(
-                "{} = {} +/- {}".format(p, params_med[p].value, params_med[p].stderr),
-                olog=olog,
-            )
-        exit(0)
-
-        # result_json_path = os.path.join(logdir, "info/results.json")
-        # results = json.load(open(result_json_path))
-
-        # printlog("Saving MEDIAN PARAMETERS", olog=olog)
-        # pyca.quick_save_params_ultra(
-        #     os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
-        #     planet_args,
-        #     star_args,
-        #     params_lm_loop,
-        #     results,
+        # pyca.quick_save_params_ultranest(
+        #     os.path.join(visit_folder.resolve(), "02_params_ultranest_mle.dat"),
+        #     params_mle,
         #     dataset.lc["bjd_ref"],
-        #     mod="median",
         # )
 
-        # _ = pyca.computes_rms_ultra(
-        #     dataset, params_best=params_med, glint=False, olog=olog
-        # )
         fig, _ = pyca.model_plot_fit(
             dataset,
             params_med,
             par_type="median",
-            nsamples=nwalkers,
-            flatchains=result.chain,
+            nsamples=0,
+            flatchains=None,
             model_filename=os.path.join(
-                visit_folder.resolve(), "02_lc_emcee_median.dat"
+                visit_folder.resolve(), "02_lc_ultranest_median.dat"
             ),
         )
         for ext in fig_ext:
             fig.savefig(
                 os.path.join(
-                    visit_folder.resolve(), "02_lc_emcee_median.{}".format(ext)
+                    visit_folder.resolve(), "02_lc_ultranest_median.{}".format(ext)
                 ),
                 bbox_inches="tight",
             )
@@ -642,8 +621,56 @@ class Optimizers:
         for ext in fig_ext:
             fig.savefig(
                 os.path.join(
-                    visit_folder.resolve(), "02_fft_emcee_median.{}".format(ext)
+                    visit_folder.resolve(), "02_fft_ultranest_median.{}".format(ext)
                 ),
                 bbox_inches="tight",
             )
         plt.close(fig)
+
+        printlog("MLE PARAMETERS", olog=olog)
+        for p in params_mle:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle[p].value, params_mle[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "02_params_ultranest_mle.dat"),
+            params_mle,
+            dataset.lc["bjd_ref"],
+        )
+
+        # _ = pyca.computes_rms(dataset, params_best=params_mle, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle,
+            par_type="mle",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "02_lc_ultranest_mle.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_lc_ultranest_mle.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_fft_ultranest_mle.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        file_emcee = pyca.save_dataset(
+            dataset, visit_folder.resolve(), star_name, file_key, gp=False
+        )
+        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
