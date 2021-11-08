@@ -27,6 +27,7 @@ class ReadFile:
             "file_key",
             "passband",
             "aperture",
+            "dace",
             "shape",
             "seed",
             "glint_type",
@@ -243,6 +244,9 @@ class ReadFile:
         # clip_outliers
         self.visit_args["clip_outliers"] = 5
 
+        if self.visit_args["dace"] == "None":
+            self.visit_args["dace"] = False
+
         try:
             co = round(self.yaml_input["clip_outliers"])
             if co < 1:
@@ -257,11 +261,11 @@ class ReadFile:
 
         star = StarProperties(
             self.star_args["star_name"],
-            match_arcsec=None,
+            match_arcsec=5,
             teff=self.star_args["teff"],
             logg=self.star_args["logg"],
             metal=self.star_args["feh"],
-            dace=False,
+            dace=self.visit_args["dace"],
         )
 
         if (self.star_args["h_1_fit"] == False) or (self.star_args["h_2_fit"] == False):
