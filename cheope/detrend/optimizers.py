@@ -552,14 +552,6 @@ class Optimizers:
             add_shoterm=False,
         )
 
-        # TODO use params_lm_loop to update and create params_med and params_mle, the
-        # update is going to use the info/result.json file]
-
-        # print(sampler.paramnames)
-        # print(type(sampler.paramnames))
-        # print(sampler.derivedparamnames)
-        # print(type(sampler.derivedparamnames))
-
         printlog("Plotting run", olog=olog)
         sampler.plot_run()
 
@@ -592,12 +584,6 @@ class Optimizers:
             params_med,
             dataset.lc["bjd_ref"],
         )
-
-        # pyca.quick_save_params_ultranest(
-        #     os.path.join(visit_folder.resolve(), "02_params_ultranest_mle.dat"),
-        #     params_mle,
-        #     dataset.lc["bjd_ref"],
-        # )
 
         fig, _ = pyca.model_plot_fit(
             dataset,
@@ -670,7 +656,250 @@ class Optimizers:
             )
         plt.close(fig)
 
-        file_emcee = pyca.save_dataset(
+        file_ultranest = pyca.save_dataset(
             dataset, visit_folder.resolve(), star_name, file_key, gp=False
         )
-        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+        printlog("-Dumped dataset into file {}".format(file_ultranest), olog=olog)
+
+        ### *** ==============================================================
+        ### *** ===== TRAIN GP ===============================================
+        printlog("", olog=olog)
+        printlog("TRAIN GP HYPERPARAMETERS FIXING PARAMETERS", olog=olog)
+
+        params_fixed = pyca.copy_parameters(params_mle)
+        # for p in ['T_0','D','W','b']: # only transit shape
+        for p in params_mle:  # fixing all transit and detrending parameters
+            params_fixed[p].set(vary=False)
+        params_fixed["log_sigma"].set(vary=True)
+
+        logdir = os.path.join(visit_folder.resolve(), "03_ultranest")
+        sampler_gp = dataset.ultranest_sampler(
+            params=params_fixed,
+            live_points=live_points,
+            tol=tolerance,
+            cluster_num_live_points=cluster_num_live_points,
+            logdir=logdir,
+            resume=resume,
+            adaptive_nsteps=adaptive_nsteps,
+            add_shoterm=True,
+        )
+
+        printlog("Plotting run", olog=olog)
+        sampler_gp.plot_run()
+
+        printlog("Plotting traces", olog=olog)
+        sampler_gp.plot_trace()
+
+        printlog("Generating corner plot", olog=olog)
+        sampler_gp.plot_corner()
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+
+        result_json_path = os.path.join(logdir, "info/results.json")
+        results = json.load(open(result_json_path))
+
+        params_med_gp_train, params_mle_gp_train = pyca.get_best_parameters_ultranest(
+            results, params_fixed, sampler_gp, dataset_type="visit"
+        )
+
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "03_params_ultranest_median.dat"),
+            params_med_gp_train,
+            dataset.lc["bjd_ref"],
+        )
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp_train,
+            par_type="median-GPtrain",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "03_lc_ultranest_median_gp_train.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "03_lc_ultranest_median_gp_train.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp_train,
+            par_type="mle-GPtrain",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "03_lc_ultranest_mle_gp_train.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "03_lc_ultranest_mle_gp_train.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "03_params_ultranest_mle.dat"),
+            params_mle_gp_train,
+            dataset.lc["bjd_ref"],
+        )
+
+        ### *** =======================================++=====================
+        ### *** ===== FIT TRANSIT + DETRENDING + GP =++=======================
+        printlog("\nRUN FULL FIT TRANSIT+DETRENDING+GP W/ ULTRANEST", olog=olog)
+
+        params_fit_gp = pyca.copy_parameters(params_mle)
+        for p in ["log_S0", "log_omega0", "log_sigma"]:
+            # params_fit_gp[p] = params_mle_gp_train[p]
+            # printlog("{} = {} user_data = {}".format(p, params_fit_gp[p], params_fit_gp[p].user_data), olog=olog)
+            # params_fit_gp[p].user_data = ufloat(params_mle_gp_train[p].value, 2*params_mle_gp_train[p].stderr)
+            # printlog("{} = {} user_data = {}".format(p, params_fit_gp[p], params_fit_gp[p].user_data), olog=olog)
+            params_fit_gp.add(
+                p,
+                value=params_mle_gp_train[p].value,
+                vary=True,
+                min=params_mle_gp_train[p].min,
+                max=params_mle_gp_train[p].max,
+            )
+            params_fit_gp[p].user_data = ufloat(
+                params_mle_gp_train[p].value, 2 * params_mle_gp_train[p].stderr
+            )
+
+        # log_Q = 1/sqrt(2)
+        params_fit_gp.add("log_Q", value=np.log(1 / np.sqrt(2)), vary=False)
+
+        logdir = os.path.join(visit_folder.resolve(), "04_ultranest")
+        sampler_gp = dataset.ultranest_sampler(
+            params=params_fit_gp,
+            live_points=live_points,
+            tol=tolerance,
+            cluster_num_live_points=cluster_num_live_points,
+            logdir=logdir,
+            resume=resume,
+            adaptive_nsteps=adaptive_nsteps,
+            add_shoterm=False,
+        )
+
+        printlog("Plotting run", olog=olog)
+        sampler_gp.plot_run()
+
+        printlog("Plotting traces", olog=olog)
+        sampler_gp.plot_trace()
+
+        printlog("Generating corner plot", olog=olog)
+        sampler_gp.plot_corner()
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+
+        result_json_path = os.path.join(logdir, "info/results.json")
+        results_gp = json.load(open(result_json_path))
+
+        params_med_gp, params_mle_gp = pyca.get_best_parameters_ultranest(
+            results_gp, params_fit_gp, sampler_gp, dataset_type="visit"
+        )
+
+        printlog("MEDIAN PARAMETERS w/ GP", olog=olog)
+        for p in params_med_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med_gp[p].value, params_med_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "04_params_ultranest_median_gp.dat"),
+            params_med_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        # _ = pyca.computes_rms(
+        #     dataset, params_best=params_med_gp, glint=False, olog=olog
+        # )
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp,
+            par_type="median w/ GP",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "04_lc_ultranest_median_gp.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "04_lc_ultranest_median_gp.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "04_fft_ultranest_median_gp.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("MLE PARAMETERS w/ GP", olog=olog)
+        for p in params_mle_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle_gp[p].value, params_mle_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "04_params_ultranest_mle_gp.dat"),
+            params_mle_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp,
+            par_type="mle w/ GP",
+            nsamples=0,
+            flatchains=None,
+            model_filename=os.path.join(
+                visit_folder.resolve(), "04_lc_ultranest_mle_gp.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "04_lc_ultranest_mle_gp.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "04_fft_ultranest_mle_gp.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        file_ultranest = pyca.save_dataset(
+            dataset, visit_folder.resolve(), star_name, file_key, gp=True
+        )
+        printlog("-Dumped dataset into file {}".format(file_ultranest), olog=olog)
