@@ -576,15 +576,46 @@ class Optimizers:
         result_json_path = os.path.join(logdir, "info/results.json")
         results = json.load(open(result_json_path))
 
-        printlog("Saving MEDIAN PARAMETERS", olog=olog)
-        pyca.quick_save_params_ultra(
-            os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
-            planet_args,
-            star_args,
-            results,
-            dataset.lc["bjd_ref"],
-            mod="median",
+        params_med, params_mle = pyca.get_best_parameters_ultranest(
+            results, params_lm_loop, sampler, dataset_type="visit"
         )
+
+        # for params in params_med:
+        #     print(params)
+
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
+            params_med,
+            dataset.lc["bjd_ref"],
+        )
+
+        pyca.quick_save_params_ultranest(
+            os.path.join(visit_folder.resolve(), "02_params_ultranest_mle.dat"),
+            params_mle,
+            dataset.lc["bjd_ref"],
+        )
+
+        printlog("MEDIAN PARAMETERS", olog=olog)
+        for p in params_med:
+            printlog(
+                "{} = {} +/- {}".format(p, params_med[p].value, params_med[p].stderr),
+                olog=olog,
+            )
+        exit(0)
+
+        # result_json_path = os.path.join(logdir, "info/results.json")
+        # results = json.load(open(result_json_path))
+
+        # printlog("Saving MEDIAN PARAMETERS", olog=olog)
+        # pyca.quick_save_params_ultra(
+        #     os.path.join(visit_folder.resolve(), "02_params_ultranest_median.dat"),
+        #     planet_args,
+        #     star_args,
+        #     params_lm_loop,
+        #     results,
+        #     dataset.lc["bjd_ref"],
+        #     mod="median",
+        # )
 
         # _ = pyca.computes_rms_ultra(
         #     dataset, params_best=params_med, glint=False, olog=olog
