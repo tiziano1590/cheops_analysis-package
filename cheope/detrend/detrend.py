@@ -2400,11 +2400,11 @@ class SingleBayesKeplerTess:
 
         star = pyca.CustomStarProperties(
             star_name,
-            match_arcsec=None,
+            match_arcsec=5,
             teff=teff,
             logg=logg,
             metal=feh,
-            dace=False,
+            dace=visit_args["dace"],
             passband=passband,
         )
 

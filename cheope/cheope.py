@@ -193,6 +193,10 @@ def main():
 
         process_pool = Pool()
         data = list(enumerate(keywords))
+        # for d in data:
+        #     print(d)
+        #     num, keyword = d
+        #     check_gen_file(num, keyword)
         process_pool.starmap(check_gen_file, data)
 
         # global check_gen_file
