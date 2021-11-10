@@ -66,8 +66,12 @@ class Optimizers:
         shape = visit_args["shape"]
 
         # visit_folder = Path('/home/borsato/Dropbox/Research/exoplanets/objects/KELT/KELT-6/data/CHEOPS_DATA/pycheops_analysis/visit_01/')
-        visit_name = "visit_{:02d}_{:s}_{:s}_shape_ap{:s}_BF".format(
-            visit_number, file_key, shape.lower(), aperture.upper()
+        visit_name = "visit_{:02d}_{:s}_{:s}_shape_ap{:s}_BF_{:s}".format(
+            visit_number,
+            file_key,
+            shape.lower(),
+            aperture.upper(),
+            visit_args["optimizer"],
         )
         visit_folder = Path(os.path.join(main_folder, visit_name))
 
@@ -512,8 +516,12 @@ class Optimizers:
         shape = visit_args["shape"]
 
         # visit_folder = Path('/home/borsato/Dropbox/Research/exoplanets/objects/KELT/KELT-6/data/CHEOPS_DATA/pycheops_analysis/visit_01/')
-        visit_name = "visit_{:02d}_{:s}_{:s}_shape_ap{:s}_BF".format(
-            visit_number, file_key, shape.lower(), aperture.upper()
+        visit_name = "visit_{:02d}_{:s}_{:s}_shape_ap{:s}_BF_{:s}".format(
+            visit_number,
+            file_key,
+            shape.lower(),
+            aperture.upper(),
+            visit_args["optimizer"],
         )
         visit_folder = Path(os.path.join(main_folder, visit_name))
 
