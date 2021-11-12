@@ -163,7 +163,12 @@ class SingleCheck:
         feh = star_args["feh"]
 
         star = StarProperties(
-            star_name, match_arcsec=None, teff=teff, logg=logg, metal=feh, dace=False
+            star_name,
+            match_arcsec=5,
+            teff=teff,
+            logg=logg,
+            metal=feh,
+            dace=visit_args["dace"],
         )
 
         printlog("STAR INFORMATION", olog=olog)

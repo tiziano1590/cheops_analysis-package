@@ -5,6 +5,6 @@ from .detrend import (
     SingleBayesASCII,
 )
 
-from .optimizers import Optimizers
+from .optimizers import Optimizers, OptimizersMultivisit
 
 from .single_check import SingleCheck
