@@ -360,10 +360,19 @@ class ReadFile:
             )
             inc, aRs, b = 90.0, 1.0, 0.0
             # sys.exit()
-        self.planet_args["inc"] = inc.n
-        self.planet_args["aRs"] = aRs.n
+        try:
+            self.planet_args["inc"] = inc.n
+        except AttributeError:
+            self.planet_args["inc"] = inc
+        try:
+            self.planet_args["aRs"] = aRs.n
+        except AttributeError:
+            self.planet_args["aRs"] = aRs
         self.planet_args["aRs_bounds"] = [1.0, 1e6]
-        self.planet_args["b"] = b.n
+        try:
+            self.planet_args["b"] = b.n
+        except AttributeError:
+            self.planet_args["b"] = b
         self.planet_args["b_fit"] = True
         self.planet_args["b_bounds"] = [
             0.0,

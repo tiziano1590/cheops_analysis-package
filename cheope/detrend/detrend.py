@@ -2324,11 +2324,11 @@ class SingleBayesASCII:
 
         star = StarProperties(
             star_args["star_name"],
-            match_arcsec=None,
+            match_arcsec=5,
             teff=teff,
             logg=logg,
             metal=feh,
-            dace=False,
+            dace=visit_args["dace"],
         )
 
         # TO clip or not to clip
@@ -3136,7 +3136,12 @@ class SingleBayesASCII:
         feh = star_args["feh"]
 
         star = StarProperties(
-            star_name, match_arcsec=None, teff=teff, logg=logg, metal=feh, dace=False
+            star_name,
+            match_arcsec=5,
+            teff=teff,
+            logg=logg,
+            metal=feh,
+            dace=visit_args["dace"],
         )
         printlog(
             "Updating LD coeff. based on input: {} ==> {}".format(
