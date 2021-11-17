@@ -331,7 +331,6 @@ class SingleBayes:
         in_par = Parameters()
 
         for key in self.input_pars:
-            print(key)
             cat = category_args(key)
             if key in ["D", "W", "b"]:
                 # Randomize here
@@ -428,16 +427,16 @@ class SingleBayes:
         printlog("", olog=olog)
 
         # roll angle plot
-        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(),
-                    "00_lmfit0_roll_angle_vs_residual.{}".format(ext),
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(),
+        #             "00_lmfit0_roll_angle_vs_residual.{}".format(ext),
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         # input params plot
         fig, _ = pyca.model_plot_fit(
@@ -612,16 +611,16 @@ class SingleBayes:
         printlog("\n{}".format(", ".join(det_list)), olog=olog)
 
         # roll angle plot
-        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(),
-                    "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(),
+        #             "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
         # best-fit plot
         fig, _ = pyca.model_plot_fit(
             dataset,
