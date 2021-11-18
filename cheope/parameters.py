@@ -132,7 +132,7 @@ class ReadFile:
                     self.star_args[key] = None
                 self.star_args[key + "_fit"] = fit
                 if (
-                    inval.get("bounds") != None
+                    inval.get("bounds") == None
                     and np.isfinite(val[1])
                     and abs(val[1]) > 0
                 ):
@@ -140,6 +140,8 @@ class ReadFile:
                         val[0] - val[1],
                         val[0] + val[1],
                     ]
+                elif inval.get("bounds") != None:
+                    self.star_args[key + "_bounds"] = inval.get("bounds")
                 else:
                     self.star_args[key + "_bounds"] = [-np.inf, np.inf]
                 if val != None:
@@ -187,6 +189,8 @@ class ReadFile:
                         val[0] - val[1],
                         val[0] + val[1],
                     ]
+                elif inval.get("bounds") != None:
+                    self.planet_args[key + "_bounds"] = inval.get("bounds")
                 else:
                     self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
                 self.planet_args[key + "_user_data"] = ufloat(val[0], val[1])
