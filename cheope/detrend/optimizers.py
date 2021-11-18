@@ -5,10 +5,13 @@ import sys
 import json
 from pathlib import Path
 from uncertainties import ufloat
+import h5py
+import shutil
 
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
 import cheope.linear_ephemeris as lep
+
 
 printlog = pyca.printlog
 fig_ext = ["png", "pdf"]
@@ -563,6 +566,28 @@ class Optimizers:
             adaptive_nsteps=adaptive_nsteps,
             add_shoterm=False,
         )
+        """
+        dir(sampler) = ['Lmin', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', 
+        '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', 
+        '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', 
+        '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_adaptive_strategy_advice', '_check_likelihood_function', 
+        '_create_point', '_expand_nodes_before', '_find_strategy', '_refill_samples', '_set_likelihood_function', '_setup_distributed_seeds', 
+        '_should_node_be_expanded', '_update_region', '_update_results', '_widen_nodes', '_widen_roots', 'build_tregion', 'cluster_num_live_points', 
+        'comm', 'derivedparamnames', 'draw_multiple', 'ib', 'likes', 'live_points_healthy', 'log', 'log_to_disk', 'log_to_pointstore', 'loglike', 
+        'min_num_live_points', 'mpi_rank', 'mpi_size', 'ncall', 'ncall_region', 'ndraw_max', 'ndraw_min', 'num_bootstraps', 'num_params', 'paramnames', 
+        'plot', 'plot_corner', 'plot_run', 'plot_trace', 'pointpile', 'pointstore', 'print_results', 'region', 'region_class', 'region_nodes', 'results', 
+        'root', 'run', 'run_iter', 'run_sequence', 'sampler', 'samples', 'samplesv', 'sampling_slow_warned', 'stepsampler', 'store_tree', 'transform', 
+        'transformLayer', 'transform_limits', 'tregion', 'use_mpi', 'use_point_stack', 'volfactor', 'wrapped_axes', 'x_dim']
+        """
+
+        result_json_path = os.path.join(logdir, "info/results.json")
+        results = json.load(open(result_json_path))
+
+        flatchain = np.array(sampler.results["samples"])
+
+        params_med, params_mle = pyca.get_best_parameters_ultranest(
+            results, params_lm_loop, sampler, dataset_type="visit"
+        )
 
         printlog("Plotting run", olog=olog)
         sampler.plot_run()
@@ -575,13 +600,6 @@ class Optimizers:
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
-        )
-
-        result_json_path = os.path.join(logdir, "info/results.json")
-        results = json.load(open(result_json_path))
-
-        params_med, params_mle = pyca.get_best_parameters_ultranest(
-            results, params_lm_loop, sampler, dataset_type="visit"
         )
 
         printlog("MEDIAN PARAMETERS", olog=olog)
@@ -601,8 +619,8 @@ class Optimizers:
             dataset,
             params_med,
             par_type="median",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "02_lc_ultranest_median.dat"
             ),
@@ -644,8 +662,8 @@ class Optimizers:
             dataset,
             params_mle,
             par_type="mle",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "02_lc_ultranest_mle.dat"
             ),
@@ -696,6 +714,11 @@ class Optimizers:
             add_shoterm=True,
         )
 
+        result_json_path = os.path.join(logdir, "info/results.json")
+        results_gp = json.load(open(result_json_path))
+
+        flatchain = np.array(sampler_gp.results["samples"])
+
         printlog("Plotting run", olog=olog)
         sampler_gp.plot_run()
 
@@ -709,11 +732,8 @@ class Optimizers:
             "\n-Computing my parameters and plot models with random samples", olog=olog
         )
 
-        result_json_path = os.path.join(logdir, "info/results.json")
-        results = json.load(open(result_json_path))
-
         params_med_gp_train, params_mle_gp_train = pyca.get_best_parameters_ultranest(
-            results, params_fixed, sampler_gp, dataset_type="visit"
+            results_gp, params_fixed, sampler_gp, dataset_type="visit"
         )
 
         pyca.quick_save_params_ultranest(
@@ -726,8 +746,8 @@ class Optimizers:
             dataset,
             params_med_gp_train,
             par_type="median-GPtrain",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "03_lc_ultranest_median_gp_train.dat"
             ),
@@ -746,8 +766,8 @@ class Optimizers:
             dataset,
             params_mle_gp_train,
             par_type="mle-GPtrain",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "03_lc_ultranest_mle_gp_train.dat"
             ),
@@ -804,6 +824,12 @@ class Optimizers:
             add_shoterm=False,
         )
 
+        result_json_path = os.path.join(logdir, "info/results.json")
+        results_gp = json.load(open(result_json_path))
+
+        flatchain = np.array(sampler_gp.results["samples"])
+
+
         printlog("Plotting run", olog=olog)
         sampler_gp.plot_run()
 
@@ -816,9 +842,6 @@ class Optimizers:
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
         )
-
-        result_json_path = os.path.join(logdir, "info/results.json")
-        results_gp = json.load(open(result_json_path))
 
         params_med_gp, params_mle_gp = pyca.get_best_parameters_ultranest(
             results_gp, params_fit_gp, sampler_gp, dataset_type="visit"
@@ -845,8 +868,8 @@ class Optimizers:
             dataset,
             params_med_gp,
             par_type="median w/ GP",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "04_lc_ultranest_median_gp.dat"
             ),
@@ -887,8 +910,8 @@ class Optimizers:
             dataset,
             params_mle_gp,
             par_type="mle w/ GP",
-            nsamples=0,
-            flatchains=None,
+            nsamples=300,
+            flatchains=flatchain,
             model_filename=os.path.join(
                 visit_folder.resolve(), "04_lc_ultranest_mle_gp.dat"
             ),
