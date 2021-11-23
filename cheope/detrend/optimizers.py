@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 import os
 import sys
 import json
@@ -7,10 +8,19 @@ from pathlib import Path
 from uncertainties import ufloat
 import h5py
 import shutil
+from mpi4py import MPI
+import copyreg
 
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
 import cheope.linear_ephemeris as lep
+
+# MPI._p_pickle.dumps = dill.dumps
+# MPI._p_pickle.loads = dill.loads
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
 
 
 printlog = pyca.printlog
@@ -585,6 +595,22 @@ class Optimizers:
 
         flatchain = np.array(sampler.results["samples"])
 
+        # for obj in (MPI.COMM_NULL, MPI.COMM_SELF, MPI.COMM_WORLD):
+        # assert pickle.loads(pickle.dumps(obj)) == obj
+
+        # comm = MPI.COMM_WORLD
+        # size = comm.Get_size()
+        # rank = comm.Get_rank()
+        # if rank == 0:
+        #     rt_folder = (
+        #         "/data2/zingales/cheops_analysis-package_testold/notebook/run_example/"
+        #     )
+        #     with open(os.path.join(rt_folder, "sampler.pickle"), "wb") as sampler_file:
+        #         pickle.dump(sampler, sampler_file, pickle.HIGHEST_PROTOCOL)
+
+        #     with open(os.path.join(rt_folder, "results.pickle"), "wb") as results_file:
+        #         pickle.dump(results, results_file, pickle.HIGHEST_PROTOCOL)
+
         params_med, params_mle = pyca.get_best_parameters_ultranest(
             results, params_lm_loop, sampler, dataset_type="visit"
         )
@@ -828,7 +854,6 @@ class Optimizers:
         results_gp = json.load(open(result_json_path))
 
         flatchain = np.array(sampler_gp.results["samples"])
-
 
         printlog("Plotting run", olog=olog)
         sampler_gp.plot_run()

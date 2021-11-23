@@ -164,10 +164,9 @@ class ReadFits:
                 tra["T_0_bounds"] = [Tlin - 0.5 * Wd.n, Tlin + 0.5 * Wd.n]
                 tra["T_0_user_data"] = ufloat(Tlin, 0.5 * Wd.n)
                 transits.append(tra)
+                t0s.append(tra["bjdref"])
             else:
                 pass
-
-            t0s.append(tra["bjdref"])
 
         t0s = np.array(t0s) - 2457000
         print(f"Aperture is: {self.visit_args['aperture']}")

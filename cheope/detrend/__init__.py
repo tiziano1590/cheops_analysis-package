@@ -7,4 +7,4 @@ from .detrend import (
 
 from .optimizers import Optimizers, OptimizersMultivisit
 
-from .single_check import SingleCheck
+from .single_check import SingleCheck, CheckEphemerids

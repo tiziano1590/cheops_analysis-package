@@ -21,6 +21,7 @@ def main():
         SingleBayesKeplerTess,
         SingleBayesASCII,
         SingleCheck,
+        CheckEphemerids,
         MultivisitAnalysis,
     )
     from cheope.dace import DACESearch
@@ -39,6 +40,15 @@ def main():
         type=str,
         required=True,
         help="Input par file to pass",
+    )
+
+    parser.add_argument(
+        "-ce",
+        "--check-ephemerids",
+        dest="check_ephemerids",
+        default=False,
+        help="Checks the observing time interval starting from the period and the Tref",
+        action="store_true",
     )
 
     parser.add_argument(
@@ -141,6 +151,10 @@ def main():
 
     print("Cheope PROGRAM STARTS AT %s" % datetime.datetime.now())
 
+    if args.check_ephemerids:
+        ce = CheckEphemerids(args.input_file)
+        ce.plot_lightcurve()
+
     if args.single_check:
         sc = SingleCheck(args.input_file)
         sc.run()
@@ -193,24 +207,7 @@ def main():
 
         process_pool = Pool()
         data = list(enumerate(keywords))
-        # for d in data:
-        #     print(d)
-        #     num, keyword = d
-        #     check_gen_file(num, keyword)
         process_pool.starmap(check_gen_file, data)
-
-        # global check_gen_file
-
-        # def check_gen_file(num, keyword):
-        #     infile = search.substitute_file_key(keyword, num + 1)
-
-        #     if args.add_sc:
-        #         sb = SingleCheck(infile)
-        #         sb.run()
-
-        # process_pool = Pool()
-        # data = list(enumerate(keywords))
-        # process_pool.starmap(check_gen_file, data)
 
     print("Cheope PROGRAM FINISHES AT %s" % datetime.datetime.now())
 

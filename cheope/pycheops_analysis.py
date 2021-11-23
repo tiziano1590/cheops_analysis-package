@@ -1592,7 +1592,7 @@ def get_best_parameters_ultranest(result, params, sampler, dataset_type="visit")
         inc_med = inc
         inc_mle = inc
         err = np.arcsin(params["sini"].stderr) * cst.rad2deg
-    except AttributeError:
+    except (AttributeError, TypeError):
         inc_med = inc
         inc_mle = inc
         err = 0.0

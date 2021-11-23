@@ -356,10 +356,13 @@ class ReadFile:
                 "ERROR: missing needed planet keyword: D or k or Rp (Rearth)"
             )
 
-        self.planet_args["D"] = D.n
+        # self.planet_args["D"] = D.n
+        # if self.planet_args["D_bounds"][0] < 0:
+        #     self.planet_args["D_bounds"][0] = 0
+
         self.planet_args["D_bounds"] = [
-            0.5 * D.n,
-            1.5 * D.n,
+            0.1 * D.n,
+            10.0 * D.n,
         ]
         self.planet_args["D_fit"] = True
         self.planet_args["D_user_data"] = D
@@ -418,8 +421,8 @@ class ReadFile:
         self.planet_args["W"] = W.n
         self.planet_args["W_fit"] = True
         self.planet_args["W_bounds"] = [
-            0.5 * W.n,
-            1.5 * W.n,
+            0.1 * W.n,
+            10.0 * W.n,
         ]
         self.planet_args["W_user_data"] = W
 

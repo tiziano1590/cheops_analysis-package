@@ -37,6 +37,8 @@ import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
 from cheope.parameters import ReadFile
 
+from pycheops.instrument import CHEOPS_ORBIT_MINUTES
+
 # matplotlib rc params
 my_dpi = 192
 plt.rcParams["text.usetex"] = False
@@ -285,6 +287,176 @@ class SingleCheck:
         printlog("\n===\nEND\n===\n", olog=olog)
 
         olog.close()
+
+
+class CheckEphemerids:
+    def __init__(self, input_file):
+        self.input_file = input_file
+
+        inpars = ReadFile(self.input_file)
+
+        # ======================================================================
+        # CONFIGURATION
+        # ======================================================================
+
+        (
+            self.visit_args,
+            self.star_args,
+            self.planet_args,
+            self.emcee_args,
+            self.read_file_status,
+        ) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
+
+    # ======================================================================
+    # ======================================================================
+
+    def plot_lightcurve(self):
+
+        mpl.use("TkAgg")
+
+        dataset = Dataset(
+            file_key=self.visit_args["file_key"],
+            target=self.star_args["star_name"],
+            download_all=True,
+            view_report_on_download=False,
+            n_threads=self.emcee_args["nthreads"],
+        )
+
+        dataset.get_lightcurve("DEFAULT", decontaminate=False)
+
+        T_ref = self.planet_args["T_ref"]
+        P = self.planet_args["P_user_data"]
+        Wd = self.planet_args["W"] * P
+
+        btjd = dataset.lc["bjd_ref"]
+
+        t = dataset.lc["time"] + btjd
+        emin = np.rint((np.min(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emin
+        if x < np.min(t):
+            emin -= 1
+        emax = np.rint((np.max(t) - T_ref.n) / P.n)
+        x = T_ref.n + P.n * emax
+        if x > np.max(t):
+            emax += 1
+        epochs = np.arange(emin, emax + 1, 1).astype(np.int32)
+
+        lc = dataset.lc
+
+        vdurh = dataset.lc.get("vdurh")
+
+        if vdurh is None:
+            vdurh = 1.5 * Wd.n * cst.day2hour + 3.0 * CHEOPS_ORBIT_MINUTES * cst.min2day
+        vdur = vdurh / cst.day2hour
+        hdur = 0.5 * vdur
+        vdur_co = vdur * cst.day2min / CHEOPS_ORBIT_MINUTES
+
+        # printlog("t min: {:.5f}".format(np.min(t)))
+        # printlog("t max: {:.5f}".format(np.max(t)))
+
+        transits = []
+        t0s = []
+
+        median_flux = np.median(dataset.lc["flux"])
+        std_flux = np.std(dataset.lc["flux"])
+
+        dataset.lc["flux"][
+            np.where(np.abs(dataset.lc["flux"] - median_flux) > 2 * std_flux)
+        ] = median_flux
+
+        # for i_epo, epo in enumerate(epochs):
+
+        #     bjd_lin = T_ref.n + P.n * epo
+
+        #     sel = np.logical_and(t >= bjd_lin - hdur, t < bjd_lin + hdur)
+        #     nsel = np.sum(sel)
+        #     wsel = np.logical_and(
+        #         t >= bjd_lin - (Wd.n * 0.5), t < bjd_lin + (Wd.n * 0.5)
+        #     )
+        #     nwsel = np.sum(wsel)
+        #     if nsel > 0 and nwsel > 3:
+        #         tra = {}
+        #         tra["epoch"] = epo
+        #         tra["data"] = {}
+        #         for k, v in lc.items():
+        #             tra["data"][k] = v[sel]
+        #         bjdref = int(np.min(tra["data"]["time"]) + btjd)
+        #         tra["bjdref"] = bjdref
+        #         Tlin = bjd_lin - bjdref
+        #         tra["T_0"] = Tlin
+        #         tra["T_0_bounds"] = [Tlin - 0.5 * Wd.n, Tlin + 0.5 * Wd.n]
+        #         tra["T_0_user_data"] = ufloat(Tlin, 0.5 * Wd.n)
+        #         transits.append(tra)
+        #         t0s.append(tra["bjdref"])
+        #     else:
+        #         # pass
+
+        t0s = [T_ref.n + P.n * epo for epo in range(min(epochs) - 1, max(epochs) + 1)]
+
+        t0s_maxs = [
+            T_ref.n + P.n * epo + np.sqrt(T_ref.s ** 2 + P.s ** 2)
+            for epo in range(min(epochs) - 1, max(epochs) + 1)
+        ]
+
+        t0s_mins = [
+            T_ref.n + P.n * epo - np.sqrt(T_ref.s ** 2 + P.s ** 2)
+            for epo in range(min(epochs) - 1, max(epochs) + 1)
+        ]
+
+        t0s = np.array(t0s) - btjd
+        t0s_maxs = np.array(t0s_maxs) - btjd
+        t0s_mins = np.array(t0s_mins) - btjd
+
+        print(f"Aperture is: {self.visit_args['aperture']}")
+        print(t0s)
+
+        if self.visit_args["aperture"].lower() == "sap":
+            flux_lab = "SAP_FLUX"
+        elif self.visit_args["aperture"].lower() == "pdc":
+            flux_lab = "PDCSAP_FLUX"
+
+        markers, caps, bars = plt.errorbar(
+            dataset.lc["time"],
+            dataset.lc["flux"],
+            yerr=dataset.lc["flux_err"],
+            fmt="o",
+            markersize=0.3,
+            capsize=0.2,
+            color="k",
+            ecolor="gray",
+            elinewidth=0.2,
+        )
+
+        plt.vlines(
+            t0s,
+            ymin=0,
+            ymax=10 * max(dataset.lc["flux"]),
+            color="firebrick",
+            linewidth=0.5,
+            linestyles="dashed",
+        )
+
+        for i in range(len(t0s_maxs)):
+            plt.axvspan(t0s_mins[i], t0s_maxs[i], alpha=0.5, color="gray")
+
+        for cap in caps:
+            cap.set_markeredgewidth(0.3)
+
+        [bar.set_alpha(0.5) for bar in bars]
+        [cap.set_alpha(0.5) for cap in caps]
+        plt.ylim(
+            min(dataset.lc["flux"]) - max(dataset.lc["flux_err"]),
+            max(dataset.lc["flux"]) + max(dataset.lc["flux_err"]),
+        )
+        plt.xlabel(f"Time (BTJD - {btjd})")
+        plt.ylabel("Flux")
+        plt.show()
 
 
 # ======================================================================
