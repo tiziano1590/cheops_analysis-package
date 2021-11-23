@@ -287,6 +287,8 @@ class DACESearch:
             + f"/{self.visit_args['object_name']}_V{visit_number}_CH_{keyword}_selenium.yml"
         )
 
+        print(new_file_name)
+
         new_file = []
         for line in file_list:
             if "file_key" in line:

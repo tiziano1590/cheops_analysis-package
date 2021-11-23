@@ -414,7 +414,6 @@ class CheckEphemerids:
         t0s_mins = np.array(t0s_mins) - btjd
 
         print(f"Aperture is: {self.visit_args['aperture']}")
-        print(t0s)
 
         if self.visit_args["aperture"].lower() == "sap":
             flux_lab = "SAP_FLUX"

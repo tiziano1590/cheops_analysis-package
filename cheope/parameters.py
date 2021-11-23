@@ -397,13 +397,20 @@ class ReadFile:
             self.planet_args["inc"] = inc
         try:
             self.planet_args["aRs"] = aRs.n
+            self.planet_args["aRs_user_data"] = ufloat(aRs.n, aRs.s)
         except AttributeError:
             self.planet_args["aRs"] = aRs
+            self.planet_args["aRs_user_data"] = ufloat(aRs, 0.1 * aRs)
         # self.planet_args["aRs_bounds"] = [1.0, 1e6]
         try:
             self.planet_args["b"] = b.n
         except AttributeError:
             self.planet_args["b"] = b
+
+        self.planet_args["aRs_bounds"] = [
+            0.1 * self.planet_args["aRs"],
+            10 * self.planet_args["aRs"],
+        ]
         self.planet_args["b_fit"] = True
         self.planet_args["b_bounds"] = [
             0.0,

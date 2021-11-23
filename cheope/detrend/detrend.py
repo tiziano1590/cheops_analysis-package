@@ -2476,15 +2476,15 @@ class SingleBayesASCII:
         printlog("", olog=olog)
 
         # roll angle plot
-        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    epoch_folder, "00_lmfit0_roll_angle_vs_residual.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             epoch_folder, "00_lmfit0_roll_angle_vs_residual.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
         # best-fit plot
         params_lm0 = lmfit0.params.copy()
         fig, _ = pyca.model_plot_fit(
@@ -2633,15 +2633,15 @@ class SingleBayesASCII:
         printlog("\n{}".format(", ".join(det_list)), olog=olog)
 
         # roll angle plot
-        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    epoch_folder, "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             epoch_folder, "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
         # best-fit plot
         fig, _ = pyca.model_plot_fit(
             dataset,
