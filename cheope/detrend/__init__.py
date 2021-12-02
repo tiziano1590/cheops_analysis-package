@@ -5,6 +5,6 @@ from .detrend import (
     SingleBayesASCII,
 )
 
-from .optimizers import Optimizers, OptimizersMultivisit
+from .optimizers import Optimizers, OptimizersKeplerTESS, OptimizersMultivisit
 
 from .single_check import SingleCheck, CheckEphemerids

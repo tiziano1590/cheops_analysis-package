@@ -342,13 +342,23 @@ class ReadFile:
 
         planet_yaml = self.yaml_input["planet"]
         if "D" in planet_yaml:
-            D = ufloat(planet_yaml["D"][0], planet_yaml["D"][1])
+            D = ufloat(
+                self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
+            )
             k = um.sqrt(D)
         elif "k" in planet_yaml:
-            k = ufloat(planet_yaml["k"][0], planet_yaml["k"][1])
+            k = ufloat(
+                self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
+            )
             D = k ** 2
         elif "Rp" in planet_yaml:
-            Rp = ufloat(planet_yaml["Rp"][0], planet_yaml["Rp"][1]) * cst.Rears
+            Rp = (
+                ufloat(
+                    self.planet_args["Rp_user_data"].n,
+                    self.planet_args["Rp_user_data"].s,
+                )
+                * cst.Rears
+            )
             k = Rp / self.star_args["Rstar"]
             D = k ** 2
         else:
@@ -370,20 +380,38 @@ class ReadFile:
         self.planet_args["k"] = k
 
         if "inc" in planet_yaml and "aRs" in planet_yaml and "b" in planet_yaml:
-            inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
-            aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
-            b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
+            inc = ufloat(
+                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            )
+            aRs = ufloat(
+                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            )
+            b = ufloat(
+                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            )
         elif "inc" in planet_yaml and "aRs" in planet_yaml:
-            inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
-            aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
+            inc = ufloat(
+                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            )
+            aRs = ufloat(
+                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            )
             b = aRs * um.cos(inc * cst.deg2rad)
         elif "b" in planet_yaml and "aRs" in planet_yaml:
-            aRs = ufloat(planet_yaml["aRs"][0], planet_yaml["aRs"][1])
-            b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
+            aRs = ufloat(
+                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            )
+            b = ufloat(
+                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            )
             inc = um.acos(b / aRs) * cst.rad2deg
         elif "b" in planet_yaml and "inc" in planet_yaml:
-            b = ufloat(planet_yaml["b"][0], planet_yaml["b"][1])
-            inc = ufloat(planet_yaml["inc"][0], planet_yaml["inc"][1])
+            b = ufloat(
+                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            )
+            inc = ufloat(
+                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            )
             aRs = b / um.cos(inc * cst.deg2rad)
         else:
             self.read_file_status.append(

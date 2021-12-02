@@ -968,7 +968,7 @@ class SingleBayesKeplerTess:
         # load fits file and extract needed data and header keywords
         with fits.open(file_fits) as hdul:
             hdul.info()
-            btjd = hdul[1].header["BJDREFI"]
+            btjd = hdul[1].header["BJDREFI"] + hdul[1].header["BJDREFF"]
             data_raw = hdul[1].data
             exp_time = hdul[1].header["TIMEDEL"]
 

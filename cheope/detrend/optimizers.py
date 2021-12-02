@@ -965,6 +965,11 @@ class Optimizers:
         printlog("-Dumped dataset into file {}".format(file_ultranest), olog=olog)
 
 
+class OptimizersKeplerTESS:
+    def __init__(self):
+        self.optimizers_list = ["emcee", "ultranest"]
+
+
 class OptimizersMultivisit:
     def __init__(self):
         self.optimizers_list = ["emcee", "ultranest"]
