@@ -969,6 +969,428 @@ class OptimizersKeplerTESS:
     def __init__(self):
         self.optimizers_list = ["emcee", "ultranest"]
 
+    def emcee(
+        self,
+        olog=None,
+        dataset=None,
+        epoch_folder=None,
+        params_lm_loop=None,
+        star=None,
+        epoch_name=None,
+        stats_lm=None,
+        visit_args=None,
+        star_args=None,
+        emcee_args=None,
+    ):
+        aperture = visit_args["aperture"]
+
+        # =====================
+        # name of the file in pycheops_data
+        file_key = visit_args["file_key"]
+
+        # visit_folder
+        main_folder = visit_args["main_folder"]
+        visit_number = visit_args["visit_number"]
+        shape = visit_args["shape"]
+
+        logs_folder = os.path.join(main_folder, "logs")
+
+        star_name = star_args["star_name"]
+
+        nwalkers = emcee_args["nwalkers"]
+        nprerun = emcee_args["nprerun"]
+        nsteps = emcee_args["nsteps"]
+        nburn = emcee_args["nburn"]
+        nthin = emcee_args["nthin"]
+        nthreads = emcee_args["nthreads"]
+        progress = emcee_args["progress"]
+
+        # Run emcee from last best fit
+        printlog("\n-Run emcee from last best fit with:", olog=olog)
+        printlog(" nwalkers = {}".format(nwalkers), olog=olog)
+        printlog(" nprerun  = {}".format(nprerun), olog=olog)
+        printlog(" nsteps   = {}".format(nsteps), olog=olog)
+        printlog(" nburn    = {}".format(nburn), olog=olog)
+        printlog(" nthin    = {}".format(nthin), olog=olog)
+        printlog(" nthreads = {}".format(nthreads), olog=olog)
+        printlog("", olog=olog)
+
+        # EMCEE-------------------------------------------------------------
+        result = dataset.emcee_sampler(
+            params=params_lm_loop,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            add_shoterm=False,
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        params_med, stats_med, params_mle, stats_mle = pyca.get_best_parameters(
+            result, dataset, nburn=nburn, dataset_type="visit", update_dataset=True
+        )
+        # update emcee.params -> median and emcee.params_mle -> mle
+        for p in dataset.emcee.params:
+            dataset.emcee.params[p] = params_med[p]
+            dataset.emcee.params_best[p] = params_mle[p]
+
+        printlog("MEDIAN PARAMETERS", olog=olog)
+        for p in params_med:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med[p].value, params_med[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "02_params_emcee_median.dat"),
+            params_med,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(dataset, params_best=params_med, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med,
+            par_type="median",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "02_lc_emcee_median.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_lc_emcee_median.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_fft_emcee_median.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("MLE PARAMETERS", olog=olog)
+        for p in params_mle:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle[p].value, params_mle[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "02_params_emcee_mle.dat"),
+            params_mle,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(dataset, params_best=params_mle, glint=False, olog=olog)
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle,
+            par_type="mle",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "02_lc_emcee_mle.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_lc_emcee_mle.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_fft_emcee_mle.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        params = {"med": params_med, "mle": params_mle}
+
+        file_emcee = pyca.save_dataset(
+            dataset, epoch_folder, star.identifier, epoch_name, gp=False
+        )
+        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        ### *** ==============================================================
+        ### *** ===== TRAIN GP ===============================================
+        printlog("", olog=olog)
+        printlog("TRAIN GP HYPERPARAMETERS FIXING PARAMETERS", olog=olog)
+
+        params_fixed = pyca.copy_parameters(params_mle)
+        # for p in ['T_0','D','W','b']: # only transit shape
+        for p in params_mle:  # fixing all transit and detrending parameters
+            params_fixed[p].set(vary=False)
+        params_fixed["log_sigma"].set(vary=True)
+
+        result_gp_train = dataset.emcee_sampler(
+            params=params_fixed,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            add_shoterm=True,
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains of GP training", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "03_trace_emcee_gp_train.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        (
+            params_med_gp_train,
+            stats_med,
+            params_mle_gp_train,
+            stats_mle,
+        ) = pyca.get_best_parameters(
+            result_gp_train,
+            dataset,
+            nburn=nburn,
+            dataset_type="visit",
+            update_dataset=False,
+        )
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp_train,
+            par_type="median-GPtrain",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(
+                epoch_folder, "03_lc_emcee_median_gp_train.dat"
+            ),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    epoch_folder, "03_lc_emcee_median_gp_train.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp_train,
+            par_type="mle-GPtrain",
+            nsamples=nwalkers,
+            flatchains=result.chain,
+            model_filename=os.path.join(epoch_folder, "03_lc_emcee_mle_gp_train.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "03_lc_emcee_mle_gp_train.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        ### *** =======================================++=====================
+        ### *** ===== FIT TRANSIT + DETRENDING + GP =++=======================
+        printlog("\nRUN FULL FIT TRANSIT+DETRENDING+GP W/ EMCEE", olog=olog)
+
+        params_fit_gp = pyca.copy_parameters(params_mle)
+        for p in ["log_S0", "log_omega0", "log_sigma"]:
+            # params_fit_gp[p] = params_mle_gp_train[p]
+            # printlog("{} = {} user_data = {} (vary = {})".format(p,
+            #   params_fit_gp[p], params_fit_gp[p].user_data, params_fit_gp[p].vary),
+            #   olog=olog
+            # )
+            # params_fit_gp[p].user_data = ufloat(params_mle_gp_train[p].value, 2*params_mle_gp_train[p].stderr)
+            # printlog("{} = {} user_data = {} (vary = {})".format(p,
+            #   params_fit_gp[p], params_fit_gp[p].user_data, params_fit_gp[p].vary),
+            #   olog=olog
+            # )
+            params_fit_gp.add(
+                p,
+                value=params_mle_gp_train[p].value,
+                vary=True,
+                min=params_mle_gp_train[p].min,
+                max=params_mle_gp_train[p].max,
+            )
+            params_fit_gp[p].user_data = ufloat(
+                params_mle_gp_train[p].value, 2 * params_mle_gp_train[p].stderr
+            )
+
+        # log_Q = 1/sqrt(2)
+        params_fit_gp.add("log_Q", value=np.log(1 / np.sqrt(2)), vary=False)
+
+        result_gp = dataset.emcee_sampler(
+            params=params_fit_gp,
+            nwalkers=nwalkers,
+            burn=nprerun,
+            steps=nsteps,
+            thin=nthin,
+            # add_shoterm = True, # not needed the second time
+            progress=progress,
+        )
+
+        printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog(
+            "\n-Computing my parameters and plot models with random samples", olog=olog
+        )
+        (
+            params_med_gp,
+            stats_med_gp,
+            params_mle_gp,
+            stats_mle_gp,
+        ) = pyca.get_best_parameters(
+            result_gp, dataset, nburn=nburn, dataset_type="visit", update_dataset=True
+        )
+        # update emcee.params -> median and emcee.params_mle -> mle
+        for p in dataset.emcee.params:
+            dataset.emcee.params[p] = params_med_gp[p]
+            dataset.emcee.params_best[p] = params_mle_gp[p]
+
+        printlog("MEDIAN PARAMETERS w/ GP", olog=olog)
+        for p in params_med_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_med_gp[p].value, params_med_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "04_params_emcee_median_gp.dat"),
+            params_med_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(
+            dataset, params_best=params_med_gp, glint=False, olog=olog
+        )
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_med_gp,
+            par_type="median w/ GP",
+            nsamples=nwalkers,
+            flatchains=result_gp.chain,
+            model_filename=os.path.join(epoch_folder, "04_lc_emcee_median_gp.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_lc_emcee_median_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_med_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_fft_emcee_median_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("MLE PARAMETERS w/ GP", olog=olog)
+        for p in params_mle_gp:
+            printlog(
+                "{:20s} = {:20.12f} +/- {:20.12f}".format(
+                    p, params_mle_gp[p].value, params_mle_gp[p].stderr
+                ),
+                olog=olog,
+            )
+        pyca.quick_save_params(
+            os.path.join(epoch_folder, "04_params_emcee_mle_gp.dat"),
+            params_mle_gp,
+            dataset.lc["bjd_ref"],
+        )
+
+        _ = pyca.computes_rms(
+            dataset, params_best=params_mle_gp, glint=False, olog=olog
+        )
+        fig, _ = pyca.model_plot_fit(
+            dataset,
+            params_mle_gp,
+            par_type="mle w/ GP",
+            nsamples=nwalkers,
+            flatchains=result_gp.chain,
+            model_filename=os.path.join(epoch_folder, "04_lc_emcee_mle_gp.dat"),
+        )
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_lc_emcee_mle_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+        fig = pyca.plot_fft(dataset, params_mle_gp, star=star)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_fft_emcee_mle_gp.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        params_gp = {"med": params_med_gp, "mle": params_mle_gp}
+
+        file_emcee = pyca.save_dataset(
+            dataset, epoch_folder, star.identifier, epoch_name, gp=True
+        )
+        printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        return (
+            stats_lm,
+            stats_med,
+            stats_mle,
+            params,
+            stats_med_gp,
+            stats_mle_gp,
+            params_gp,
+        )
+
 
 class OptimizersMultivisit:
     def __init__(self):
