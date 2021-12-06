@@ -1097,6 +1097,7 @@ class SingleBayesKeplerTess:
         star_args,
         planet_args,
         emcee_args,
+        ultranest_args,
         epoch_folder,
         olog=None,
     ):
@@ -1519,11 +1520,16 @@ class SingleBayesKeplerTess:
             ### *** ===== Ultranest ==================================================
             optimizer = OptimizersKeplerTESS()
             optimizer.ultranest(
-                inpars=inpars,
-                dataset=dataset,
                 olog=olog,
+                dataset=dataset,
+                epoch_folder=epoch_folder,
                 params_lm_loop=params_lm_loop,
                 star=star,
+                epoch_name=epoch_name,
+                stats_lm=stats_lm,
+                visit_args=visit_args,
+                star_args=star_args,
+                ultranest_args=ultranest_args,
             )
 
         else:
@@ -1570,11 +1576,19 @@ class SingleBayesKeplerTess:
         # ======================================================================
         inpars = ReadFile(self.input_file)
 
-        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+        (
+            visit_args,
+            star_args,
+            planet_args,
+            emcee_args,
+            ultranest_args,
+            read_file_status,
+        ) = (
             inpars.visit_args,
             inpars.star_args,
             inpars.planet_args,
             inpars.emcee_args,
+            inpars.ultranest_args,
             inpars.read_file_status,
         )
 
@@ -1739,6 +1753,7 @@ class SingleBayesKeplerTess:
                 star_args,
                 planet_args,
                 emcee_args,
+                ultranest_args,
                 epoch_folder,
                 olog=olog,
             )
