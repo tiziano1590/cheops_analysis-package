@@ -5,6 +5,7 @@ import os
 import sys
 import json
 from pathlib import Path
+from pycheops.instrument import exposure_time
 from uncertainties import ufloat
 import h5py
 import shutil
@@ -1412,7 +1413,8 @@ class OptimizersKeplerTESS:
         file_key = visit_args["file_key"]
 
         # visit_folder
-        main_folder = visit_args["main_folder"]
+        # main_folder = visit_args["main_folder"]
+        main_folder = epoch_folder
         visit_number = visit_args["visit_number"]
         shape = visit_args["shape"]
 
@@ -1424,7 +1426,7 @@ class OptimizersKeplerTESS:
             aperture.upper(),
             visit_args["optimizer"],
         )
-        visit_folder = Path(os.path.join(main_folder, visit_name))
+        visit_folder = Path(os.path.join(main_folder, ""))
 
         logs_folder = os.path.join(main_folder, "logs")
 
