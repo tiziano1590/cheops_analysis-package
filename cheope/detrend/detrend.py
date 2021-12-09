@@ -1209,9 +1209,9 @@ class SingleBayesKeplerTess:
         if visit_args["shape"] == "fix":
             for n in ["D", "W", "b"]:
                 in_par[n].vary = False
-            in_par["D"].value = D.n
-            in_par["W"].value = W.n
-            in_par["b"].value = b.n
+            in_par["D"].value = D
+            in_par["W"].value = W
+            in_par["b"].value = b
 
         # c calculated separately
         in_par["c"] = Parameter(

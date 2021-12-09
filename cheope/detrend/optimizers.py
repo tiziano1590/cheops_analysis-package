@@ -1947,7 +1947,7 @@ class OptimizersMultivisit:
             steps=emcee_args["nsteps"],
             nwalkers=emcee_args["nwalkers"],
             progress=emcee_args["progress"],
-            n_threads=emcee_args["nthreads"],
+            # nthreads=emcee_args["nthreads"],
         )
         # WARNING: better have priors on shape and gp hyperparameters,
         # otherwise gp will try to fit also the transit!
@@ -2427,7 +2427,7 @@ class OptimizersMultivisit:
         )
         printlog("", olog=olog)
 
-        sampler = M.fit_transit_ultranest(
+        sampler = M.fit_transit(
             T_0=T_0,
             P=P_ref,
             # TTV yes or not, default: ttv=False
