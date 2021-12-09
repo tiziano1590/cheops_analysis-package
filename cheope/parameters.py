@@ -50,7 +50,19 @@ class ReadFile:
             "h_2",
         ]
 
-        self.planet_keys = ["P", "D", "inc", "aRs", "ecc", "w", "T_0", "Kms", "W", "b"]
+        self.planet_keys = [
+            "P",
+            "D",
+            "inc",
+            "aRs",
+            "ecc",
+            "w",
+            "T_0",
+            "Kms",
+            "W",
+            "b",
+            "k",
+        ]
 
         self.emcee_keys = [
             "nwalkers",
@@ -351,6 +363,7 @@ class ReadFile:
                 self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
             )
             D = k ** 2
+            self.planet_args["D"] = D.n
         elif "Rp" in planet_yaml:
             Rp = (
                 ufloat(

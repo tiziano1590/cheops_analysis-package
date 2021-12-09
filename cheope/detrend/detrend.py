@@ -1186,7 +1186,6 @@ class SingleBayesKeplerTess:
         in_par = Parameters()
 
         for key in self.input_pars:
-            print(key)
             cat = category_args(key)
             if key in ["D", "W", "b"]:
                 # Randomize here
