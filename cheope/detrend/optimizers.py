@@ -2427,7 +2427,7 @@ class OptimizersMultivisit:
         )
         printlog("", olog=olog)
 
-        sampler = M.fit_transit(
+        sampler = M.fit_transit_ultranest(
             T_0=T_0,
             P=P_ref,
             # TTV yes or not, default: ttv=False
