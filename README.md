@@ -65,16 +65,6 @@ To run Cheope in this configuration use the command:
 cheope -i path/to/parameters/file.yml -sb
 ```
 
-### Run analysis for a Single Visit including also your Kepler/TESS points
-
-A normal Single visit run, including Kepler/TESS observation.
-
-The command is:
-
-```
-cheope -i path/to/parameters/file.yml -skt
-```
-
 ### Multivisit run
 
 In this mode, if folds all the input observations and runs a multivisit analysis.
@@ -92,3 +82,25 @@ Once reformatted the lightcurve into a `.txt` or `.dat` file, it is possible to 
 ```
 cheope -i path/to/parameters/file.yml -a
 ```
+
+## TESS
+
+In this section we explore the possible commands to analyise TESS-like datasets
+
+### Run analysis for a Single Visit including also your Kepler/TESS points
+
+A normal Single visit run, including Kepler/TESS observation.
+
+The command is:
+
+```
+cheope -i path/to/parameters/file.yml -skt
+```
+
+## Use of Selenium
+
+`cheope` incorporates a web-browser bot able to download all the datasets related to a particular target.
+
+### The CHEOPS dataset
+
+We bypass the official API (will be included in a future version) and use a human-simulated behaviour to log into the DACE platform and download the target's dataset. To
