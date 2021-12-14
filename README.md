@@ -1,4 +1,4 @@
-### Download and Install
+# Download and Install
 
 Download from GitHub:
 
@@ -33,7 +33,7 @@ and install it:
 pip install -e .
 ```
 
-## Cheops
+# Cheops
 
 In this section we regroup all the commands inherent to the CHEOPS space mission dataset analysis. Here we include some visualisation and analysis options.
 
@@ -83,7 +83,7 @@ Once reformatted the lightcurve into a `.txt` or `.dat` file, it is possible to 
 cheope -i path/to/parameters/file.yml -a
 ```
 
-## TESS
+# TESS
 
 In this section we explore the possible commands to analyise TESS-like datasets
 
@@ -97,10 +97,34 @@ The command is:
 cheope -i path/to/parameters/file.yml -skt
 ```
 
-## Use of Selenium
+# Use of Selenium
 
 `cheope` incorporates a web-browser bot able to download all the datasets related to a particular target.
 
-### The CHEOPS dataset
+## The CHEOPS dataset
 
-We bypass the official API (will be included in a future version) and use a human-simulated behaviour to log into the DACE platform and download the target's dataset. To
+We bypass the official API (will be included in a future version) and use a human-simulated behaviour to log into the DACE platform and download the target's dataset. To download and run a preliminary check on a planetary system, run:
+
+```
+cheope -i path/to/parameters/file.yml --selenium-dace --add-single-check
+```
+
+## The TESS dataset
+
+Here there is a list of command to check and analyse some TESS lightcurves.
+
+### download TESS lighcurves and run preliminary check
+
+To run the latest sectors' light curves and run a preliminary check on them:
+
+```
+cheope -i path/to/parameters/file.yml --selenium-tess --add-single-kepler-tess --download
+```
+
+### Only display the TESS' lighcurves
+
+If you want only display the TESS' lightcurve withough running any check nor analysis, run:
+
+```
+cheope -i path/to/parameters/file.yml --selenium-tess --read-fits
+```
