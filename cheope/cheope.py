@@ -126,7 +126,7 @@ def main():
         "--download",
         dest="download",
         default=False,
-        help="if called, ti navigate through the TESS viewing tool to download all the target lightcurves",
+        help="if called, it navigate through the TESS viewing tool to download all the target lightcurves",
         action="store_true",
     )
 

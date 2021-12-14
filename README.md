@@ -33,6 +33,8 @@ and install it:
 pip install -e .
 ```
 
+## Cheops
+
 ### Usage
 
 To use it, simply digit the command:
@@ -75,6 +77,15 @@ cheope -i path/to/parameters/file.yml -skt
 
 In this mode, if folds all the input observations and runs a multivisit analysis.
 To activate the multivisit mode, run:
+
+```
+cheope -i path/to/parameters/file.yml -m
+```
+
+### User-defined light curve
+
+`cheope` can run also user-precomputer light curves stored in an ascii file, the minimum file should have three columns with: time, flux and the error on the flux.
+Once reformatted the lightcurve into a `.txt` or `.dat` file, it is possible to fit the user-defined lightcurve by using the command:
 
 ```
 cheope -i path/to/parameters/file.yml -m
