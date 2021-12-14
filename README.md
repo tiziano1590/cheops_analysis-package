@@ -35,6 +35,8 @@ pip install -e .
 
 ## Cheops
 
+In this section we regroup all the commands inherent to the CHEOPS space mission dataset analysis. Here we include some visualisation and analysis options.
+
 ### Usage
 
 To use it, simply digit the command:
@@ -88,5 +90,5 @@ cheope -i path/to/parameters/file.yml -m
 Once reformatted the lightcurve into a `.txt` or `.dat` file, it is possible to fit the user-defined lightcurve by using the command:
 
 ```
-cheope -i path/to/parameters/file.yml -m
+cheope -i path/to/parameters/file.yml -a
 ```
