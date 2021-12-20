@@ -1,0 +1,52 @@
+:py:mod:`parameters`
+====================
+
+.. py:module:: parameters
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   parameters.ReadFile
+
+
+
+
+.. py:class:: ReadFile(input_file, multivisit=False)
+
+   .. py:method:: visit_pars(self)
+
+
+   .. py:method:: star_pars(self)
+
+
+   .. py:method:: planet_pars(self)
+
+
+   .. py:method:: emcee_pars(self)
+
+
+   .. py:method:: ultranest_pars(self)
+
+
+   .. py:method:: apply_visit_conditions(self)
+
+
+   .. py:method:: apply_star_conditions(self)
+
+
+   .. py:method:: apply_planet_conditions(self)
+
+
+   .. py:method:: category_args(self, par)
+
+
+   .. py:method:: err_msg(self, keyword, dictionary)
+
+
+

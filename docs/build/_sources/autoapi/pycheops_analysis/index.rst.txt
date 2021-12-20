@@ -1,0 +1,644 @@
+:py:mod:`pycheops_analysis`
+===========================
+
+.. py:module:: pycheops_analysis
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pycheops_analysis.DatasetModel
+   pycheops_analysis.PIPEDataset
+   pycheops_analysis.FITSDataset
+   pycheops_analysis.AsciiDataset
+   pycheops_analysis.CustomMultiVisit
+   pycheops_analysis.CustomStarProperties
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pycheops_analysis.printlog
+   pycheops_analysis.plot_all_apertures
+   pycheops_analysis.plot_single_lc
+   pycheops_analysis.plot_custom_diagnostics
+   pycheops_analysis.plot_corner_diagnostics
+   pycheops_analysis.get_full_model
+   pycheops_analysis.binned_rms
+   pycheops_analysis.computes_rms
+   pycheops_analysis.computes_rms_ultra
+   pycheops_analysis.plot_and_clip_lcs
+   pycheops_analysis.copy_parameters
+   pycheops_analysis.get_fitting_parameters
+   pycheops_analysis.get_best_parameters
+   pycheops_analysis.get_best_parameters_ultranest
+   pycheops_analysis.model_plot_fit
+   pycheops_analysis.init_multi_model
+   pycheops_analysis.check_boundaries
+   pycheops_analysis.set_pycheops_par
+   pycheops_analysis.multi_model
+   pycheops_analysis.components_model
+   pycheops_analysis.plot_final_params
+   pycheops_analysis.lnprob_woGP
+   pycheops_analysis.lnprob_wGP
+   pycheops_analysis.init_walkers
+   pycheops_analysis.sampler_to_dict
+   pycheops_analysis.do_emcee_analysis
+   pycheops_analysis.high_posterior_density
+   pycheops_analysis.single_chain_summary
+   pycheops_analysis.summary_parameters
+   pycheops_analysis.trace_plot
+   pycheops_analysis.print_pycheops_pars
+   pycheops_analysis.print_analysis_stats
+   pycheops_analysis.plot_fft
+   pycheops_analysis.multi_detrending_model
+   pycheops_analysis.should_I_decorr_detrending_model
+   pycheops_analysis.save_dataset
+   pycheops_analysis.load_dataset
+   pycheops_analysis.custom_plot_phase
+   pycheops_analysis.custom_plot_phase_from_model
+   pycheops_analysis.mask_data_clipping
+   pycheops_analysis.computes_bayes_factor
+   pycheops_analysis.planet_check
+   pycheops_analysis.copy_DRP_report
+   pycheops_analysis.quick_save_params
+   pycheops_analysis.quick_save_params_ultranest
+   pycheops_analysis.quick_save_params_ultra
+   pycheops_analysis.u1u2_to_q1q2
+   pycheops_analysis.q1q2_to_u1u2
+   pycheops_analysis.generate_private_key
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pycheops_analysis.my_dpi
+   pycheops_analysis.module_celerite2
+   pycheops_analysis.out_color
+   pycheops_analysis.rms_time
+   pycheops_analysis.global_names
+   pycheops_analysis.transit_names
+   pycheops_analysis.detrend_bounds
+   pycheops_analysis.detrend_default
+   pycheops_analysis.detrend
+   pycheops_analysis.params_units
+
+
+.. py:data:: my_dpi
+   :annotation: = 192
+
+   
+
+.. py:data:: module_celerite2
+   :annotation: = True
+
+   
+
+.. py:data:: out_color
+   :annotation: = lightgray
+
+   
+
+.. py:data:: rms_time
+   
+
+   
+
+.. py:data:: global_names
+   :annotation: = ['P', 'D', 'b', 'W', 'f_c', 'f_s', 'h_1', 'h_2', 'Tref']
+
+   
+
+.. py:data:: transit_names
+   :annotation: = ['dT', 'T_0', 'c', 'dfdt', 'd2fdt2', 'dfdbg', 'dfdcontam', 'dfdx', 'd2fdx2', 'dfdy', 'd2fdy2',...
+
+   
+
+.. py:data:: detrend_bounds
+   
+
+   
+
+.. py:data:: detrend_default
+   
+
+   
+
+.. py:data:: detrend
+   
+
+   
+
+.. py:data:: params_units
+   
+
+   
+
+.. py:function:: printlog(l, olog=None)
+
+
+.. py:function:: plot_all_apertures(dataset, out_folder)
+
+
+.. py:function:: plot_single_lc(t, f, ef, bjd_ref)
+
+
+.. py:function:: plot_custom_diagnostics(lc)
+
+
+.. py:function:: plot_corner_diagnostics(dataset)
+
+
+.. py:class:: DatasetModel(n_time)
+
+
+.. py:function:: get_full_model(dataset, params_in=None, time=None)
+
+
+.. py:function:: binned_rms(stats_dict, t_lc, residuals, rms_time_in, keyword='flux-all (w/o GP)', olog=None)
+
+
+.. py:function:: computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)
+
+
+.. py:function:: computes_rms_ultra(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)
+
+
+.. py:function:: plot_and_clip_lcs(datasets, apertures, out_folder, index_to_clip='all')
+
+
+.. py:function:: copy_parameters(params_in)
+
+
+.. py:function:: get_fitting_parameters(params, to_print=False)
+
+
+.. py:function:: get_best_parameters(result, dataset, nburn=0, dataset_type='visit', update_dataset=False)
+
+
+.. py:function:: get_best_parameters_ultranest(result, params, sampler, dataset_type='visit')
+
+
+.. py:function:: model_plot_fit(dataset, par_fit, par_type='median', nsamples=0, flatchains=None, model_filename=None)
+
+
+.. py:function:: init_multi_model(datasets, params, pnames, gnames, tnames, do_fit=True)
+
+
+.. py:function:: check_boundaries(pfit, pnames, params)
+
+
+.. py:function:: set_pycheops_par(pfit, pnames, gnames, tnames, params, dataset, visit)
+
+
+.. py:function:: multi_model(pfit, pnames, gnames, tnames, params_in, datasets)
+
+
+.. py:function:: components_model(pfit, pnames, gnames, tnames, params, datasets, gps, fill_gaps=False)
+
+
+.. py:function:: plot_final_params(pbest, pnames, gnames, tnames, params, datasets, gps, out_folder, fill_gaps=True, emcee=True, pars_type='mle', nsamples=0, flatchain=None)
+
+
+.. py:function:: lnprob_woGP(pfit, pnames, gnames, tnames, params, datasets)
+
+
+.. py:function:: lnprob_wGP(pfit, pnames, gnames, tnames, params, datasets, gps)
+
+
+.. py:function:: init_walkers(lnprob, pfit, pscale, nwalkers, args=(), init_scale=0.001)
+
+
+.. py:function:: sampler_to_dict(sampler, nburn=0, nprerun=0, nthin=1)
+
+
+.. py:function:: do_emcee_analysis(lnprob, pfit, pscale, out_folder, args=(), nwalkers=64, nprerun=0, nsteps=512, nthin=4, nburn=128, progress=True, run_emcee=True, read_sampler=False)
+
+
+.. py:function:: high_posterior_density(trace, cred=0.6827)
+
+   Estimate the highest probability density interval.
+
+   This function determines the shortest, continuous interval
+   containing the specified fraction (cred) of steps of
+   the Markov chain. Note that multi-modal distribution
+   may require further scrutiny.
+
+   # cred = 0.6827 <-> -/+ 1 sigma
+   # cred = 0.9545 <-> -/+ 2 sigma
+   # cred = 0.9973 <-> -/+ 3 sigma
+   # cred = 0.999999426696856 <-> -/+ 5 sigma
+
+   Parameters
+   ----------
+   trace : array
+       The steps of the Markov chain.
+   cred : float
+       The probability mass to be included in the
+       interval (between 0 and 1).
+
+   Returns
+   -------
+   start, end : float
+       The start and end points of the interval.
+
+
+.. py:function:: single_chain_summary(singlechain, idx)
+
+
+.. py:function:: summary_parameters(samples, pnames, params, mle_within_hdi=True)
+
+
+.. py:function:: trace_plot(sampler_dict, summary, out_folder)
+
+
+.. py:function:: print_pycheops_pars(pars, user_data=True, expr=False)
+
+
+.. py:function:: print_analysis_stats(analysis_stats)
+
+
+.. py:function:: plot_fft(dataset, pars_in, star=None, gsmooth=5, logxlim=(1.5, 4.5))
+
+   Lomb-Scargle power-spectrum of the residuals.
+
+   If the previous fit included a GP then this is _not_ included in the
+   calculation of the residuals, i.e., the power spectrum includes the
+   power "fitted-out" using the GP. The assumption here is that the GP
+   has been used to model stellar variability that we wish to
+   characterize using the power spectrum.
+
+   The red vertical dotted lines show the CHEOPS  orbital frequency and
+   its first two harmonics.
+
+   If star is a pycheops starproperties object and star.teff is <7000K,
+   then the likely range of nu_max is shown using green dashed lines.
+
+
+
+.. py:function:: multi_detrending_model(detrending_args)
+
+
+.. py:function:: should_I_decorr_detrending_model(detrending_args)
+
+
+.. py:class:: PIPEDataset(file_key, force_download=False, download_all=True, configFile=None, target=None, verbose=True, metadata=True, view_report_on_download=True, n_threads=1)
+
+   Bases: :py:obj:`pycheops.Dataset`
+
+   CHEOPS Dataset object
+
+   :param file_key:
+   :param force_download:
+   :param download_all: If False, download light curves only
+   :param configFile:
+   :param target:
+   :param view_report_on_download:
+   :param metadata: True to load meta data
+   :param verbose:
+
+
+   .. py:method:: get_PIPE_lightcurve(self, PIPE_data, reject_highpoints=False, verbose=False)
+
+
+
+.. py:class:: FITSDataset(file_key, force_download=False, download_all=True, configFile=None, target=None, verbose=True, metadata=True, view_report_on_download=True, n_threads=1)
+
+   Bases: :py:obj:`pycheops.Dataset`
+
+   CHEOPS Dataset object
+
+   :param file_key:
+   :param force_download:
+   :param download_all: If False, download light curves only
+   :param configFile:
+   :param target:
+   :param view_report_on_download:
+   :param metadata: True to load meta data
+   :param verbose:
+
+
+   .. py:method:: get_FITS_lightcurve(self, visit_args, transit, info, reject_highpoints=False, verbose=False)
+
+
+
+.. py:class:: AsciiDataset(file_key, force_download=False, download_all=True, configFile=None, target=None, verbose=True, metadata=True, view_report_on_download=True, n_threads=1)
+
+   Bases: :py:obj:`pycheops.Dataset`
+
+   CHEOPS Dataset object
+
+   :param file_key:
+   :param force_download:
+   :param download_all: If False, download light curves only
+   :param configFile:
+   :param target:
+   :param view_report_on_download:
+   :param metadata: True to load meta data
+   :param verbose:
+
+
+   .. py:method:: get_ascii_lightcurve(self, ascii_data, normalise=False, reject_highpoints=False, verbose=False)
+
+
+
+.. py:function:: save_dataset(dataset, folder, target, file_key, gp=False)
+
+   Save the current dataset as a pickle file
+
+   :returns: pickle file name
+
+
+.. py:function:: load_dataset(filename)
+
+   Load a dataset from a pickle file
+
+   :param filename: pickle file name
+
+   :returns: dataset object
+
+
+
+.. py:class:: CustomMultiVisit(target=None, datasets_list=None, ident=None, id_kws={'dace': True}, verbose=True)
+
+   Bases: :py:obj:`pycheops.MultiVisit`
+
+   CHEOPS MultiVisit object
+
+   Specify a target name to initialize from pickled datasets in the current
+   working directory (or in datadir if datadir is not None).
+
+   The target name can include blanks - these are replaced by "_"
+   automatically before searching for matching file names.
+
+   The parameter ident is used to collect star and planet properties from the
+   relevant tables at DACE. If ident is None (default) then the target name
+   is used in place of ident. Set ident='none' to disable this feature.  See
+   also StarProperties for other options that can be set using id_kws, e.g.,
+   id_kws={'dace':False} to use SWEET-Cat instead of DACE.
+
+   All dates and times in each of the dataset are stored as BJD-2457000 (same
+   as TESS).
+
+   :param target: target name to identify pickled datasets
+
+   :param datadir: directory containing pickled datasets
+
+   :param ident: identifier in star properties table. If None use target. If
+   'none'
+
+   :param id_kws: keywords for call to StarProperties.
+
+   :param verbose: print dataset names, etc. if True
+
+   Notes on fitting routines
+   ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Transit parameters
+   ~~~~~~~~~~~~~~~~~~
+
+   The same values of the transit parameters T_0, P, D, W, b, f_c and f_s are
+   used for all the datasets in the combined fit. This also applies to h_1
+   and h_2 when fitting transits.
+
+   User-defined parameters can be specified in one of the following ways:
+
+   * fixed value, e.g., P=1.234
+   * free parameter with uniform prior interval specified as a 2-tuple,
+     e.g., dfdx=(-1,1). The initial value is taken as the the mid-point of
+     the allowed interval;
+   * free parameter with uniform prior interval and initial value
+     specified as a 3-tuple, e.g., (0.1, 0.2, 1);
+   * free parameter with a Gaussian prior specified as a ufloat, e.g.,
+     ufloat(0,1);
+   * as an lmfit Parameter object.
+
+   A transit parameter will be fixed in the fit to the combined datasets
+   only if the same parameter was fixed in the last fit to all datasets
+   and the same parameter is not specified as a free parameter in the
+   call to this method.
+
+   If no user-defined value is provided then the initial value for each
+   transit parameter is set using the mean value across the individual
+   datasets. For T_0 an integer number of periods are added or subtracted
+   from the individual T_0 values so that the mean T_0 value corresponds
+   to a time of mid-transit near the centre of the datasets.
+
+   N.B. The timescale for T_0 in BJD_TDB - 2457000.
+
+   Priors on transit parameters are only set if they are specified in the
+   call to the fitting method using either a ufloat, or as an lmfit Parameter
+   object that includes a ufloat in its user_data.
+
+   Priors on the derived parameters e, q_1, q_2, logrho, etc. can be
+   specified as a dictionary of ufloat values using the extra_priors
+   keyword, e.g., extra_priors={'e':ufloat(0.2,0.01)}. Priors on parameters
+   that apply to individual datasets can also be specified in extra_priors,
+   e.g., extra_priors['dfdt_01'] = ufloat(0.0,0.001). Priors listed in
+   extra_priors will supercede priors on parameters saved with the individual
+   datasets.
+
+   Noise model
+   ~~~~~~~~~~~
+
+   The noise model assumes that the error bars on each data point have
+   addition white noise with standard deviation log_sigma_w. Optionally,
+   correlated noise can be included using celerite2 with kernel
+   SHOTerm(log_omega0, log_S0, log_Q). The same values of log_sigma_w,
+   log_omega0, log_S0 and log_Q are used for all the datasets in the combined
+   fit.
+
+   The fit to the combined datasets will only include a GP if log_omega0 and
+   log_S0 are both specified as arguments in the call to the fitting method.
+   If log_Q is not specified as an argument in the call to the fitting method
+   then it is fixed at the value log_Q=1/sqrt(2).
+
+   Gaussian priors on the values of log_omega0, log_S0 and log_Q will
+   only be applied if the user-specified value includes a Gaussian prior,
+   e.g., log_omega0=ufloat(6,1), log_S0=ufloat(-24,2).
+
+   N.B. Gaussian priors on log_omega0, log_S0 and log_Q specified in the
+   individual datasets are ignored.
+
+   Parameter decorrelation
+   ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Decorrelation against roll angle (phi) is handled differently in
+   Multivisit to Dataset. The decorrelation against cos(phi), sin(phi),
+   cos(2.phi), sin(2.phi), etc. is done using a combination of the trick
+   from Rodrigo et al. (2017RNAAS...1....7L) and the celerite model by
+   Foremann-Mackey et al. (2017AJ....154..220F). This enables the
+   coefficients of this "linear harmonic instrumental noise model" to be
+   treated as nuisance parameters that are automatically marginalised
+   away by adding a suitable term (CosineTerm) to the covariance matrix. This
+   is all done transparently by setting "unroll=True". The number of harmonic
+   terms is set by nroll, e.g., setting nroll=3 (default) includes terms
+   up to sin(3.phi) and cos(3.phi). This requires that phi is a linear
+   function of time for each dataset, which is a good approximation for
+   individual CHEOPS visits.
+
+   Other decorrelation parameters not derived from the roll angle, e.g. dfdx,
+   dfdy, etc. are included in the fit to individual datasets only if they
+   were free parameters in the last fit to that dataset. The decorrelation is
+   done independently for each dataset. The free parameters are labelled
+   dfdx_ii, dfdy_ii where ii is the number of the dataset to which each
+   decorrelation parameter applies, i.e. ii=01, 02, 03, etc.
+
+   Glint correction is done independently for each dataset if the glint
+   correction was included in the last fit to that dataset. The glint
+   scale factor for dataset ii is labelled glint_scale_ii. The glint
+   scaling factor for each dataset can either be a fixed or a free
+   parameter, depending on whether it was a fixed or a free parameter in
+   the last fit to that dataset.
+
+   Note that the "unroll" method implicitly assumes that the rate of change
+   of roll angle, Omega = d(phi)/dt, is constant. This is a reasonable
+   approximation but can introduce some extra noise in cases where
+   instrumental noise correlated with roll angle is large, e.g., observations
+   of faint stars in crowded fields. In this case it may be better to
+   include the best-fit trends against roll angle from the last fit stored in
+   the .dataset file in the fit to each dataset. This case be done using the
+   keyword argument "unwrap=True". This option can be combined with the
+   "unroll=True" option, i.e. to use "unroll"  as a small correction to the
+   "unwrap" roll-angle decorrelation from the last fit to each data set.
+
+    If you only want to store and yield 1-in-thin samples in the chain, set
+   thin to an integer greater than 1. When this is set, thin*steps will be
+   made and the chains returned with have "steps" values per walker.
+
+   Fits, models, trends and correlated noise
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   The best fit to the light curve in each data set is
+
+     f_fit = f_sys x f_fac + f_glint + f_celerite + f_unwrap
+
+   - "f_sys" includes all the photometric effects intrinsic to the
+      star/planet system, i.e. transits and eclipses
+   - "f_fac" includes all the trends correlated with parameters apart
+      from spacecraft roll angle
+   - "f_glint" is an optional function of roll angle scaled by the parameter
+     glint_scale used to model internal reflections or other features
+     correlated with roll angle (otherwise f_glint=0).
+   - "f_celerite" is the maximum-likelihood Gaussian process generated for a
+     kernel SHOTerm() + CosineTerm(Omega) + CosineTerm(2*Omega) + ..., where
+     the number of CosineTerm() kernels is specified by nroll and SHOTerm()
+     is only included if correlated noise is included in the model.
+   - "f_unwrap" are the trends correlated with spacecraft roll angle removed
+     if the unwrap=True option is specified (otherwise f_unwrap = 0)
+
+   For plotting and data output we require the "detrended flux", i.e.
+
+     flux_d = f_sys + f_sho + f_fit - f_obs
+
+   where f_obs is the observed flux and f_sho is the maximum-likelihood
+   Gaussian process generated using only the SHOTerm() kernel, i.e. the
+   detrended fluxes include the correlated noise modelled by f_sho. The
+   detrended fluxes for the best fits to each dataset are included in the
+   output lmfit ModelResult object in the attribute fluxes_det.
+
+   Return value
+   ~~~~~~~~~~~~
+    The fitting routines return lmfit MinimizerResult objects with a few
+    extra attributes. Samples generated by emcee are returned as a python
+    array in the attribute flat_chain instead of a pandas.DataFrame object in
+    the attribute flatchain.
+
+   Backends
+   --------
+    See https://emcee.readthedocs.io/en/stable/tutorials/monitor/ for use of
+    the backend keyword.
+
+
+
+
+.. py:function:: custom_plot_phase(M, result, title=None)
+
+
+.. py:function:: custom_plot_phase_from_model(model, title=None)
+
+
+.. py:function:: mask_data_clipping(x, k, clip_type='median')
+
+
+.. py:function:: computes_bayes_factor(params)
+
+
+.. py:function:: planet_check(dataset, olog=None)
+
+
+.. py:function:: copy_DRP_report(dataset, output_folder, olog=None)
+
+
+.. py:class:: CustomStarProperties(identifier, force_download=False, dace=False, match_arcsec=None, configFile=None, teff=None, logg=None, metal=None, passband='CHEOPS', verbose=True)
+
+   Bases: :py:obj:`object`
+
+   CHEOPS StarProperties object
+
+   The observed properties T_eff, log_g and [Fe/H] are obtained from
+   DACE or SWEET-Cat, or can be specified by the user.
+
+   Set match_arcsec=None to skip extraction of parameters from SWEET-Cat.
+
+   By default properties are obtained from SWEET-Cat.
+
+   Set dace=True to obtain parameters from the stellar properties table at
+   DACE.
+
+   User-defined properties are specified either as a ufloat or as a 2-tuple
+   (value, error), e.g., teff=(5000,100).
+
+   User-defined properties over-write values obtained from SWEET-Cat or DACE.
+
+   The stellar density is estimated using an linear relation between log(rho)
+   and log(g) derived using the method of Moya et al. (2018ApJS..237...21M)
+
+   Limb darkening parameters in the CHEOPS band are interpolated from Table 2
+   of Maxted (2018A&A...616A..39M). The error on these parameters is
+   propogated from the errors in Teff, log_g and [Fe/H] plus an additional
+   error of 0.01 for h_1 and 0.05 for h_2, as recommended in Maxted (2018).
+   If [Fe/H] for the star is not specified, the value 0.0 +/- 0.3 is assumed.
+
+   If the stellar parameters are outside the range covered by Table 2 of
+   Maxted (2018), then the results from ATLAS model from Table 10 of Claret
+   (2019RNAAS...3...17C) are used instead. For stars cooler than 3500K the
+   PHOENIX models for solar metalicity  from Table 5 of Claret (2019) are
+   used. The parameters h_1 and h_2 are both given nominal errors of 0.1 for
+   both ATLAS model, and 0.15 for PHOENIX models.
+
+
+   .. py:method:: __repr__(self)
+
+      Return repr(self).
+
+
+
+.. py:function:: quick_save_params(out_file, params, bjd_ref)
+
+
+.. py:function:: quick_save_params_ultranest(out_file, params, bjd_ref)
+
+
+.. py:function:: quick_save_params_ultra(out_file, star_inputs, planet_inputs, params_lm_loop, results, bjd_ref, mod='median')
+
+
+.. py:function:: u1u2_to_q1q2(u1, u2)
+
+
+.. py:function:: q1q2_to_u1u2(q1, q2)
+
+
+.. py:function:: generate_private_key(path)
+
+

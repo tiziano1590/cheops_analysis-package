@@ -1,0 +1,37 @@
+:py:mod:`dace`
+==============
+
+.. py:module:: dace
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   dace_search/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   dace.DACESearch
+
+
+
+
+.. py:class:: DACESearch(input_file)
+
+   .. py:method:: get_observations(self)
+
+
+   .. py:method:: substitute_file_key(self, keyword, visit_number)
+
+
+

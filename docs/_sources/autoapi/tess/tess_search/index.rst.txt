@@ -1,0 +1,60 @@
+:py:mod:`tess.tess_search`
+==========================
+
+.. py:module:: tess.tess_search
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   tess.tess_search.TESSSearch
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   tess.tess_search._wait_browser
+   tess.tess_search._wait_browser_and_click
+   tess.tess_search._wait_browser_and_send_keys
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   tess.tess_search.LIMIT_TIME
+
+
+.. py:data:: LIMIT_TIME
+   :annotation: = 60
+
+   
+
+.. py:function:: _wait_browser(foo)
+
+
+.. py:function:: _wait_browser_and_click(foo)
+
+
+.. py:function:: _wait_browser_and_send_keys(foo)
+
+
+.. py:class:: TESSSearch(input_file)
+
+   .. py:method:: get_observations(self, download=True)
+
+
+   .. py:method:: substitute_file_key(self, keyword, visit_number)
+
+
+
