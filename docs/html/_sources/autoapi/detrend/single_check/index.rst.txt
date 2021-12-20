@@ -1,0 +1,81 @@
+:py:mod:`detrend.single_check`
+==============================
+
+.. py:module:: detrend.single_check
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   detrend.single_check.SingleCheck
+   detrend.single_check.CheckEphemerids
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   detrend.single_check.my_dpi
+   detrend.single_check.print_pycheops_pars
+   detrend.single_check.print_analysis_stats
+   detrend.single_check.multi_detrending_model
+   detrend.single_check.printlog
+   detrend.single_check.fig_ext
+   detrend.single_check.sc
+
+
+.. py:data:: my_dpi
+   :annotation: = 192
+
+   
+
+.. py:data:: print_pycheops_pars
+   
+
+   
+
+.. py:data:: print_analysis_stats
+   
+
+   
+
+.. py:data:: multi_detrending_model
+   
+
+   
+
+.. py:data:: printlog
+   
+
+   
+
+.. py:data:: fig_ext
+   :annotation: = ['png', 'pdf']
+
+   
+
+.. py:class:: SingleCheck(input_file)
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: CheckEphemerids(input_file)
+
+   .. py:method:: plot_lightcurve(self)
+
+
+
+.. py:data:: sc
+   
+
+   
+
