@@ -20,12 +20,6 @@ Welcome to cheope's documentation!
     Project Page <https://github.com/tiziano1590/cheops_analysis-package>
 
 
-Automatic API
-=======================================================
-.. toctree::
-
-    autoapi/example/index
-
 
 cheope - interpreting lightcurves from any dataset
 =======================================================
