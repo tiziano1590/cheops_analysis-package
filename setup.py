@@ -46,7 +46,6 @@ setup(
     author='Tiziano Zingales',
     author_email='tiziano.zingales@gmail.com',
     license="LICENSE",
-    version=version,
     description='CHEOPE: studying transiting exoplanets',
     classifiers=classifiers,
     long_description=long_description,

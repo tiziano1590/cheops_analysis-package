@@ -2,3 +2,4 @@
 *__pycache__*
 cheope.egg-info/*
 docs/_build/*
+dist/*
