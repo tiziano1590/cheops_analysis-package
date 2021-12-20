@@ -1,0 +1,128 @@
+:py:mod:`detrend`
+=================
+
+.. py:module:: detrend
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   detrend/index.rst
+   optimizers/index.rst
+   single_check/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   detrend.SingleBayes
+   detrend.MultivisitAnalysis
+   detrend.SingleBayesKeplerTess
+   detrend.SingleBayesASCII
+   detrend.Optimizers
+   detrend.OptimizersKeplerTESS
+   detrend.OptimizersMultivisit
+   detrend.SingleCheck
+   detrend.CheckEphemerids
+
+
+
+
+.. py:class:: SingleBayes(input_file)
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: MultivisitAnalysis(input_file)
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: SingleBayesKeplerTess(input_file)
+
+   .. py:method:: load_fits_file(self, file_fits, olog=None)
+
+
+   .. py:method:: get_transit_epochs(self, data, info, visit_args, planet_args, olog=None)
+
+
+   .. py:method:: single_epoch_analysis(self, transit, info, star, visit_args, star_args, planet_args, emcee_args, ultranest_args, epoch_folder, olog=None)
+
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: SingleBayesASCII(input_file)
+
+   .. py:method:: get_ld_h1h2(self, visit_args)
+
+
+   .. py:method:: load_ascii_file(self, visit_args, olog=None)
+
+
+   .. py:method:: single_Bayes_ASCII(self, ascii_data, star_args, visit_args, planet_args, emcee_args, epoch_folder, olog=None, n_threads=1)
+
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: Optimizers
+
+   Optimizers class:
+   it contains al list of all the possible optimizers used for Bayesian analysis.
+
+   The Emcee function is used for MCMC analysis and t prints the results in the most
+   appropriate format for emcee.
+
+   The Ultranest function uses Nested sampling and returns also the characteristic plots for this
+   alsorithm.
+
+   .. py:method:: emcee(self, inpars=None, dataset=None, olog=None, params_lm_loop=None, star=None)
+
+
+   .. py:method:: ultranest(self, inpars=None, dataset=None, olog=None, params_lm_loop=None, star=None)
+
+
+
+.. py:class:: OptimizersKeplerTESS
+
+   .. py:method:: emcee(self, olog=None, dataset=None, epoch_folder=None, params_lm_loop=None, star=None, epoch_name=None, stats_lm=None, visit_args=None, star_args=None, emcee_args=None)
+
+
+   .. py:method:: ultranest(self, olog=None, dataset=None, epoch_folder=None, params_lm_loop=None, star=None, epoch_name=None, stats_lm=None, visit_args=None, star_args=None, ultranest_args=None)
+
+
+
+.. py:class:: OptimizersMultivisit
+
+   .. py:method:: emcee(self, inpars=None, M=None, olog=None, new_params=None, T_0=None, T_ref=None, P_ref=None, log_omega0=None, log_S0=None, extra_priors=None)
+
+
+   .. py:method:: ultranest(self, inpars=None, M=None, olog=None, new_params=None, T_0=None, T_ref=None, P_ref=None, log_omega0=None, log_S0=None, extra_priors=None)
+
+
+
+.. py:class:: SingleCheck(input_file)
+
+   .. py:method:: run(self)
+
+
+
+.. py:class:: CheckEphemerids(input_file)
+
+   .. py:method:: plot_lightcurve(self)
+
+
+

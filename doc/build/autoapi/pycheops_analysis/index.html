@@ -1,0 +1,1042 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>pycheops_analysis &#8212; cheope 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cheope 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">pycheops_analysis</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-pycheops_analysis">
+<span id="pycheops-analysis"></span><h1><a class="reference internal" href="#module-pycheops_analysis" title="pycheops_analysis"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pycheops_analysis</span></code></a><a class="headerlink" href="#module-pycheops_analysis" title="Permalink to this headline">¶</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.DatasetModel" title="pycheops_analysis.DatasetModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetModel</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.PIPEDataset" title="pycheops_analysis.PIPEDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PIPEDataset</span></code></a></p></td>
+<td><p>CHEOPS Dataset object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.FITSDataset" title="pycheops_analysis.FITSDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FITSDataset</span></code></a></p></td>
+<td><p>CHEOPS Dataset object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.AsciiDataset" title="pycheops_analysis.AsciiDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsciiDataset</span></code></a></p></td>
+<td><p>CHEOPS Dataset object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.CustomMultiVisit" title="pycheops_analysis.CustomMultiVisit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomMultiVisit</span></code></a></p></td>
+<td><p>CHEOPS MultiVisit object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.CustomStarProperties" title="pycheops_analysis.CustomStarProperties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomStarProperties</span></code></a></p></td>
+<td><p>CHEOPS StarProperties object</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.printlog" title="pycheops_analysis.printlog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">printlog</span></code></a>(l, olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_all_apertures" title="pycheops_analysis.plot_all_apertures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_all_apertures</span></code></a>(dataset, out_folder)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_single_lc" title="pycheops_analysis.plot_single_lc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_single_lc</span></code></a>(t, f, ef, bjd_ref)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_custom_diagnostics" title="pycheops_analysis.plot_custom_diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_custom_diagnostics</span></code></a>(lc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_corner_diagnostics" title="pycheops_analysis.plot_corner_diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_corner_diagnostics</span></code></a>(dataset)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_full_model" title="pycheops_analysis.get_full_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_model</span></code></a>(dataset, params_in=None, time=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.binned_rms" title="pycheops_analysis.binned_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_rms</span></code></a>(stats_dict, t_lc, residuals, rms_time_in, keyword='flux-all (w/o GP)', olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.computes_rms" title="pycheops_analysis.computes_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computes_rms</span></code></a>(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.computes_rms_ultra" title="pycheops_analysis.computes_rms_ultra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computes_rms_ultra</span></code></a>(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_and_clip_lcs" title="pycheops_analysis.plot_and_clip_lcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_and_clip_lcs</span></code></a>(datasets, apertures, out_folder, index_to_clip='all')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.copy_parameters" title="pycheops_analysis.copy_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_parameters</span></code></a>(params_in)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_fitting_parameters" title="pycheops_analysis.get_fitting_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fitting_parameters</span></code></a>(params, to_print=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.get_best_parameters" title="pycheops_analysis.get_best_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_parameters</span></code></a>(result, dataset, nburn=0, dataset_type='visit', update_dataset=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_best_parameters_ultranest" title="pycheops_analysis.get_best_parameters_ultranest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_parameters_ultranest</span></code></a>(result, params, sampler, dataset_type='visit')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.model_plot_fit" title="pycheops_analysis.model_plot_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_plot_fit</span></code></a>(dataset, par_fit, par_type='median', nsamples=0, flatchains=None, model_filename=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.init_multi_model" title="pycheops_analysis.init_multi_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_multi_model</span></code></a>(datasets, params, pnames, gnames, tnames, do_fit=True)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.check_boundaries" title="pycheops_analysis.check_boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_boundaries</span></code></a>(pfit, pnames, params)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.set_pycheops_par" title="pycheops_analysis.set_pycheops_par"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_pycheops_par</span></code></a>(pfit, pnames, gnames, tnames, params, dataset, visit)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.multi_model" title="pycheops_analysis.multi_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multi_model</span></code></a>(pfit, pnames, gnames, tnames, params_in, datasets)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.components_model" title="pycheops_analysis.components_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">components_model</span></code></a>(pfit, pnames, gnames, tnames, params, datasets, gps, fill_gaps=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_final_params" title="pycheops_analysis.plot_final_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_final_params</span></code></a>(pbest, pnames, gnames, tnames, params, datasets, gps, out_folder, fill_gaps=True, emcee=True, pars_type='mle', nsamples=0, flatchain=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.lnprob_woGP" title="pycheops_analysis.lnprob_woGP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lnprob_woGP</span></code></a>(pfit, pnames, gnames, tnames, params, datasets)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.lnprob_wGP" title="pycheops_analysis.lnprob_wGP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lnprob_wGP</span></code></a>(pfit, pnames, gnames, tnames, params, datasets, gps)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.init_walkers" title="pycheops_analysis.init_walkers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_walkers</span></code></a>(lnprob, pfit, pscale, nwalkers, args=(), init_scale=0.001)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.sampler_to_dict" title="pycheops_analysis.sampler_to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampler_to_dict</span></code></a>(sampler, nburn=0, nprerun=0, nthin=1)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.do_emcee_analysis" title="pycheops_analysis.do_emcee_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_emcee_analysis</span></code></a>(lnprob, pfit, pscale, out_folder, args=(), nwalkers=64, nprerun=0, nsteps=512, nthin=4, nburn=128, progress=True, run_emcee=True, read_sampler=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.high_posterior_density" title="pycheops_analysis.high_posterior_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">high_posterior_density</span></code></a>(trace, cred=0.6827)</p></td>
+<td><p>Estimate the highest probability density interval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.single_chain_summary" title="pycheops_analysis.single_chain_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">single_chain_summary</span></code></a>(singlechain, idx)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.summary_parameters" title="pycheops_analysis.summary_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary_parameters</span></code></a>(samples, pnames, params, mle_within_hdi=True)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.trace_plot" title="pycheops_analysis.trace_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trace_plot</span></code></a>(sampler_dict, summary, out_folder)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.print_pycheops_pars" title="pycheops_analysis.print_pycheops_pars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_pycheops_pars</span></code></a>(pars, user_data=True, expr=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.print_analysis_stats" title="pycheops_analysis.print_analysis_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_analysis_stats</span></code></a>(analysis_stats)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_fft" title="pycheops_analysis.plot_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_fft</span></code></a>(dataset, pars_in, star=None, gsmooth=5, logxlim=(1.5, 4.5))</p></td>
+<td><p>Lomb-Scargle power-spectrum of the residuals.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.multi_detrending_model" title="pycheops_analysis.multi_detrending_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multi_detrending_model</span></code></a>(detrending_args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.should_I_decorr_detrending_model" title="pycheops_analysis.should_I_decorr_detrending_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">should_I_decorr_detrending_model</span></code></a>(detrending_args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.save_dataset" title="pycheops_analysis.save_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_dataset</span></code></a>(dataset, folder, target, file_key, gp=False)</p></td>
+<td><p>Save the current dataset as a pickle file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.load_dataset" title="pycheops_analysis.load_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_dataset</span></code></a>(filename)</p></td>
+<td><p>Load a dataset from a pickle file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.custom_plot_phase" title="pycheops_analysis.custom_plot_phase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_plot_phase</span></code></a>(M, result, title=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.custom_plot_phase_from_model" title="pycheops_analysis.custom_plot_phase_from_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_plot_phase_from_model</span></code></a>(model, title=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.mask_data_clipping" title="pycheops_analysis.mask_data_clipping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask_data_clipping</span></code></a>(x, k, clip_type='median')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.computes_bayes_factor" title="pycheops_analysis.computes_bayes_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computes_bayes_factor</span></code></a>(params)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.planet_check" title="pycheops_analysis.planet_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">planet_check</span></code></a>(dataset, olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.copy_DRP_report" title="pycheops_analysis.copy_DRP_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_DRP_report</span></code></a>(dataset, output_folder, olog=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.quick_save_params" title="pycheops_analysis.quick_save_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quick_save_params</span></code></a>(out_file, params, bjd_ref)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.quick_save_params_ultranest" title="pycheops_analysis.quick_save_params_ultranest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quick_save_params_ultranest</span></code></a>(out_file, params, bjd_ref)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.quick_save_params_ultra" title="pycheops_analysis.quick_save_params_ultra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quick_save_params_ultra</span></code></a>(out_file, star_inputs, planet_inputs, params_lm_loop, results, bjd_ref, mod='median')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.u1u2_to_q1q2" title="pycheops_analysis.u1u2_to_q1q2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u1u2_to_q1q2</span></code></a>(u1, u2)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.q1q2_to_u1u2" title="pycheops_analysis.q1q2_to_u1u2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">q1q2_to_u1u2</span></code></a>(q1, q2)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.generate_private_key" title="pycheops_analysis.generate_private_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_private_key</span></code></a>(path)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.my_dpi" title="pycheops_analysis.my_dpi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">my_dpi</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.module_celerite2" title="pycheops_analysis.module_celerite2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">module_celerite2</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.out_color" title="pycheops_analysis.out_color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">out_color</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.rms_time" title="pycheops_analysis.rms_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rms_time</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.global_names" title="pycheops_analysis.global_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">global_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.transit_names" title="pycheops_analysis.transit_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_names</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.detrend_bounds" title="pycheops_analysis.detrend_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend_bounds</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.detrend_default" title="pycheops_analysis.detrend_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend_default</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.detrend" title="pycheops_analysis.detrend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.params_units" title="pycheops_analysis.params_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">params_units</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.my_dpi">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">my_dpi</span></span><em class="property"> <span class="pre">=</span> <span class="pre">192</span></em><a class="headerlink" href="#pycheops_analysis.my_dpi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.module_celerite2">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">module_celerite2</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#pycheops_analysis.module_celerite2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.out_color">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">out_color</span></span><em class="property"> <span class="pre">=</span> <span class="pre">lightgray</span></em><a class="headerlink" href="#pycheops_analysis.out_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.rms_time">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">rms_time</span></span><a class="headerlink" href="#pycheops_analysis.rms_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.global_names">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">global_names</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['P',</span> <span class="pre">'D',</span> <span class="pre">'b',</span> <span class="pre">'W',</span> <span class="pre">'f_c',</span> <span class="pre">'f_s',</span> <span class="pre">'h_1',</span> <span class="pre">'h_2',</span> <span class="pre">'Tref']</span></em><a class="headerlink" href="#pycheops_analysis.global_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.transit_names">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">transit_names</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['dT',</span> <span class="pre">'T_0',</span> <span class="pre">'c',</span> <span class="pre">'dfdt',</span> <span class="pre">'d2fdt2',</span> <span class="pre">'dfdbg',</span> <span class="pre">'dfdcontam',</span> <span class="pre">'dfdx',</span> <span class="pre">'d2fdx2',</span> <span class="pre">'dfdy',</span> <span class="pre">'d2fdy2',...</span></em><a class="headerlink" href="#pycheops_analysis.transit_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.detrend_bounds">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">detrend_bounds</span></span><a class="headerlink" href="#pycheops_analysis.detrend_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.detrend_default">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">detrend_default</span></span><a class="headerlink" href="#pycheops_analysis.detrend_default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.detrend">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">detrend</span></span><a class="headerlink" href="#pycheops_analysis.detrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pycheops_analysis.params_units">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">params_units</span></span><a class="headerlink" href="#pycheops_analysis.params_units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.printlog">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">printlog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.printlog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_all_apertures">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_all_apertures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_all_apertures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_single_lc">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_single_lc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bjd_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_single_lc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_custom_diagnostics">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_custom_diagnostics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_custom_diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_corner_diagnostics">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_corner_diagnostics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_corner_diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.DatasetModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">DatasetModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.DatasetModel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.get_full_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_full_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_full_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.binned_rms">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">binned_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_time_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flux-all</span> <span class="pre">(w/o</span> <span class="pre">GP)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.binned_rms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.computes_rms">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">computes_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_best</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">glint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_rms_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.computes_rms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.computes_rms_ultra">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">computes_rms_ultra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_best</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">glint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_rms_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.computes_rms_ultra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_and_clip_lcs">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_and_clip_lcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apertures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_to_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_and_clip_lcs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.copy_parameters">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">copy_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.copy_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.get_fitting_parameters">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_fitting_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_fitting_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.get_best_parameters">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_best_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nburn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'visit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_best_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.get_best_parameters_ultranest">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_best_parameters_ultranest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'visit'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_best_parameters_ultranest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.model_plot_fit">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">model_plot_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par_fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatchains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.model_plot_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.init_multi_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">init_multi_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.init_multi_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.check_boundaries">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">check_boundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.check_boundaries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.set_pycheops_par">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">set_pycheops_par</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.set_pycheops_par" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.multi_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">multi_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.multi_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.components_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">components_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_gaps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.components_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_final_params">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_final_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pbest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_gaps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emcee</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pars_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatchain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_final_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.lnprob_woGP">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">lnprob_woGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.lnprob_woGP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.lnprob_wGP">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">lnprob_wGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.lnprob_wGP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.init_walkers">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">init_walkers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lnprob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalkers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.init_walkers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.sampler_to_dict">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">sampler_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nburn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprerun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nthin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.sampler_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.do_emcee_analysis">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">do_emcee_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lnprob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalkers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprerun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nthin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nburn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_emcee</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.do_emcee_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.high_posterior_density">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">high_posterior_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6827</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.high_posterior_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate the highest probability density interval.</p>
+<p>This function determines the shortest, continuous interval
+containing the specified fraction (cred) of steps of
+the Markov chain. Note that multi-modal distribution
+may require further scrutiny.</p>
+<p># cred = 0.6827 &lt;-&gt; -/+ 1 sigma
+# cred = 0.9545 &lt;-&gt; -/+ 2 sigma
+# cred = 0.9973 &lt;-&gt; -/+ 3 sigma
+# cred = 0.999999426696856 &lt;-&gt; -/+ 5 sigma</p>
+<dl class="simple">
+<dt>trace<span class="classifier">array</span></dt><dd><p>The steps of the Markov chain.</p>
+</dd>
+<dt>cred<span class="classifier">float</span></dt><dd><p>The probability mass to be included in the
+interval (between 0 and 1).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>start, end<span class="classifier">float</span></dt><dd><p>The start and end points of the interval.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.single_chain_summary">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">single_chain_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">singlechain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.single_chain_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.summary_parameters">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">summary_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mle_within_hdi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.summary_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.trace_plot">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">trace_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampler_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.trace_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.print_pycheops_pars">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">print_pycheops_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.print_pycheops_pars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.print_analysis_stats">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">print_analysis_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_stats</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.print_analysis_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.plot_fft">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pars_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsmooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logxlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1.5,</span> <span class="pre">4.5)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lomb-Scargle power-spectrum of the residuals.</p>
+<p>If the previous fit included a GP then this is _not_ included in the
+calculation of the residuals, i.e., the power spectrum includes the
+power “fitted-out” using the GP. The assumption here is that the GP
+has been used to model stellar variability that we wish to
+characterize using the power spectrum.</p>
+<p>The red vertical dotted lines show the CHEOPS  orbital frequency and
+its first two harmonics.</p>
+<p>If star is a pycheops starproperties object and star.teff is &lt;7000K,
+then the likely range of nu_max is shown using green dashed lines.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.multi_detrending_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">multi_detrending_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detrending_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.multi_detrending_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.should_I_decorr_detrending_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">should_I_decorr_detrending_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detrending_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.should_I_decorr_detrending_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.PIPEDataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">PIPEDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_report_on_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.PIPEDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pycheops.Dataset</span></code></p>
+<p>CHEOPS Dataset object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_key</strong> – </p></li>
+<li><p><strong>force_download</strong> – </p></li>
+<li><p><strong>download_all</strong> – If False, download light curves only</p></li>
+<li><p><strong>configFile</strong> – </p></li>
+<li><p><strong>target</strong> – </p></li>
+<li><p><strong>view_report_on_download</strong> – </p></li>
+<li><p><strong>metadata</strong> – True to load meta data</p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycheops_analysis.PIPEDataset.get_PIPE_lightcurve">
+<span class="sig-name descname"><span class="pre">get_PIPE_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PIPE_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject_highpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.PIPEDataset.get_PIPE_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.FITSDataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">FITSDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_report_on_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.FITSDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pycheops.Dataset</span></code></p>
+<p>CHEOPS Dataset object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_key</strong> – </p></li>
+<li><p><strong>force_download</strong> – </p></li>
+<li><p><strong>download_all</strong> – If False, download light curves only</p></li>
+<li><p><strong>configFile</strong> – </p></li>
+<li><p><strong>target</strong> – </p></li>
+<li><p><strong>view_report_on_download</strong> – </p></li>
+<li><p><strong>metadata</strong> – True to load meta data</p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycheops_analysis.FITSDataset.get_FITS_lightcurve">
+<span class="sig-name descname"><span class="pre">get_FITS_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject_highpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.FITSDataset.get_FITS_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.AsciiDataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">AsciiDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_report_on_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.AsciiDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pycheops.Dataset</span></code></p>
+<p>CHEOPS Dataset object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_key</strong> – </p></li>
+<li><p><strong>force_download</strong> – </p></li>
+<li><p><strong>download_all</strong> – If False, download light curves only</p></li>
+<li><p><strong>configFile</strong> – </p></li>
+<li><p><strong>target</strong> – </p></li>
+<li><p><strong>view_report_on_download</strong> – </p></li>
+<li><p><strong>metadata</strong> – True to load meta data</p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycheops_analysis.AsciiDataset.get_ascii_lightcurve">
+<span class="sig-name descname"><span class="pre">get_ascii_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ascii_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject_highpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.AsciiDataset.get_ascii_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.save_dataset">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">save_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.save_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the current dataset as a pickle file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>pickle file name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.load_dataset">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a dataset from a pickle file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – pickle file name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dataset object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.CustomMultiVisit">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">CustomMultiVisit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ident</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'dace':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.CustomMultiVisit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pycheops.MultiVisit</span></code></p>
+<p>CHEOPS MultiVisit object</p>
+<p>Specify a target name to initialize from pickled datasets in the current
+working directory (or in datadir if datadir is not None).</p>
+<p>The target name can include blanks - these are replaced by “_”
+automatically before searching for matching file names.</p>
+<p>The parameter ident is used to collect star and planet properties from the
+relevant tables at DACE. If ident is None (default) then the target name
+is used in place of ident. Set ident=’none’ to disable this feature.  See
+also StarProperties for other options that can be set using id_kws, e.g.,
+id_kws={‘dace’:False} to use SWEET-Cat instead of DACE.</p>
+<p>All dates and times in each of the dataset are stored as BJD-2457000 (same
+as TESS).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> – target name to identify pickled datasets</p></li>
+<li><p><strong>datadir</strong> – directory containing pickled datasets</p></li>
+<li><p><strong>ident</strong> – identifier in star properties table. If None use target. If</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘none’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_kws</strong> – keywords for call to StarProperties.</p></li>
+<li><p><strong>verbose</strong> – print dataset names, etc. if True</p></li>
+</ul>
+</dd>
+</dl>
+<p>The same values of the transit parameters T_0, P, D, W, b, f_c and f_s are
+used for all the datasets in the combined fit. This also applies to h_1
+and h_2 when fitting transits.</p>
+<p>User-defined parameters can be specified in one of the following ways:</p>
+<ul class="simple">
+<li><p>fixed value, e.g., P=1.234</p></li>
+<li><p>free parameter with uniform prior interval specified as a 2-tuple,
+e.g., dfdx=(-1,1). The initial value is taken as the the mid-point of
+the allowed interval;</p></li>
+<li><p>free parameter with uniform prior interval and initial value
+specified as a 3-tuple, e.g., (0.1, 0.2, 1);</p></li>
+<li><p>free parameter with a Gaussian prior specified as a ufloat, e.g.,
+ufloat(0,1);</p></li>
+<li><p>as an lmfit Parameter object.</p></li>
+</ul>
+<p>A transit parameter will be fixed in the fit to the combined datasets
+only if the same parameter was fixed in the last fit to all datasets
+and the same parameter is not specified as a free parameter in the
+call to this method.</p>
+<p>If no user-defined value is provided then the initial value for each
+transit parameter is set using the mean value across the individual
+datasets. For T_0 an integer number of periods are added or subtracted
+from the individual T_0 values so that the mean T_0 value corresponds
+to a time of mid-transit near the centre of the datasets.</p>
+<p>N.B. The timescale for T_0 in BJD_TDB - 2457000.</p>
+<p>Priors on transit parameters are only set if they are specified in the
+call to the fitting method using either a ufloat, or as an lmfit Parameter
+object that includes a ufloat in its user_data.</p>
+<p>Priors on the derived parameters e, q_1, q_2, logrho, etc. can be
+specified as a dictionary of ufloat values using the extra_priors
+keyword, e.g., extra_priors={‘e’:ufloat(0.2,0.01)}. Priors on parameters
+that apply to individual datasets can also be specified in extra_priors,
+e.g., extra_priors[‘dfdt_01’] = ufloat(0.0,0.001). Priors listed in
+extra_priors will supercede priors on parameters saved with the individual
+datasets.</p>
+<p>The noise model assumes that the error bars on each data point have
+addition white noise with standard deviation log_sigma_w. Optionally,
+correlated noise can be included using celerite2 with kernel
+SHOTerm(log_omega0, log_S0, log_Q). The same values of log_sigma_w,
+log_omega0, log_S0 and log_Q are used for all the datasets in the combined
+fit.</p>
+<p>The fit to the combined datasets will only include a GP if log_omega0 and
+log_S0 are both specified as arguments in the call to the fitting method.
+If log_Q is not specified as an argument in the call to the fitting method
+then it is fixed at the value log_Q=1/sqrt(2).</p>
+<p>Gaussian priors on the values of log_omega0, log_S0 and log_Q will
+only be applied if the user-specified value includes a Gaussian prior,
+e.g., log_omega0=ufloat(6,1), log_S0=ufloat(-24,2).</p>
+<p>N.B. Gaussian priors on log_omega0, log_S0 and log_Q specified in the
+individual datasets are ignored.</p>
+<p>Decorrelation against roll angle (phi) is handled differently in
+Multivisit to Dataset. The decorrelation against cos(phi), sin(phi),
+cos(2.phi), sin(2.phi), etc. is done using a combination of the trick
+from Rodrigo et al. (2017RNAAS…1….7L) and the celerite model by
+Foremann-Mackey et al. (2017AJ….154..220F). This enables the
+coefficients of this “linear harmonic instrumental noise model” to be
+treated as nuisance parameters that are automatically marginalised
+away by adding a suitable term (CosineTerm) to the covariance matrix. This
+is all done transparently by setting “unroll=True”. The number of harmonic
+terms is set by nroll, e.g., setting nroll=3 (default) includes terms
+up to sin(3.phi) and cos(3.phi). This requires that phi is a linear
+function of time for each dataset, which is a good approximation for
+individual CHEOPS visits.</p>
+<p>Other decorrelation parameters not derived from the roll angle, e.g. dfdx,
+dfdy, etc. are included in the fit to individual datasets only if they
+were free parameters in the last fit to that dataset. The decorrelation is
+done independently for each dataset. The free parameters are labelled
+dfdx_ii, dfdy_ii where ii is the number of the dataset to which each
+decorrelation parameter applies, i.e. ii=01, 02, 03, etc.</p>
+<p>Glint correction is done independently for each dataset if the glint
+correction was included in the last fit to that dataset. The glint
+scale factor for dataset ii is labelled glint_scale_ii. The glint
+scaling factor for each dataset can either be a fixed or a free
+parameter, depending on whether it was a fixed or a free parameter in
+the last fit to that dataset.</p>
+<p>Note that the “unroll” method implicitly assumes that the rate of change
+of roll angle, Omega = d(phi)/dt, is constant. This is a reasonable
+approximation but can introduce some extra noise in cases where
+instrumental noise correlated with roll angle is large, e.g., observations
+of faint stars in crowded fields. In this case it may be better to
+include the best-fit trends against roll angle from the last fit stored in
+the .dataset file in the fit to each dataset. This case be done using the
+keyword argument “unwrap=True”. This option can be combined with the
+“unroll=True” option, i.e. to use “unroll”  as a small correction to the
+“unwrap” roll-angle decorrelation from the last fit to each data set.</p>
+<blockquote>
+<div><p>If you only want to store and yield 1-in-thin samples in the chain, set</p>
+</div></blockquote>
+<p>thin to an integer greater than 1. When this is set, thin*steps will be
+made and the chains returned with have “steps” values per walker.</p>
+<p>The best fit to the light curve in each data set is</p>
+<blockquote>
+<div><p>f_fit = f_sys x f_fac + f_glint + f_celerite + f_unwrap</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>“f_sys” includes all the photometric effects intrinsic to the</dt><dd><p>star/planet system, i.e. transits and eclipses</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>“f_fac” includes all the trends correlated with parameters apart</dt><dd><p>from spacecraft roll angle</p>
+</dd>
+</dl>
+</li>
+<li><p>“f_glint” is an optional function of roll angle scaled by the parameter
+glint_scale used to model internal reflections or other features
+correlated with roll angle (otherwise f_glint=0).</p></li>
+<li><p>“f_celerite” is the maximum-likelihood Gaussian process generated for a
+kernel SHOTerm() + CosineTerm(Omega) + CosineTerm(2*Omega) + …, where
+the number of CosineTerm() kernels is specified by nroll and SHOTerm()
+is only included if correlated noise is included in the model.</p></li>
+<li><p>“f_unwrap” are the trends correlated with spacecraft roll angle removed
+if the unwrap=True option is specified (otherwise f_unwrap = 0)</p></li>
+</ul>
+<p>For plotting and data output we require the “detrended flux”, i.e.</p>
+<blockquote>
+<div><p>flux_d = f_sys + f_sho + f_fit - f_obs</p>
+</div></blockquote>
+<p>where f_obs is the observed flux and f_sho is the maximum-likelihood
+Gaussian process generated using only the SHOTerm() kernel, i.e. the
+detrended fluxes include the correlated noise modelled by f_sho. The
+detrended fluxes for the best fits to each dataset are included in the
+output lmfit ModelResult object in the attribute fluxes_det.</p>
+<blockquote>
+<div><p>The fitting routines return lmfit MinimizerResult objects with a few
+extra attributes. Samples generated by emcee are returned as a python
+array in the attribute flat_chain instead of a pandas.DataFrame object in
+the attribute flatchain.</p>
+</div></blockquote>
+<blockquote>
+<div><p>See <a class="reference external" href="https://emcee.readthedocs.io/en/stable/tutorials/monitor/">https://emcee.readthedocs.io/en/stable/tutorials/monitor/</a> for use of
+the backend keyword.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.custom_plot_phase">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">custom_plot_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.custom_plot_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.custom_plot_phase_from_model">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">custom_plot_phase_from_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.custom_plot_phase_from_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.mask_data_clipping">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">mask_data_clipping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.mask_data_clipping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.computes_bayes_factor">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">computes_bayes_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.computes_bayes_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.planet_check">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">planet_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.planet_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.copy_DRP_report">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">copy_DRP_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.copy_DRP_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pycheops_analysis.CustomStarProperties">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">CustomStarProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">teff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passband</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CHEOPS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.CustomStarProperties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>CHEOPS StarProperties object</p>
+<p>The observed properties T_eff, log_g and [Fe/H] are obtained from
+DACE or SWEET-Cat, or can be specified by the user.</p>
+<p>Set match_arcsec=None to skip extraction of parameters from SWEET-Cat.</p>
+<p>By default properties are obtained from SWEET-Cat.</p>
+<p>Set dace=True to obtain parameters from the stellar properties table at
+DACE.</p>
+<p>User-defined properties are specified either as a ufloat or as a 2-tuple
+(value, error), e.g., teff=(5000,100).</p>
+<p>User-defined properties over-write values obtained from SWEET-Cat or DACE.</p>
+<p>The stellar density is estimated using an linear relation between log(rho)
+and log(g) derived using the method of Moya et al. (2018ApJS..237…21M)</p>
+<p>Limb darkening parameters in the CHEOPS band are interpolated from Table 2
+of Maxted (2018A&amp;A…616A..39M). The error on these parameters is
+propogated from the errors in Teff, log_g and [Fe/H] plus an additional
+error of 0.01 for h_1 and 0.05 for h_2, as recommended in Maxted (2018).
+If [Fe/H] for the star is not specified, the value 0.0 +/- 0.3 is assumed.</p>
+<p>If the stellar parameters are outside the range covered by Table 2 of
+Maxted (2018), then the results from ATLAS model from Table 10 of Claret
+(2019RNAAS…3…17C) are used instead. For stars cooler than 3500K the
+PHOENIX models for solar metalicity  from Table 5 of Claret (2019) are
+used. The parameters h_1 and h_2 are both given nominal errors of 0.1 for
+both ATLAS model, and 0.15 for PHOENIX models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycheops_analysis.CustomStarProperties.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.CustomStarProperties.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.quick_save_params">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">quick_save_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bjd_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.quick_save_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.quick_save_params_ultranest">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">quick_save_params_ultranest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bjd_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.quick_save_params_ultranest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.quick_save_params_ultra">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">quick_save_params_ultra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star_inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planet_inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_lm_loop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bjd_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.quick_save_params_ultra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.u1u2_to_q1q2">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">u1u2_to_q1q2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.u1u2_to_q1q2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.q1q2_to_u1u2">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">q1q2_to_u1u2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.q1q2_to_u1u2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycheops_analysis.generate_private_key">
+<span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">generate_private_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.generate_private_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pycheops_analysis</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#pycheops_analysis.my_dpi">my_dpi</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.module_celerite2">module_celerite2</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.out_color">out_color</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.rms_time">rms_time</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.global_names">global_names</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.transit_names">transit_names</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.detrend_bounds">detrend_bounds</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.detrend_default">detrend_default</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.detrend">detrend</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.params_units">params_units</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.printlog">printlog</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_all_apertures">plot_all_apertures</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_single_lc">plot_single_lc</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_custom_diagnostics">plot_custom_diagnostics</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_corner_diagnostics">plot_corner_diagnostics</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.DatasetModel">DatasetModel</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.get_full_model">get_full_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.binned_rms">binned_rms</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.computes_rms">computes_rms</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.computes_rms_ultra">computes_rms_ultra</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_and_clip_lcs">plot_and_clip_lcs</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.copy_parameters">copy_parameters</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.get_fitting_parameters">get_fitting_parameters</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.get_best_parameters">get_best_parameters</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.get_best_parameters_ultranest">get_best_parameters_ultranest</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.model_plot_fit">model_plot_fit</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.init_multi_model">init_multi_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.check_boundaries">check_boundaries</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.set_pycheops_par">set_pycheops_par</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.multi_model">multi_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.components_model">components_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_final_params">plot_final_params</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.lnprob_woGP">lnprob_woGP</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.lnprob_wGP">lnprob_wGP</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.init_walkers">init_walkers</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.sampler_to_dict">sampler_to_dict</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.do_emcee_analysis">do_emcee_analysis</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.high_posterior_density">high_posterior_density</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.single_chain_summary">single_chain_summary</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.summary_parameters">summary_parameters</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.trace_plot">trace_plot</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.print_pycheops_pars">print_pycheops_pars</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.print_analysis_stats">print_analysis_stats</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.plot_fft">plot_fft</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.multi_detrending_model">multi_detrending_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.should_I_decorr_detrending_model">should_I_decorr_detrending_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.PIPEDataset">PIPEDataset</a><ul>
+<li><a class="reference internal" href="#pycheops_analysis.PIPEDataset.get_PIPE_lightcurve">get_PIPE_lightcurve</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pycheops_analysis.FITSDataset">FITSDataset</a><ul>
+<li><a class="reference internal" href="#pycheops_analysis.FITSDataset.get_FITS_lightcurve">get_FITS_lightcurve</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pycheops_analysis.AsciiDataset">AsciiDataset</a><ul>
+<li><a class="reference internal" href="#pycheops_analysis.AsciiDataset.get_ascii_lightcurve">get_ascii_lightcurve</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pycheops_analysis.save_dataset">save_dataset</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.load_dataset">load_dataset</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.CustomMultiVisit">CustomMultiVisit</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.custom_plot_phase">custom_plot_phase</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.custom_plot_phase_from_model">custom_plot_phase_from_model</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.mask_data_clipping">mask_data_clipping</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.computes_bayes_factor">computes_bayes_factor</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.planet_check">planet_check</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.copy_DRP_report">copy_DRP_report</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.CustomStarProperties">CustomStarProperties</a><ul>
+<li><a class="reference internal" href="#pycheops_analysis.CustomStarProperties.__repr__">__repr__</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pycheops_analysis.quick_save_params">quick_save_params</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.quick_save_params_ultranest">quick_save_params_ultranest</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.quick_save_params_ultra">quick_save_params_ultra</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.u1u2_to_q1q2">u1u2_to_q1q2</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.q1q2_to_u1u2">q1q2_to_u1u2</a></li>
+<li><a class="reference internal" href="#pycheops_analysis.generate_private_key">generate_private_key</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/autoapi/pycheops_analysis/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cheope 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">pycheops_analysis</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Tiziano Zingales, Luca Borsato.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
