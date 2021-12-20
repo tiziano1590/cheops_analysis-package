@@ -19,11 +19,6 @@ Welcome to cheope's documentation!
     Citation <citation>
     Project Page <https://github.com/tiziano1590/cheops_analysis-package>
 
-
-
-cheope - interpreting lightcurves from any dataset
-=======================================================
-
     |image1|
 
 ``cheope`` is an open-source fully bayesian code able to interpret 
@@ -38,12 +33,12 @@ and one day it will be conscious.
 
 
 
-If you use ``cheope`` in you work, please see the guide to :ref:`Citations`.
+If you use ``cheope`` in you work, please see the guide to :ref:`citations`.
 
 
 -----------------------------------
 
-Installation :ref:`installation`
+Installation: :ref:`installation`
 
 ``cheope`` quickstart: :ref:`quickstart`
 

@@ -2,7 +2,7 @@
 from setuptools import find_packages
 from distutils.core import setup
 
-packages = find_packages(exclude=('tests', 'doc'))
+# packages = find_packages(exclude=('tests', 'doc'))
 
 provides = ['cheope', ]
 
@@ -34,26 +34,29 @@ classifiers = [
 ]
 
 # Handle versioning
-version = '0.0.1'
+version = '0.1.0'
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name='cheope',
-      author='Tiziano Zingales',
-      author_email='tiziano.zingales@gmail.com',
-      license="LICENSE",
-      version=version,
-      description='CHEOPE: studying transiting exoplanets',
-      classifiers=classifiers,
-      packages=packages,
-      long_description=long_description,
-      url='',
-      long_description_content_type="text/markdown",
-      keywords = ['astrophysics', 'exoplanets', 'photometry', 'transit'],
-      package_data={"": ["*.txt", "*.rst", "*.dat", "*.csv"]},
-      # include_package_data=True,
-      entry_points=entry_points,
-      provides=provides,
-      requires=requires,
-      install_requires=install_requires)
+setup(
+    name='cheope',
+    version=version,
+    packages=["cheope"],
+    author='Tiziano Zingales',
+    author_email='tiziano.zingales@gmail.com',
+    license="LICENSE",
+    version=version,
+    description='CHEOPE: studying transiting exoplanets',
+    classifiers=classifiers,
+    long_description=long_description,
+    url='https://github.com/tiziano1590/cheops_analysis-package/cheope',
+    long_description_content_type="text/markdown",
+    keywords = ['astrophysics', 'exoplanets', 'photometry', 'transit'],
+    package_data={"": ["*.txt", "*.rst", "*.dat", "*.csv"]},
+    # include_package_data=True,
+    entry_points=entry_points,
+    provides=provides,
+    requires=requires,
+    install_requires=install_requires
+    )
