@@ -1,6 +1,32 @@
+# Documentation
+
+'cheope' ahs its own documentation and can be found here :ref: `https://tiziano1590.github.io/cheops_analysis-package/index.html`
+
+# Create the appropriate environment
+
+It is suggestted to create a separate anaconda environment to proceed with the installation:
+
+```
+conda create -n cheope python==3.8 numpy scipy matplotlib pandas
+```
+
+After creating a conda environmnent called `cheope` and installed the basic libraries `numpy`, `scipy`, `matplotlib` and `pandas`, activate the environment
+
+```
+conda activate cheope
+```
+
 # Download and Install
 
-Download from GitHub:
+### Download with PyPI:
+
+Simply:
+
+```
+pip install cheope
+```
+
+### Download from GitHub:
 
 ```
 git clone https://github.com/tiziano1590/cheops_analysis_package
