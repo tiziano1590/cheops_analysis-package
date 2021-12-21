@@ -1,6 +1,6 @@
 # Documentation
 
-'cheope' ahs its own documentation and can be found here :ref: `https://tiziano1590.github.io/cheops_analysis-package/index.html`
+'cheope' has its own documentation and can be found [here](https://tiziano1590.github.io/cheops_analysis-package/index.html)
 
 # Create the appropriate environment
 
