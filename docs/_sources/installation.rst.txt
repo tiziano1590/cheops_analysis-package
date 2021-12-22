@@ -16,7 +16,7 @@ It is suggestted to create a separate anaconda environment to proceed with the i
         conda create -n cheope python==3.8 numpy scipy matplotlib pandas
 
 
-After creating a conda environmnent called `cheope` and installed the basic libraries `numpy`, `scipy`, `matplotlib` and `pandas`, activate the environment
+After creating a conda environmnent called `cheope` and installed the basic libraries `numpy`, `scipy`, `matplotlib` and `pandas`, activate the environment:
 
 .. code-block::
 

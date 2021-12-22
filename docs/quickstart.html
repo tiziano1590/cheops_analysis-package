@@ -45,7 +45,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Citations" href="citations.html" />
-    <link rel="prev" title="Download and Install" href="installation.html" /> 
+    <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,7 +98,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#single-visit">Single Visit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multivisit">Multivisit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tess-kepler-k2">TESS &amp; Kepler/K2</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/tiziano1590/cheops_analysis-package">Project Page</a></li>
 <li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
@@ -175,8 +180,227 @@
             
   <div class="section" id="basic-usage">
 <span id="quickstart"></span><h1>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
-<p>To use <cite>cheope</cite> follow these instructions.</p>
-<p>On Development…</p>
+<p>In these section we show the possible parametrs file to be used in different configurations.
+Use these tmaplates as example and modify with your destination folder and physical parameters:</p>
+<div class="section" id="single-visit">
+<h2>Single Visit<a class="headerlink" href="#single-visit" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_folder</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">folder</span>
+<span class="n">visit_number</span><span class="p">:</span> <span class="mi">1</span> <span class="c1"># starting from 1</span>
+<span class="n">file_key</span><span class="p">:</span> <span class="n">name</span> <span class="n">of</span> <span class="n">your</span> <span class="n">dace</span> <span class="n">file</span> <span class="n">key</span> <span class="c1"># example CH_PR100015_TG006701_V0200</span>
+<span class="n">aperture</span><span class="p">:</span> <span class="n">default</span> <span class="c1"># default, optimal, rinf, rsup</span>
+<span class="n">shape</span><span class="p">:</span> <span class="n">fit</span> <span class="c1"># fit or fix, default fit</span>
+<span class="n">seed</span><span class="p">:</span> <span class="mi">42</span> <span class="c1"># a int number</span>
+<span class="n">optimizer</span><span class="p">:</span> <span class="n">emcee</span> <span class="c1"># emcee or ultranest</span>
+<span class="n">star</span><span class="p">:</span>
+  <span class="n">star_name</span><span class="p">:</span> <span class="n">WASP</span><span class="o">-</span><span class="mi">106</span>
+  <span class="n">Rstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.418</span><span class="p">,</span> <span class="mf">0.0190</span><span class="p">]</span>
+  <span class="n">Mstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.262</span><span class="p">,</span> <span class="mf">0.052</span><span class="p">]</span>
+  <span class="n">teff</span><span class="p">:</span> <span class="p">[</span><span class="mi">6265</span><span class="p">,</span> <span class="mi">36</span><span class="p">]</span> <span class="c1"># None</span>
+  <span class="n">logg</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.38</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]</span>
+  <span class="n">feh</span> <span class="p">:</span> <span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span>
+<span class="n">planet</span><span class="p">:</span>
+  <span class="n">P</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.289715</span><span class="p">,</span> <span class="mf">0.000010</span><span class="p">]</span> <span class="c1"># period in days</span>
+  <span class="n">D</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.00642</span><span class="p">,</span> <span class="mf">0.00018</span><span class="p">]</span> <span class="c1"># flux depth</span>
+  <span class="c1">#k: None # = Rp/Rstar, None, omitted or as D, D stronger than k</span>
+  <span class="c1"># or Rp in Rearth</span>
+  <span class="c1"># provide:</span>
+  <span class="c1"># {inc, aRs, b}</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {inc, aRs} =&gt; b</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, aRs} ==&gt; inc</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, inc} ==&gt; aRs</span>
+  <span class="c1">#b: None</span>
+  <span class="n">inc</span><span class="p">:</span> <span class="p">[</span><span class="mf">89.49</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">]</span> <span class="c1"># degrees</span>
+  <span class="n">aRs</span><span class="p">:</span> <span class="p">[</span><span class="mf">14.20</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">]</span>
+  <span class="c1"># if total duration T14 in days provided use it for W = T14/P,</span>
+  <span class="c1"># otherwise computed from</span>
+  <span class="c1"># {k, b, aRs}</span>
+  <span class="c1">#T14: None</span>
+  <span class="n">ecc</span><span class="p">:</span> <span class="kc">None</span>
+  <span class="n">w</span><span class="p">:</span> <span class="kc">None</span> <span class="c1"># degrees</span>
+  <span class="n">T_0</span><span class="p">:</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># CHANGE IT ACCORDINGLY TO YOUR VISIT</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.57</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">]</span> <span class="c1"># CHANGE IT ACCORDINGLY TO YOUR VISIT</span>
+  <span class="n">Kms</span><span class="p">:</span> <span class="p">[</span><span class="mf">165.3</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">]</span> <span class="c1"># K_RV in m/s</span>
+<span class="c1"># emcee parameters: NOT USED IF optimizer is ultranest</span>
+<span class="n">emcee</span><span class="p">:</span>
+  <span class="n">nwalkers</span><span class="p">:</span> <span class="mi">256</span>
+  <span class="n">nprerun</span> <span class="p">:</span> <span class="mi">2</span>
+  <span class="n">nsteps</span>  <span class="p">:</span> <span class="mi">7</span>
+  <span class="n">nburn</span>   <span class="p">:</span> <span class="mi">0</span>
+  <span class="n">nthin</span>   <span class="p">:</span> <span class="mi">1</span>
+  <span class="n">nthreads</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="n">progress</span><span class="p">:</span> <span class="kc">True</span>
+<span class="c1"># ultranest parameters: NOT USED IF optimizer is emcee</span>
+<span class="n">ultranest</span><span class="p">:</span>
+  <span class="n">live_points</span><span class="p">:</span> <span class="mi">120</span>
+  <span class="n">cluster_num_live_points</span><span class="p">:</span> <span class="mi">40</span>
+  <span class="n">tol</span><span class="p">:</span> <span class="mf">2.0</span>
+  <span class="n">adaptive_nsteps</span><span class="p">:</span> <span class="kc">False</span>   <span class="c1">#  False, &#39;proposal-distance&#39;, &#39;move-distance&#39;</span>
+  <span class="n">resume</span><span class="p">:</span> <span class="n">overwrite</span> <span class="c1">## resume should be one of &#39;overwrite&#39; &#39;subfolder&#39;, &#39;resume&#39; or &#39;resume-similar&#39;</span>
+</pre></div>
+</div>
+<p>The T_0 parameters, initially, is assumed and it can be checked using the SingleCheck <code class="docutils literal notranslate"><span class="pre">cheope</span></code>’s class. To check the dataset and using a T_0 that actually makes sense,
+launche the <code class="docutils literal notranslate"><span class="pre">cheope</span></code>’s check using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">sc</span>
+</pre></div>
+</div>
+<p>After it finishes, <code class="docutils literal notranslate"><span class="pre">cheope</span></code> created a folder inside the main folder defined in the parameters’ file. Looking at the plots that it generated, you can decide what’s the best value for the
+central transit time and modify the T_0 value accordingly.</p>
+<p>Once you modified the T_0 value and boundaries, you can launch <code class="docutils literal notranslate"><span class="pre">cheope</span></code> again to fit the light curve using the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">sb</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multivisit">
+<h2>Multivisit<a class="headerlink" href="#multivisit" title="Permalink to this headline">¶</a></h2>
+<p>In the following we followed an example of Multivisit usage after analysed separately three data sets in Single visit using the previous section.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_folder</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">folder</span>
+<span class="n">datasets</span><span class="p">:</span>
+  <span class="n">v1</span><span class="p">:</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">visit_01_your_first_dataset_single_visit_analysis_folder</span><span class="o">/</span><span class="n">your_planet</span><span class="o">.</span><span class="n">tgz</span><span class="o">.</span><span class="n">dataset</span>
+  <span class="n">v2</span><span class="p">:</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">visit_02_your_second_dataset_single_visit_analysis_folder</span><span class="o">/</span><span class="n">your_planet</span><span class="o">.</span><span class="n">tgz</span><span class="o">.</span><span class="n">dataset</span>
+  <span class="n">v3</span><span class="p">:</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">visit_03_your_third_dataset_single_visit_analysis_folder</span><span class="o">/</span><span class="n">your_planet</span><span class="o">.</span><span class="n">tgz</span><span class="o">.</span><span class="n">dataset</span>
+<span class="n">seed</span><span class="p">:</span> <span class="mi">42</span>
+<span class="c1">#aperture: default # default, optimal, rinf, rsup</span>
+<span class="n">shape</span><span class="p">:</span> <span class="n">fit</span> <span class="c1"># fit or fix, default fit</span>
+<span class="n">GP</span><span class="p">:</span> <span class="kc">False</span>
+<span class="n">nroll</span><span class="p">:</span> <span class="mi">3</span>
+<span class="n">unwrap</span><span class="p">:</span> <span class="kc">False</span>
+<span class="n">optimizer</span><span class="p">:</span> <span class="n">emcee</span>
+<span class="n">star</span><span class="p">:</span>
+  <span class="n">star_name</span><span class="p">:</span> <span class="n">WASP</span><span class="o">-</span><span class="mi">47</span>
+  <span class="n">dace</span><span class="p">:</span> <span class="kc">False</span>
+  <span class="n">Rstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.13</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">Mstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">teff</span><span class="p">:</span> <span class="p">[</span><span class="mi">5552</span><span class="p">,</span> <span class="mi">75</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">logg</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.34</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">feh</span> <span class="p">:</span> <span class="p">[</span><span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">h_1</span><span class="p">:</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.714</span><span class="p">,</span> <span class="mf">0.011</span><span class="p">]</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+  <span class="n">h_2</span><span class="p">:</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.438</span><span class="p">,</span> <span class="mf">0.050</span><span class="p">]</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="n">planet</span><span class="p">:</span>
+  <span class="n">T_ref</span><span class="p">:</span> <span class="p">[</span><span class="mf">2459124.94060303</span><span class="p">,</span> <span class="mf">0.0005711284</span><span class="p">]</span> <span class="c1"># value +/- error</span>
+  <span class="n">P_ref</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.16071</span><span class="p">,</span> <span class="mf">0.00038</span><span class="p">]</span> <span class="c1"># period in days # Almenara et al., 2016</span>
+  <span class="n">Kms</span><span class="p">:</span> <span class="p">[</span><span class="mf">142.0</span><span class="p">,</span> <span class="mf">1.7</span> <span class="p">]</span> <span class="c1"># K_RV in m/s # Almenara et al., 2016</span>
+<span class="c1"># emcee parameters: NOT USED IF optimizer is ultranest</span>
+<span class="n">emcee</span><span class="p">:</span>
+  <span class="n">nwalkers</span><span class="p">:</span> <span class="mi">256</span>
+  <span class="n">nprerun</span> <span class="p">:</span> <span class="mi">2</span>
+  <span class="n">nsteps</span>  <span class="p">:</span> <span class="mi">7</span>
+  <span class="n">nburn</span>   <span class="p">:</span> <span class="mi">0</span>
+  <span class="n">nthin</span>   <span class="p">:</span> <span class="mi">1</span>
+  <span class="n">nthreads</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="n">progress</span><span class="p">:</span> <span class="kc">True</span>
+<span class="c1"># ultranest parameters: NOT USED IF optimizer is emcee</span>
+<span class="n">ultranest</span><span class="p">:</span>
+  <span class="n">live_points</span><span class="p">:</span> <span class="mi">120</span>
+  <span class="n">cluster_num_live_points</span><span class="p">:</span> <span class="mi">40</span>
+  <span class="n">tol</span><span class="p">:</span> <span class="mf">2.0</span>
+  <span class="n">adaptive_nsteps</span><span class="p">:</span> <span class="kc">False</span>   <span class="c1">#  False, &#39;proposal-distance&#39;, &#39;move-distance&#39;</span>
+  <span class="n">resume</span><span class="p">:</span> <span class="n">overwrite</span> <span class="c1">## resume should be one of &#39;overwrite&#39; &#39;subfolder&#39;, &#39;resume&#39; or &#39;resume-similar&#39;</span>
+</pre></div>
+</div>
+<p>Currently, it runs only with MCMC, the nested sampling version with <code class="docutils literal notranslate"><span class="pre">ultranest</span></code> is still under development, so it will currently use <code class="docutils literal notranslate"><span class="pre">emcee</span></code> as default optimizer.</p>
+<p>After modified the above file, you can use the <code class="docutils literal notranslate"><span class="pre">cheope</span></code>’s multivisit class by digiting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">m</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tess-kepler-k2">
+<h2>TESS &amp; Kepler/K2<a class="headerlink" href="#tess-kepler-k2" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cheope</span></code> can analyse also datasets different from the ones of the CHEOPS space mission. In this example we show how to set up the parameters file to analyse the light curves from the TESS data sets.</p>
+<p>It can also automatically search, download and analyse different sectors’s lightcurves of TESS using the <code class="docutils literal notranslate"><span class="pre">selenium</span></code> functionalities (see below for its usage).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_folder</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">folder</span>
+<span class="n">firefox_driver_path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">firefox</span><span class="o">/</span><span class="n">geckodriver</span>
+<span class="n">download_path</span><span class="p">:</span> <span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">folder</span>
+<span class="n">file_fits</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">TESS</span><span class="o">/</span><span class="n">lightcurve_lc</span><span class="o">.</span><span class="n">fits</span>
+<span class="n">object_name</span><span class="p">:</span> <span class="mi">102264230</span> <span class="c1"># TIC number</span>
+<span class="n">passband</span><span class="p">:</span> <span class="n">TESS</span>
+<span class="n">aperture</span><span class="p">:</span> <span class="n">pdc</span> <span class="c1"># sap or pdc</span>
+<span class="n">seed</span><span class="p">:</span> <span class="mi">42</span>
+<span class="n">single_duration_hour</span><span class="p">:</span> <span class="mf">13.7267</span>
+<span class="n">optimizer</span><span class="p">:</span> <span class="n">emcee</span>
+<span class="n">dace</span><span class="p">:</span> <span class="kc">True</span>
+<span class="n">shape</span><span class="p">:</span> <span class="n">fix</span>
+<span class="n">star</span><span class="p">:</span>
+  <span class="n">star_name</span><span class="p">:</span> <span class="n">WASP</span><span class="o">-</span><span class="mi">47</span>
+  <span class="n">Rstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.13</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">Mstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">teff</span><span class="p">:</span> <span class="p">[</span><span class="mi">5552</span><span class="p">,</span> <span class="mi">75</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">logg</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.34</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">feh</span> <span class="p">:</span> <span class="p">[</span><span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+<span class="n">planet</span><span class="p">:</span>
+  <span class="n">P</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.1591289</span><span class="p">,</span> <span class="mf">0.0000042</span><span class="p">]</span> <span class="c1"># period in days</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+  <span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.10193</span><span class="p">,</span> <span class="mf">0.00021</span><span class="p">]</span>
+  <span class="n">b</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.173</span><span class="p">,</span> <span class="mf">0.032</span><span class="p">]</span>
+  <span class="n">W</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5722</span><span class="p">,</span> <span class="mf">0.003</span><span class="p">]</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+  <span class="c1"># D: [0.003430, 0.000286] # flux depth</span>
+  <span class="c1">#k: None # = Rp/Rstar, None, omitted or as D, D stronger than k</span>
+  <span class="c1"># or Rp in Rearth</span>
+  <span class="c1"># k: [0.1019, 0.0002] # Almenara et al., 2016</span>
+  <span class="c1"># provide:</span>
+  <span class="c1"># {inc, aRs, b}</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {inc, aRs} =&gt; b</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, aRs} ==&gt; inc</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, inc} ==&gt; aRs</span>
+  <span class="c1">#b: None</span>
+  <span class="c1"># inc:</span>
+  <span class="c1">#   fit: True</span>
+  <span class="c1">#   value: [89.49, 0.64] # degrees</span>
+  <span class="c1">#   bounds: [70, 90]</span>
+  <span class="n">inc</span><span class="p">:</span> <span class="p">[</span><span class="mf">88.98</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+  <span class="n">aRs</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.702</span><span class="p">,</span> <span class="mf">0.044</span><span class="p">]</span>
+  <span class="c1"># if total duration T14 in days provided use it for W = T14/P,</span>
+  <span class="c1"># otherwise computed from</span>
+  <span class="c1"># {k, b, aRs}</span>
+  <span class="c1">#T14: None</span>
+  <span class="n">T_ref</span><span class="p">:</span> <span class="p">[</span><span class="mf">2459470.147334</span><span class="p">,</span> <span class="mf">0.0011402</span><span class="p">]</span>
+<span class="c1"># emcee parameters: NOT USED IF optimizer is ultranest</span>
+<span class="n">emcee</span><span class="p">:</span>
+  <span class="n">nwalkers</span><span class="p">:</span> <span class="mi">256</span>
+  <span class="n">nprerun</span> <span class="p">:</span> <span class="mi">2</span>
+  <span class="n">nsteps</span>  <span class="p">:</span> <span class="mi">7</span>
+  <span class="n">nburn</span>   <span class="p">:</span> <span class="mi">0</span>
+  <span class="n">nthin</span>   <span class="p">:</span> <span class="mi">1</span>
+  <span class="n">nthreads</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="n">progress</span><span class="p">:</span> <span class="kc">True</span>
+<span class="c1"># ultranest parameters: NOT USED IF optimizer is emcee</span>
+<span class="n">ultranest</span><span class="p">:</span>
+  <span class="n">live_points</span><span class="p">:</span> <span class="mi">120</span>
+  <span class="n">cluster_num_live_points</span><span class="p">:</span> <span class="mi">40</span>
+  <span class="n">tol</span><span class="p">:</span> <span class="mf">2.0</span>
+  <span class="n">adaptive_nsteps</span><span class="p">:</span> <span class="kc">False</span>   <span class="c1">#  False, &#39;proposal-distance&#39;, &#39;move-distance&#39;</span>
+  <span class="n">resume</span><span class="p">:</span> <span class="n">overwrite</span> <span class="c1">## resume should be one of &#39;overwrite&#39; &#39;subfolder&#39;, &#39;resume&#39; or &#39;resume-similar&#39;</span>
+</pre></div>
+</div>
+<p>To run <code class="docutils literal notranslate"><span class="pre">cheope</span></code> simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">skt</span>
+</pre></div>
+</div>
+<p>If you installed the <code class="docutils literal notranslate"><span class="pre">firefox</span></code> geckodriver from their <a class="reference external" href="https://github.com/mozilla/geckodriver/releases">GitHub repository</a>, you can specify in the parameters file the location of the driver and download the TESS lightcurves using the following command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">selenium</span><span class="o">-</span><span class="n">tess</span> <span class="o">--</span><span class="n">download</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -186,7 +410,7 @@
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="citations.html" class="btn btn-neutral float-right" title="Citations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="installation.html" class="btn btn-neutral float-left" title="Download and Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

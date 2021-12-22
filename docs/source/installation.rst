@@ -1,7 +1,7 @@
 .. _installation:
 
-Download and Installation
-=========================
+Installation
+============
 
 Before proceeding with the installation, please download and install a python 3 Anaconda distribution on their `Anaconda website <https://www.anaconda.com/>`_.
 
