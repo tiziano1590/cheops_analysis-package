@@ -18,7 +18,7 @@
 Welcome to cheope's documentation!
 ==================================
 
-.. figure::  _static/cheope_logo.jpg
+.. figure::  source/static/cheope_logo.jpg
     :align: center
     :height: 180
 

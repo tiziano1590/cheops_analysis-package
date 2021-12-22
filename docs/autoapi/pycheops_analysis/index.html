@@ -7,11 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-<<<<<<< HEAD
-  <title>pycheops_analysis &mdash; cheope 0.1.0 documentation</title>
-=======
   <title>pycheops_analysis &mdash; cheope 0.3.3 beta documentation</title>
->>>>>>> c3f811c... added automatic version and copy of github pages files
   
 
   
@@ -99,7 +95,10 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/tiziano1590/cheops_analysis-package">Project Page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citations.html">Citations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">API Reference</a></li>
 </ul>
 
@@ -185,7 +184,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.DatasetModel" title="pycheops_analysis.DatasetModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetModel</span></code></a></p></td>
-<td><p>A class used to store the light-curve model of a Dataset</p></td>
+<td><p>A class used to store the light-curve model of a Dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.PIPEDataset" title="pycheops_analysis.PIPEDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PIPEDataset</span></code></a></p></td>
 <td><p>CHEOPS Dataset object</p></td>
@@ -229,7 +228,7 @@
 <td><p>Function that plots all diagnostics of the photometry extracted for a given aperture</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_full_model" title="pycheops_analysis.get_full_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_model</span></code></a>(dataset, params_in=None, time=None)</p></td>
-<td><p>Function to compute the full photometric model of a pycheops Dataset</p></td>
+<td><p>Function to compute the full photometric model of a pycheops Dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.binned_rms" title="pycheops_analysis.binned_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_rms</span></code></a>(stats_dict, t_lc, residuals, rms_time_in, keyword='flux-all (w/o GP)', olog=None)</p></td>
 <td><p></p></td>
@@ -513,7 +512,7 @@ Each aperture is plotted in an own subplot.</p>
 <dd><p>Function that plots some selected diagnostics of the photometry extracted for a given aperture.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>lc</strong> – ligh-curve dictionary, see Dataset.lc for the keys.</p>
+<dd class="field-odd"><p><strong>lc</strong> – ligth-curve dictionary, see Dataset.lc for the keys.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>figure object.</p>
@@ -539,43 +538,48 @@ in a corner/triangle plot.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pycheops_analysis.DatasetModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">DatasetModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.DatasetModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class used to store the light-curve model of a Dataset
-…</p>
+<dd><p>A class used to store the light-curve model of a Dataset.</p>
+<dl>
+<dt>Args:</dt><dd><p>n (int): Length of the time serie (number of time-points).
+time (numpy.array): Array of time points (length n).
+tra (numpy.array): Array (length n) of the transit model.
+trend (numpy.array): Array (length n) of the trend model</p>
+<blockquote>
+<div><p>(used to detrend the light-curve).</p>
+</div></blockquote>
+<p>glint (numpy.array): Array (length n) of the glint model.
+gp (numpy.array): Array (length n) of the SHOTerm (celerite/celerite2)</p>
+<blockquote>
+<div><p>Gaussian-Process model.</p>
+</div></blockquote>
 <dl class="simple">
-<dt>n<span class="classifier">int</span></dt><dd><p>length of the time serie (number of time-points)</p>
+<dt>all_nogp (numpy.array): Array (length n) of the full model</dt><dd><p>(transit, trend, and glint) without the Gaussian-Process (gp) model.</p>
 </dd>
-<dt>time<span class="classifier">numpy.array</span></dt><dd><p>array of time points (length n)</p>
-</dd>
-<dt>tra<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the transit model</p>
-</dd>
-<dt>trend<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the trend model (used to detrend the light-curve)</p>
-</dd>
-<dt>glint<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the glint model</p>
-</dd>
-<dt>gp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model</p>
-</dd>
-<dt>all_nogp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model</p>
-</dd>
-<dt>all<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, glint, and gp)</p>
+<dt>all (numpy.array): Array (length n) of the full model</dt><dd><p>(transit, trend, glint, and gp).</p>
 </dd>
 </dl>
-<p>None methods have been implemented for this object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.get_full_model">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_full_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_full_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to compute the full photometric model of a pycheops Dataset</p>
-<dl class="simple">
-<dt>dataset<span class="classifier">pycheops Dataset object</span></dt><dd><p>you have to run lmfit or emcee before using this function.</p>
+<dd><p>Function to compute the full photometric model of a pycheops Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – pycheops Dataset object.
+You have to run lmfit or emcee before using this function.</p></li>
+<li><p><strong>params_in</strong> – list or numpy.array, optional (default None).
+Parameters for which compute the model, if None the lmfit or emcee the params_best will be used.</p></li>
+<li><p><strong>time</strong> – list or numpy.array, optional, default None.
+Time vector needed to compute the light-curve model, if None the dataset.lc[“time”] will be used.</p></li>
+</ul>
 </dd>
-<dt>params_in<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>parameters for which compute the model, if None the lmfit or emcee the params_best will be used.</p>
-</dd>
-<dt>time<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>time vector needed to compute the light-curve model, if None the dataset.lc[“time”] will be used.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>m<span class="classifier">DatasetModel object</span></dt><dd><p>It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DatasetModel object.
+It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None).</p>
 </dd>
 </dl>
 </dd></dl>
