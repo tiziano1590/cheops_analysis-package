@@ -184,7 +184,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.DatasetModel" title="pycheops_analysis.DatasetModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetModel</span></code></a></p></td>
-<td><p>A class used to store the light-curve model of a Dataset</p></td>
+<td><p>A class used to store the light-curve model of a Dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.PIPEDataset" title="pycheops_analysis.PIPEDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PIPEDataset</span></code></a></p></td>
 <td><p>CHEOPS Dataset object</p></td>
@@ -228,16 +228,16 @@
 <td><p>Function that plots all diagnostics of the photometry extracted for a given aperture</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_full_model" title="pycheops_analysis.get_full_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_model</span></code></a>(dataset, params_in=None, time=None)</p></td>
-<td><p>Function to compute the full photometric model of a pycheops Dataset</p></td>
+<td><p>Function to compute the full photometric model of a pycheops Dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.binned_rms" title="pycheops_analysis.binned_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_rms</span></code></a>(stats_dict, t_lc, residuals, rms_time_in, keyword='flux-all (w/o GP)', olog=None)</p></td>
-<td><p></p></td>
+<td><p>Function that computes the root mean square (rms) of the photometric residuals at different time-bin.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.computes_rms" title="pycheops_analysis.computes_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computes_rms</span></code></a>(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)</p></td>
-<td><p></p></td>
+<td><p>Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.computes_rms_ultra" title="pycheops_analysis.computes_rms_ultra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computes_rms_ultra</span></code></a>(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None)</p></td>
-<td><p></p></td>
+<td><p>Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_and_clip_lcs" title="pycheops_analysis.plot_and_clip_lcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_and_clip_lcs</span></code></a>(datasets, apertures, out_folder, index_to_clip='all')</p></td>
 <td><p></p></td>
@@ -459,8 +459,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>l</strong> – string to print and write.</p></li>
-<li><p><strong>olog</strong> – opened file object to write the string. Defaul is None.</p></li>
+<li><p><strong>l</strong> (<em>str</em>) – string to print and write.</p></li>
+<li><p><strong>olog</strong> – opened file object to write the string. Default is None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -477,8 +477,8 @@ Each aperture is plotted in an own subplot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> – CHEOPS Dataset object.</p></li>
-<li><p><strong>out_folder</strong> – output folder to save the plot.</p></li>
+<li><p><strong>dataset</strong> (<em>Dataset</em>) – CHEOPS Dataset object.</p></li>
+<li><p><strong>out_folder</strong> (<em>str</em>) – output folder to save the plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -494,10 +494,10 @@ Each aperture is plotted in an own subplot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> – time as BJD_TDB - bjd_ref.</p></li>
-<li><p><strong>f</strong> – normalized flux.</p></li>
-<li><p><strong>ef</strong> – error of the normalized flux.</p></li>
-<li><p><strong>bjd_ref</strong> – reference time of the time vector. Defined as the integer part of the first time-point.</p></li>
+<li><p><strong>t</strong> (<em>list</em><em> or </em><em>float array</em>) – time as BJD_TDB - bjd_ref.</p></li>
+<li><p><strong>f</strong> (<em>list</em><em> or </em><em>float array</em>) – normalized flux.</p></li>
+<li><p><strong>ef</strong> (<em>list</em><em> or </em><em>float array</em>) – error of the normalized flux.</p></li>
+<li><p><strong>bjd_ref</strong> (<em>int</em><em> or </em><em>float</em>) – reference time of the time vector. Defined as the integer part of the first time-point.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -512,7 +512,7 @@ Each aperture is plotted in an own subplot.</p>
 <dd><p>Function that plots some selected diagnostics of the photometry extracted for a given aperture.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>lc</strong> – ligh-curve dictionary, see Dataset.lc for the keys.</p>
+<dd class="field-odd"><p><strong>lc</strong> (<em>dict</em>) – ligth-curve dictionary, see Dataset.lc for the keys.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>figure object.</p>
@@ -527,7 +527,7 @@ Each aperture is plotted in an own subplot.</p>
 in a corner/triangle plot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dataset</strong> – CHEOPS Dataset object.</p>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>Dataset</em>) – CHEOPS Dataset object.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>figure object.</p>
@@ -538,43 +538,31 @@ in a corner/triangle plot.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pycheops_analysis.DatasetModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">DatasetModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.DatasetModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class used to store the light-curve model of a Dataset
-…</p>
-<dl class="simple">
-<dt>n<span class="classifier">int</span></dt><dd><p>length of the time serie (number of time-points)</p>
-</dd>
-<dt>time<span class="classifier">numpy.array</span></dt><dd><p>array of time points (length n)</p>
-</dd>
-<dt>tra<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the transit model</p>
-</dd>
-<dt>trend<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the trend model (used to detrend the light-curve)</p>
-</dd>
-<dt>glint<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the glint model</p>
-</dd>
-<dt>gp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model</p>
-</dd>
-<dt>all_nogp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model</p>
-</dd>
-<dt>all<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, glint, and gp)</p>
+<dd><p>A class used to store the light-curve model of a Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_time</strong> (<em>int</em>) – Length of the photometric light-curve, needed to initialize the arrays.</p>
 </dd>
 </dl>
-<p>None methods have been implemented for this object.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.get_full_model">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_full_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_full_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to compute the full photometric model of a pycheops Dataset</p>
-<dl class="simple">
-<dt>dataset<span class="classifier">pycheops Dataset object</span></dt><dd><p>you have to run lmfit or emcee before using this function.</p>
+<dd><p>Function to compute the full photometric model of a pycheops Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>Dataset</em>) – pycheops Dataset object. You have to run lmfit or emcee before using this function.</p></li>
+<li><p><strong>params_in</strong> (<em>Parameters</em><em> or </em><em>list of Parameter</em><em>, </em><em>optional</em><em> (</em><em>default None</em><em>)</em>) – Parameters for which compute the model, if None the lmfit or emcee the params_best will be used.</p></li>
+<li><p><strong>time</strong> (<em>list</em><em> or </em><em>float array</em><em>, </em><em>optional</em><em> (</em><em>default None</em><em>)</em>) – Time vector needed to compute the light-curve model, if None the dataset.lc[“time”] will be used.</p></li>
+</ul>
 </dd>
-<dt>params_in<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>parameters for which compute the model, if None the lmfit or emcee the params_best will be used.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DatasetModel object. It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None).</p>
 </dd>
-<dt>time<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>time vector needed to compute the light-curve model, if None the dataset.lc[“time”] will be used.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>m<span class="classifier">DatasetModel object</span></dt><dd><p>It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pycheops_analysis.DatasetModel" title="pycheops_analysis.DatasetModel">DatasetModel</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -582,17 +570,70 @@ in a corner/triangle plot.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.binned_rms">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">binned_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_time_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flux-all</span> <span class="pre">(w/o</span> <span class="pre">GP)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.binned_rms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function that computes the root mean square (rms) of the photometric residuals at different time-bin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stats_dict</strong> (<em>dict</em>) – Dictionary that is already defined and it will be updated with statistics.</p></li>
+<li><p><strong>t_lc</strong> (<em>list</em><em> or </em><em>float array</em>) – time vector.</p></li>
+<li><p><strong>residuals</strong> (<em>list</em><em> or </em><em>float array</em>) – residuals vector.</p></li>
+<li><p><strong>rms_time_int</strong> (<em>list</em><em> or </em><em>float array</em>) – list of the bin size, if &gt;= 1 it is interpreted as hour, otherwise in minutes.</p></li>
+<li><p><strong>keyword</strong> (<em>str</em>) – Name of the statistics, i.e. the model used to create the residuals. Default: “flux-all (w/o GP)”. Change it accordingly.</p></li>
+<li><p><strong>olog</strong> (<em>file object</em><em>, </em><em>optional</em>) – Opened log file object where to save prints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing to return, but <cite>stats_dict</cite> will be modified in place.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.computes_rms">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">computes_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_best</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">glint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_rms_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.computes_rms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>Dataset</em>) – Dataset object containing the photometry and model object.</p></li>
+<li><p><strong>params_best</strong> (<em>Parameters</em><em> or </em><em>list of Parameter</em>) – set of parameters to model the light-curves (and detrending) to compute the residuals and the rms.</p></li>
+<li><p><strong>glint</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – Specify if glint parameter has been used.</p></li>
+<li><p><strong>do_rms_bin</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default True</em>) – Specify if the statistics and rms have to be computed for the unbinned residuals only (False) or for a given set of bin-sizes (True).</p></li>
+<li><p><strong>olog</strong> (<em>file object</em><em>, </em><em>optional</em>) – Opened log file object where to save prints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return statistics</dt>
+<dd class="field-even"><p>Dictionary containing the statistics (fitness, rms, etc) of the model for given parameters.</p>
+</dd>
+<dt class="field-odd">Rtype statistics</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.computes_rms_ultra">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">computes_rms_ultra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_best</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">glint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_rms_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.computes_rms_ultra" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.
+LBo-WARNING: I DON’T KNOW WHY IT IS EXACTLY THE SAME OF <cite>computes_rms</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>Dataset</em>) – Dataset object containing the photometry and model object.</p></li>
+<li><p><strong>params_best</strong> (<em>Parameters</em><em> or </em><em>list of Parameter</em>) – set of parameters to model the light-curves (and detrending) to compute the residuals and the rms.</p></li>
+<li><p><strong>glint</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – Specify if glint parameter has been used.</p></li>
+<li><p><strong>do_rms_bin</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default True</em>) – Specify if the statistics and rms have to be computed for the unbinned residuals only (False) or for a given set of bin-sizes (True).</p></li>
+<li><p><strong>olog</strong> (<em>file object</em><em>, </em><em>optional</em>) – Opened log file object where to save prints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return statistics</dt>
+<dd class="field-even"><p>Dictionary containing the statistics (fitness, rms, etc) of the model for given parameters.</p>
+</dd>
+<dt class="field-odd">Rtype statistics</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.plot_and_clip_lcs">

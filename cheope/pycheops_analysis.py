@@ -249,9 +249,10 @@ def printlog(l, olog=None):
     """Function to print the same string to stdout and to a log file
 
     :param l: string to print and write.
-    :param olog: opened file object to write the string. Defaul is None.
+    :type l: str
+    :param olog: opened file object to write the string. Default is None.
 
-    :returns: Nothing to return.
+    :return: Nothing to return.
     """
     print(l)
     if olog is not None:
@@ -266,7 +267,9 @@ def plot_all_apertures(dataset, out_folder):
     Each aperture is plotted in an own subplot.
 
     :param dataset: CHEOPS Dataset object.
+    :type dataset: Dataset
     :param out_folder: output folder to save the plot.
+    :type out_folder: str
 
     :returns: Nothing to return.
     """
@@ -376,11 +379,15 @@ def plot_single_lc(t, f, ef, bjd_ref):
     """Function that plots the CHEOPS photometry extracted for one aperture.
 
     :param t: time as BJD_TDB - bjd_ref.
+    :type t: list or float array
     :param f: normalized flux.
+    :type f: list or float array
     :param ef: error of the normalized flux.
+    :type ef: list or float array
     :param bjd_ref: reference time of the time vector. Defined as the integer part of the first time-point.
+    :type bjd_ref: int or float
 
-    :returns: figure object.
+    :return: figure object.
     """
 
     fig = plt.figure()
@@ -411,9 +418,10 @@ def plot_single_lc(t, f, ef, bjd_ref):
 def plot_custom_diagnostics(lc):
     """Function that plots some selected diagnostics of the photometry extracted for a given aperture.
 
-    :param lc: ligh-curve dictionary, see Dataset.lc for the keys.
+    :param lc: ligth-curve dictionary, see Dataset.lc for the keys.
+    :type lc: dict
 
-    :returns: figure object.
+    :return: figure object.
     """
     nrows, ncols = 3, 2
     ms = 2
@@ -519,8 +527,9 @@ def plot_corner_diagnostics(dataset):
     in a corner/triangle plot.
 
     :param dataset: CHEOPS Dataset object.
+    :type dataset: Dataset
 
-    :returns: figure object.
+    :return: figure object.
     """
 
     lc = dataset.lc
@@ -568,55 +577,23 @@ def plot_corner_diagnostics(dataset):
 # COMPUTE FULL MODEL FOR GIVEN DATASET AND PARAMETER SET
 class DatasetModel:
     """
-    A class used to store the light-curve model of a Dataset
-    ...
+    A class used to store the light-curve model of a Dataset.
 
-    Attributes
-    ----------
-    n : int
-        length of the time serie (number of time-points)
-    time : numpy.array
-        array of time points (length n)
-    tra : numpy.array
-        array (length n) of the transit model
-    trend : numpy.array
-        array (length n) of the trend model (used to detrend the light-curve)
-    glint : numpy.array
-        array (length n) of the glint model
-    gp : numpy.array
-        array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
-    all_nogp : numpy.array
-        array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
-    all : numpy.array
-        array (length n) of the full model (transit, trend, glint, and gp)
-
-    Methods
-    -------
-    None methods have been implemented for this object.
+    :param n_time: Length of the photometric light-curve, needed to initialize the arrays.
+    :type n_time: int
 
     """
 
     def __init__(self, n_time):
-        """
-        Parameters
-        ----------
-        n : int
-            length of the time serie (number of time-points)
-        time : numpy.array
-            array of time points (length n)
-        tra : numpy.array
-            array (length n) of the transit model
-        trend : numpy.array
-            array (length n) of the trend model (used to detrend the light-curve)
-        glint : numpy.array
-            array (length n) of the glint model
-        gp : numpy.array
-            array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
-        all_nogp : numpy.array
-            array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
-        all : numpy.array
-            array (length n) of the full model (transit, trend, glint, and gp)
-        """
+        """Constructor of DatasetModel class."""
+        # n (int): Length of the time serie (number of time-points).
+        # time (numpy.array): Array of time points (length n).
+        # tra (numpy.array): Array (length n) of the transit model.
+        # trend (numpy.array): Array (length n) of the trend model (used to detrend the light-curve).
+        # glint (numpy.array): Array (length n) of the glint model.
+        # gp (numpy.array): Array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model.
+        # all_nogp (numpy.array): Array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model.
+        # all (numpy.array): Array (length n) of the full model (transit, trend, glint, and gp).
         self.n = n_time
         self.time = np.zeros((n_time))
         self.tra = np.zeros((n_time))
@@ -628,22 +605,18 @@ class DatasetModel:
 
 
 def get_full_model(dataset, params_in=None, time=None):
-    """Function to compute the full photometric model of a pycheops Dataset
+    """
+    Function to compute the full photometric model of a pycheops Dataset.
 
-    Parameters
-    ----------
-    dataset : pycheops Dataset object
-        you have to run lmfit or emcee before using this function.
-    params_in : (optional, default None) list or numpy.array
-        parameters for which compute the model, if None the lmfit or emcee the params_best will be used.
-    time : (optional, default None) list or numpy.array
-        time vector needed to compute the light-curve model, if None the dataset.lc["time"] will be used.
+    :param dataset: pycheops Dataset object. You have to run lmfit or emcee before using this function.
+    :type dataset: Dataset
+    :param params_in: Parameters for which compute the model, if None the lmfit or emcee the params_best will be used.
+    :type params_in: Parameters or list of Parameter, optional (default None)
+    :param time: Time vector needed to compute the light-curve model, if None the dataset.lc["time"] will be used.
+    :type time: list or float array, optional (default None)
 
-    Returns
-    -------
-    m : DatasetModel object
-        It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)
-
+    :return: DatasetModel object. It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None).
+    :rtype: DatasetModel
     """
 
     t_data = dataset.lc["time"]
@@ -718,6 +691,24 @@ def get_full_model(dataset, params_in=None, time=None):
 def binned_rms(
     stats_dict, t_lc, residuals, rms_time_in, keyword="flux-all (w/o GP)", olog=None
 ):
+    """
+    Function that computes the root mean square (rms) of the photometric residuals at different time-bin.
+
+    :param stats_dict: Dictionary that is already defined and it will be updated with statistics.
+    :type stats_dict: dict
+    :param t_lc: time vector.
+    :type t_lc: list or float array
+    :param residuals: residuals vector.
+    :type residuals: list or float array
+    :param rms_time_int: list of the bin size, if >= 1 it is interpreted as hour, otherwise in minutes.
+    :type rms_time_int: list or float array
+    :param keyword: Name of the statistics, i.e. the model used to create the residuals. Default: "flux-all (w/o GP)". Change it accordingly.
+    :type keyword: str
+    :param olog: Opened log file object where to save prints.
+    :type olog: file object, optional
+
+    :return: Nothing to return, but `stats_dict` will be modified in place.
+    """
     rms_unbin = np.std(residuals, ddof=1) * 1.0e6
     for binw in rms_time_in:
         if binw >= 1.0:
@@ -766,6 +757,23 @@ def binned_rms(
 
 # COMPUTE RMS FOR A SINGLE DATASET FOR GIVEN PARAMS
 def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=None):
+    """
+    Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.
+
+    :param dataset: Dataset object containing the photometry and model object.
+    :type dataset: Dataset
+    :param params_best: set of parameters to model the light-curves (and detrending) to compute the residuals and the rms.
+    :type params_best: Parameters or list of Parameter
+    :parameter glint: Specify if glint parameter has been used.
+    :type glint: bool, optional, default False
+    :param do_rms_bin: Specify if the statistics and rms have to be computed for the unbinned residuals only (False) or for a given set of bin-sizes (True).
+    :type do_rms_bin: bool, optional, default True
+    :param olog: Opened log file object where to save prints.
+    :type olog: file object, optional
+
+    :return statistics: Dictionary containing the statistics (fitness, rms, etc) of the model for given parameters.
+    :rtype statistics: dict
+    """
 
     lc = dataset.lc
     t, f, ef = lc["time"], lc["flux"], lc["flux_err"]
@@ -985,6 +993,24 @@ def computes_rms(dataset, params_best=None, glint=False, do_rms_bin=True, olog=N
 def computes_rms_ultra(
     dataset, params_best=None, glint=False, do_rms_bin=True, olog=None
 ):
+    """
+    Computes root mean square (rms) of a pycheops Dataset object for a given parameters set.
+    LBo-WARNING: I DON'T KNOW WHY IT IS EXACTLY THE SAME OF `computes_rms`
+
+    :param dataset: Dataset object containing the photometry and model object.
+    :type dataset: Dataset
+    :param params_best: set of parameters to model the light-curves (and detrending) to compute the residuals and the rms.
+    :type params_best: Parameters or list of Parameter
+    :parameter glint: Specify if glint parameter has been used.
+    :type glint: bool, optional, default False
+    :param do_rms_bin: Specify if the statistics and rms have to be computed for the unbinned residuals only (False) or for a given set of bin-sizes (True).
+    :type do_rms_bin: bool, optional, default True
+    :param olog: Opened log file object where to save prints.
+    :type olog: file object, optional
+
+    :return statistics: Dictionary containing the statistics (fitness, rms, etc) of the model for given parameters.
+    :rtype statistics: dict
+    """
 
     lc = dataset.lc
     t, f, ef = lc["time"], lc["flux"], lc["flux_err"]
