@@ -411,7 +411,7 @@ def plot_single_lc(t, f, ef, bjd_ref):
 def plot_custom_diagnostics(lc):
     """Function that plots some selected diagnostics of the photometry extracted for a given aperture.
 
-    :param lc: ligh-curve dictionary, see Dataset.lc for the keys.
+    :param lc: ligth-curve dictionary, see Dataset.lc for the keys.
 
     :returns: figure object.
     """
@@ -568,55 +568,25 @@ def plot_corner_diagnostics(dataset):
 # COMPUTE FULL MODEL FOR GIVEN DATASET AND PARAMETER SET
 class DatasetModel:
     """
-    A class used to store the light-curve model of a Dataset
-    ...
+    A class used to store the light-curve model of a Dataset.
 
-    Attributes
-    ----------
-    n : int
-        length of the time serie (number of time-points)
-    time : numpy.array
-        array of time points (length n)
-    tra : numpy.array
-        array (length n) of the transit model
-    trend : numpy.array
-        array (length n) of the trend model (used to detrend the light-curve)
-    glint : numpy.array
-        array (length n) of the glint model
-    gp : numpy.array
-        array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
-    all_nogp : numpy.array
-        array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
-    all : numpy.array
-        array (length n) of the full model (transit, trend, glint, and gp)
-
-    Methods
-    -------
-    None methods have been implemented for this object.
-
+    Args:
+        n (int): Length of the time serie (number of time-points).
+        time (numpy.array): Array of time points (length n).
+        tra (numpy.array): Array (length n) of the transit model.
+        trend (numpy.array): Array (length n) of the trend model
+            (used to detrend the light-curve).
+        glint (numpy.array): Array (length n) of the glint model.
+        gp (numpy.array): Array (length n) of the SHOTerm (celerite/celerite2)
+            Gaussian-Process model.
+        all_nogp (numpy.array): Array (length n) of the full model
+            (transit, trend, and glint) without the Gaussian-Process (gp) model.
+        all (numpy.array): Array (length n) of the full model
+            (transit, trend, glint, and gp).
     """
 
     def __init__(self, n_time):
-        """
-        Parameters
-        ----------
-        n : int
-            length of the time serie (number of time-points)
-        time : numpy.array
-            array of time points (length n)
-        tra : numpy.array
-            array (length n) of the transit model
-        trend : numpy.array
-            array (length n) of the trend model (used to detrend the light-curve)
-        glint : numpy.array
-            array (length n) of the glint model
-        gp : numpy.array
-            array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
-        all_nogp : numpy.array
-            array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
-        all : numpy.array
-            array (length n) of the full model (transit, trend, glint, and gp)
-        """
+        """Constructor of DatasetModel class."""
         self.n = n_time
         self.time = np.zeros((n_time))
         self.tra = np.zeros((n_time))
@@ -628,21 +598,17 @@ class DatasetModel:
 
 
 def get_full_model(dataset, params_in=None, time=None):
-    """Function to compute the full photometric model of a pycheops Dataset
+    """Function to compute the full photometric model of a pycheops Dataset.
 
-    Parameters
-    ----------
-    dataset : pycheops Dataset object
-        you have to run lmfit or emcee before using this function.
-    params_in : (optional, default None) list or numpy.array
-        parameters for which compute the model, if None the lmfit or emcee the params_best will be used.
-    time : (optional, default None) list or numpy.array
-        time vector needed to compute the light-curve model, if None the dataset.lc["time"] will be used.
+    :param dataset: pycheops Dataset object.
+        You have to run lmfit or emcee before using this function.
+    :param params_in: list or numpy.array, optional (default None).
+        Parameters for which compute the model, if None the lmfit or emcee the params_best will be used.
+    :param time: list or numpy.array, optional, default None.
+        Time vector needed to compute the light-curve model, if None the dataset.lc["time"] will be used.
 
-    Returns
-    -------
-    m : DatasetModel object
-        It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)
+    :returns: DatasetModel object.
+        It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None).
 
     """
 
