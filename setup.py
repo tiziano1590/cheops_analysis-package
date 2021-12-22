@@ -13,20 +13,24 @@ requires = []
 
 
 install_requires = [
-    "numpy==1.21.4",
+    "numpy",
     "matplotlib>=3.5.1",
-    "ipython==7.30.1",
-    "emcee==3.1.0",
-    "pycheops-ultra==1.0.1",
-    "ultranest==3.3.0",
-    "cython==0.29.24",
-    "pathos==0.2.8",
+    "ipython>=7.30.1",
+    "pyyaml>=5.3",
+    "emcee>=3.1.0",
+    "pycheops-ultra>=1.0.1",
+    "ultranest>=3.3.0",
+    "cython>=0.29.24",
+    "pathos>=0.2.8",
     "mpi4py>=3.0.0",
-    "scikit-learn==0.24.2",
-    "statsmodels==0.12.2",
-    "cryptography==3.4.7",
-    "h5py==3.5.0",
-    "selenium==3.141.0",
+    "scikit-learn>=0.24.2",
+    "statsmodels>=0.12.2",
+    "cryptography>=36.0.0",
+    "h5py>=3.5.0",
+    "selenium>=3.141.0",
+    "sphinx>=4.3.2",
+    "sphinx-autoapi>=1.8.4",
+    "renku-sphinx-theme",
 ]
 
 console_scripts = ["cheope=cheope.cheope:main"]
@@ -51,7 +55,7 @@ classifiers = [
 ]
 
 # Handle versioning
-version = "0.3.0"
+version = "0.3.1"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
