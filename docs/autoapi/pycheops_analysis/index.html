@@ -7,7 +7,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
+<<<<<<< HEAD
   <title>pycheops_analysis &mdash; cheope 0.1.0 documentation</title>
+=======
+  <title>pycheops_analysis &mdash; cheope 0.3.3 beta documentation</title>
+>>>>>>> c3f811c... added automatic version and copy of github pages files
   
 
   
@@ -65,6 +69,10 @@
 
           
             
+            
+              <div class="version">
+                0.3.3 beta
+              </div>
             
           
 
@@ -177,7 +185,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.DatasetModel" title="pycheops_analysis.DatasetModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetModel</span></code></a></p></td>
-<td><p></p></td>
+<td><p>A class used to store the light-curve model of a Dataset</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.PIPEDataset" title="pycheops_analysis.PIPEDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PIPEDataset</span></code></a></p></td>
 <td><p>CHEOPS Dataset object</p></td>
@@ -206,22 +214,22 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.printlog" title="pycheops_analysis.printlog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">printlog</span></code></a>(l, olog=None)</p></td>
-<td><p></p></td>
+<td><p>Function to print the same string to stdout and to a log file</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_all_apertures" title="pycheops_analysis.plot_all_apertures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_all_apertures</span></code></a>(dataset, out_folder)</p></td>
-<td><p></p></td>
+<td><p>Function that plots the CHEOPS photometry of all the apertures.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_single_lc" title="pycheops_analysis.plot_single_lc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_single_lc</span></code></a>(t, f, ef, bjd_ref)</p></td>
-<td><p></p></td>
+<td><p>Function that plots the CHEOPS photometry extracted for one aperture.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.plot_custom_diagnostics" title="pycheops_analysis.plot_custom_diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_custom_diagnostics</span></code></a>(lc)</p></td>
-<td><p></p></td>
+<td><p>Function that plots some selected diagnostics of the photometry extracted for a given aperture.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.plot_corner_diagnostics" title="pycheops_analysis.plot_corner_diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_corner_diagnostics</span></code></a>(dataset)</p></td>
-<td><p></p></td>
+<td><p>Function that plots all diagnostics of the photometry extracted for a given aperture</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pycheops_analysis.get_full_model" title="pycheops_analysis.get_full_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_model</span></code></a>(dataset, params_in=None, time=None)</p></td>
-<td><p></p></td>
+<td><p>Function to compute the full photometric model of a pycheops Dataset</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pycheops_analysis.binned_rms" title="pycheops_analysis.binned_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_rms</span></code></a>(stats_dict, t_lc, residuals, rms_time_in, keyword='flux-all (w/o GP)', olog=None)</p></td>
 <td><p></p></td>
@@ -448,37 +456,129 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.printlog">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">printlog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.printlog" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function to print the same string to stdout and to a log file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> – string to print and write.</p></li>
+<li><p><strong>olog</strong> – opened file object to write the string. Defaul is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing to return.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.plot_all_apertures">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_all_apertures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_all_apertures" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function that plots the CHEOPS photometry of all the apertures.
+Each aperture is plotted in an own subplot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – CHEOPS Dataset object.</p></li>
+<li><p><strong>out_folder</strong> – output folder to save the plot.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing to return.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.plot_single_lc">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_single_lc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bjd_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_single_lc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function that plots the CHEOPS photometry extracted for one aperture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> – time as BJD_TDB - bjd_ref.</p></li>
+<li><p><strong>f</strong> – normalized flux.</p></li>
+<li><p><strong>ef</strong> – error of the normalized flux.</p></li>
+<li><p><strong>bjd_ref</strong> – reference time of the time vector. Defined as the integer part of the first time-point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>figure object.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.plot_custom_diagnostics">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_custom_diagnostics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_custom_diagnostics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function that plots some selected diagnostics of the photometry extracted for a given aperture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lc</strong> – ligh-curve dictionary, see Dataset.lc for the keys.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>figure object.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.plot_corner_diagnostics">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_corner_diagnostics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.plot_corner_diagnostics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function that plots all diagnostics of the photometry extracted for a given aperture
+in a corner/triangle plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> – CHEOPS Dataset object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>figure object.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pycheops_analysis.DatasetModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">DatasetModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.DatasetModel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A class used to store the light-curve model of a Dataset
+…</p>
+<dl class="simple">
+<dt>n<span class="classifier">int</span></dt><dd><p>length of the time serie (number of time-points)</p>
+</dd>
+<dt>time<span class="classifier">numpy.array</span></dt><dd><p>array of time points (length n)</p>
+</dd>
+<dt>tra<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the transit model</p>
+</dd>
+<dt>trend<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the trend model (used to detrend the light-curve)</p>
+</dd>
+<dt>glint<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the glint model</p>
+</dd>
+<dt>gp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model</p>
+</dd>
+<dt>all_nogp<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model</p>
+</dd>
+<dt>all<span class="classifier">numpy.array</span></dt><dd><p>array (length n) of the full model (transit, trend, glint, and gp)</p>
+</dd>
+</dl>
+<p>None methods have been implemented for this object.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.get_full_model">
 <span class="sig-prename descclassname"><span class="pre">pycheops_analysis.</span></span><span class="sig-name descname"><span class="pre">get_full_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycheops_analysis.get_full_model" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function to compute the full photometric model of a pycheops Dataset</p>
+<dl class="simple">
+<dt>dataset<span class="classifier">pycheops Dataset object</span></dt><dd><p>you have to run lmfit or emcee before using this function.</p>
+</dd>
+<dt>params_in<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>parameters for which compute the model, if None the lmfit or emcee the params_best will be used.</p>
+</dd>
+<dt>time<span class="classifier">(optional, default None) list or numpy.array</span></dt><dd><p>time vector needed to compute the light-curve model, if None the dataset.lc[“time”] will be used.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>m<span class="classifier">DatasetModel object</span></dt><dd><p>It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycheops_analysis.binned_rms">
