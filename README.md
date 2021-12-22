@@ -1,6 +1,6 @@
 # Documentation
 
-'cheope' has its own documentation and can be found [here](https://tiziano1590.github.io/cheops_analysis-package/index.html)
+`cheope` has its own documentation and can be found [here](https://tiziano1590.github.io/cheops_analysis-package/index.html)
 
 # Create the appropriate environment
 
@@ -14,6 +14,12 @@ After creating a conda environmnent called `cheope` and installed the basic libr
 
 ```
 conda activate cheope
+```
+
+Before installing cheope, install `cython` and `mpi4py` using conda:
+
+```
+conda install cython mpi4py
 ```
 
 # Download and Install
