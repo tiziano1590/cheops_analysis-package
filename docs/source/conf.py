@@ -24,8 +24,12 @@ project = "cheope"
 copyright = "2021, Tiziano Zingales, Luca Borsato"
 author = "Tiziano Zingales, Luca Borsato"
 
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, "../../cheope/VERSION")) as version_file:
+    version = version_file.read().strip()
+
 # The full version, including alpha/beta/rc tags
-release = "0.3.0 beta"
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +53,7 @@ html_theme = "renku"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ["static"]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
