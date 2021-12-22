@@ -246,6 +246,13 @@ params_units["n_over"] = "-"
 # ======================================================================
 # ======================================================================
 def printlog(l, olog=None):
+    """Function to print the same string to stdout and to a log file
+
+    :param l: string to print and write.
+    :param olog: opened file object to write the string. Defaul is None.
+
+    :returns: Nothing to return.
+    """
     print(l)
     if olog is not None:
         olog.write("{}\n".format(l))
@@ -255,6 +262,14 @@ def printlog(l, olog=None):
 # =====================================================================
 # EXTRACT AND PLOT ALL THE LCs AT DIFFERENT APERTURE
 def plot_all_apertures(dataset, out_folder):
+    """Function that plots the CHEOPS photometry of all the apertures.
+    Each aperture is plotted in an own subplot.
+
+    :param dataset: CHEOPS Dataset object.
+    :param out_folder: output folder to save the plot.
+
+    :returns: Nothing to return.
+    """
 
     output_folder = Path(out_folder).resolve()
 
@@ -358,6 +373,15 @@ def plot_all_apertures(dataset, out_folder):
 # =====================================================================
 # PLOT SINGLE EXTRACTED LC
 def plot_single_lc(t, f, ef, bjd_ref):
+    """Function that plots the CHEOPS photometry extracted for one aperture.
+
+    :param t: time as BJD_TDB - bjd_ref.
+    :param f: normalized flux.
+    :param ef: error of the normalized flux.
+    :param bjd_ref: reference time of the time vector. Defined as the integer part of the first time-point.
+
+    :returns: figure object.
+    """
 
     fig = plt.figure()
     plt.errorbar(
@@ -385,7 +409,12 @@ def plot_single_lc(t, f, ef, bjd_ref):
 # =====================================================================
 # PLOT CUSTOM DIAGNOSTICS
 def plot_custom_diagnostics(lc):
+    """Function that plots some selected diagnostics of the photometry extracted for a given aperture.
 
+    :param lc: ligh-curve dictionary, see Dataset.lc for the keys.
+
+    :returns: figure object.
+    """
     nrows, ncols = 3, 2
     ms = 2
     mec = "None"
@@ -486,6 +515,13 @@ def plot_custom_diagnostics(lc):
 # =====================================================================
 # PLOT DIAGNOSTICS AS CORNER PLOT
 def plot_corner_diagnostics(dataset):
+    """Function that plots all diagnostics of the photometry extracted for a given aperture
+    in a corner/triangle plot.
+
+    :param dataset: CHEOPS Dataset object.
+
+    :returns: figure object.
+    """
 
     lc = dataset.lc
 
@@ -531,7 +567,56 @@ def plot_corner_diagnostics(dataset):
 # =====================================================================
 # COMPUTE FULL MODEL FOR GIVEN DATASET AND PARAMETER SET
 class DatasetModel:
+    """
+    A class used to store the light-curve model of a Dataset
+    ...
+
+    Attributes
+    ----------
+    n : int
+        length of the time serie (number of time-points)
+    time : numpy.array
+        array of time points (length n)
+    tra : numpy.array
+        array (length n) of the transit model
+    trend : numpy.array
+        array (length n) of the trend model (used to detrend the light-curve)
+    glint : numpy.array
+        array (length n) of the glint model
+    gp : numpy.array
+        array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
+    all_nogp : numpy.array
+        array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
+    all : numpy.array
+        array (length n) of the full model (transit, trend, glint, and gp)
+
+    Methods
+    -------
+    None methods have been implemented for this object.
+
+    """
+
     def __init__(self, n_time):
+        """
+        Parameters
+        ----------
+        n : int
+            length of the time serie (number of time-points)
+        time : numpy.array
+            array of time points (length n)
+        tra : numpy.array
+            array (length n) of the transit model
+        trend : numpy.array
+            array (length n) of the trend model (used to detrend the light-curve)
+        glint : numpy.array
+            array (length n) of the glint model
+        gp : numpy.array
+            array (length n) of the SHOTerm (celerite/celerite2) Gaussian-Process model
+        all_nogp : numpy.array
+            array (length n) of the full model (transit, trend, and glint) without the Gaussian-Process (gp) model
+        all : numpy.array
+            array (length n) of the full model (transit, trend, glint, and gp)
+        """
         self.n = n_time
         self.time = np.zeros((n_time))
         self.tra = np.zeros((n_time))
@@ -543,6 +628,23 @@ class DatasetModel:
 
 
 def get_full_model(dataset, params_in=None, time=None):
+    """Function to compute the full photometric model of a pycheops Dataset
+
+    Parameters
+    ----------
+    dataset : pycheops Dataset object
+        you have to run lmfit or emcee before using this function.
+    params_in : (optional, default None) list or numpy.array
+        parameters for which compute the model, if None the lmfit or emcee the params_best will be used.
+    time : (optional, default None) list or numpy.array
+        time vector needed to compute the light-curve model, if None the dataset.lc["time"] will be used.
+
+    Returns
+    -------
+    m : DatasetModel object
+        It returns nothing if params_in == None and (dataset.emcee.params_best == None or dataset.lmfit.params_best == None)
+
+    """
 
     t_data = dataset.lc["time"]
     f_data = dataset.lc["flux"]
