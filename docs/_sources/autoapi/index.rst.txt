@@ -6,13 +6,13 @@ This page contains auto-generated API reference documentation [#f1]_.
 .. toctree::
    :titlesonly:
 
-   /autoapi/pycheops_analysis/index
-   /autoapi/parameters/index
    /autoapi/pyconstants/index
    /autoapi/linear_ephemeris/index
+   /autoapi/pycheops_analysis/index
+   /autoapi/parameters/index
    /autoapi/cheope/index
-   /autoapi/tess/index
    /autoapi/dace/index
+   /autoapi/tess/index
    /autoapi/detrend/index
 
 .. [#f1] Created with `sphinx-autoapi <https://github.com/readthedocs/sphinx-autoapi>`_
