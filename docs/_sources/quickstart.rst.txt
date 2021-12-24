@@ -242,3 +242,86 @@ If you installed the ``firefox`` geckodriver from their `GitHub repository <http
 .. code-block::
 
         cheope -i path/to/parameters/file.yml --selenium-tess --download
+
+
+Custom light curve
+^^^^^^^^^^^^^^^^^^
+
+``cheope`` allows you to fit for an input lightcurve from an ASCII file (e.g. extension .dat, .txt etc.)
+The input lightcurve should have at least three columns with: time, flux and the error on the flux
+
+An example parameters file would be:
+
+.. code-block::
+
+		main_folder: /absolute/path/to/analysis/folder
+		file_ascii: /absolute/path/to/custom_lightcurve.dat
+		file_columns: [time, flux, flux_err] # allowed: [time, flux, flux_err, bg, contam, smear, centroid_x, centroid_y, xoff, yoff]
+		normalise_flux: False
+		input_LD:
+		  type: quad
+		  coeff: [0.714, 0.438]
+		seed: 42
+		dace: True
+		optimizer: emcee
+		visit_number: 1
+		#to_detrend: ['all']
+		star:
+		  star_name: WASP-47
+		  Rstar: [1.13, 0.03] # Dai et al., 2019
+		  Mstar: [1.01, 0.05] # Dai et al., 2019
+		  teff: [5552, 75] # None # Dai et al., 2019
+		  logg: [4.34, 0.03] # None # Dai et al., 2019
+		  feh : [0.38, 0.05] # None # Dai et al., 2019
+		  h_1: 
+		    fit: False
+		    value: [0.714, 0.011]
+		    bounds: [0.0, 1.0]
+
+		  h_2: 
+		    fit: False
+		    value: [0.438, 0.050]
+		    bounds: [0.0, 1.0]
+		planet:
+		  P: 
+		    value: [9.0307784240, 0.00015] # period in days
+		    fit: False
+		  aRs: [16.268,  0.074]
+		  b: [0.192, 0.065]
+		  Rp: [3.58, 0.04] # Planetary Radiu in Rearth
+		  #D: [0.00642, 0.00018] # flux depth
+		  #k: None # = Rp/Rstar, None, omitted or as D, D stronger than k
+		  # or Rp in Rearth
+		  # k: [0.1019, 0.0002] # Almenara et al., 2016
+		  # provide:
+		  # {inc, aRs, b}
+		  # or
+		  # {inc, aRs} => b
+		  # or
+		  # {b, aRs} ==> inc
+		  # or
+		  # {b, inc} ==> aRs
+		  #b: None
+		  inc: [89.32, 0.23] # degrees  # Almenara et al., 2016
+		  # aRs: [9.705, 0.047] # Almenara et al., 2016
+		  # if total duration T14 in days provided use it for W = T14/P, 
+		  # otherwise computed from
+		  # {k, b, aRs}
+		  #T14: None
+		  T_ref: [2173.3700844621, 0.0003633881]
+		# emcee parameters:
+		emcee:
+		  nwalkers: 256
+		  nprerun : 512
+		  nsteps  : 1024
+		  nburn   : 0
+		  nthin   : 1
+		  progress: True
+		ultranest:
+		  tol: 0.5
+
+To fit the lightcurve launch the following command:
+
+.. code-block::
+
+		cheope -i path/to/parameters/file.yml -a

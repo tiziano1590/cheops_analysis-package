@@ -102,6 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#single-visit">Single Visit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multivisit">Multivisit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tess-kepler-k2">TESS &amp; Kepler/K2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-light-curve">Custom light curve</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/tiziano1590/cheops_analysis-package">Project Page</a></li>
@@ -398,6 +399,83 @@ central transit time and modify the T_0 value accordingly.</p>
 </div>
 <p>If you installed the <code class="docutils literal notranslate"><span class="pre">firefox</span></code> geckodriver from their <a class="reference external" href="https://github.com/mozilla/geckodriver/releases">GitHub repository</a>, you can specify in the parameters file the location of the driver and download the TESS lightcurves using the following command</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">selenium</span><span class="o">-</span><span class="n">tess</span> <span class="o">--</span><span class="n">download</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="custom-light-curve">
+<h2>Custom light curve<a class="headerlink" href="#custom-light-curve" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cheope</span></code> allows you to fit for an input lightcurve from an ASCII file (e.g. extension .dat, .txt etc.)
+The input lightcurve should have at least three columns with: time, flux and the error on the flux</p>
+<p>An example parameters file would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_folder</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">folder</span>
+<span class="n">file_ascii</span><span class="p">:</span> <span class="o">/</span><span class="n">absolute</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">custom_lightcurve</span><span class="o">.</span><span class="n">dat</span>
+<span class="n">file_columns</span><span class="p">:</span> <span class="p">[</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">]</span> <span class="c1"># allowed: [time, flux, flux_err, bg, contam, smear, centroid_x, centroid_y, xoff, yoff]</span>
+<span class="n">normalise_flux</span><span class="p">:</span> <span class="kc">False</span>
+<span class="n">input_LD</span><span class="p">:</span>
+  <span class="nb">type</span><span class="p">:</span> <span class="n">quad</span>
+  <span class="n">coeff</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.714</span><span class="p">,</span> <span class="mf">0.438</span><span class="p">]</span>
+<span class="n">seed</span><span class="p">:</span> <span class="mi">42</span>
+<span class="n">dace</span><span class="p">:</span> <span class="kc">True</span>
+<span class="n">optimizer</span><span class="p">:</span> <span class="n">emcee</span>
+<span class="n">visit_number</span><span class="p">:</span> <span class="mi">1</span>
+<span class="c1">#to_detrend: [&#39;all&#39;]</span>
+<span class="n">star</span><span class="p">:</span>
+  <span class="n">star_name</span><span class="p">:</span> <span class="n">WASP</span><span class="o">-</span><span class="mi">47</span>
+  <span class="n">Rstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.13</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">Mstar</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># Dai et al., 2019</span>
+  <span class="n">teff</span><span class="p">:</span> <span class="p">[</span><span class="mi">5552</span><span class="p">,</span> <span class="mi">75</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">logg</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.34</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">feh</span> <span class="p">:</span> <span class="p">[</span><span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span> <span class="c1"># None # Dai et al., 2019</span>
+  <span class="n">h_1</span><span class="p">:</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.714</span><span class="p">,</span> <span class="mf">0.011</span><span class="p">]</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+  <span class="n">h_2</span><span class="p">:</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.438</span><span class="p">,</span> <span class="mf">0.050</span><span class="p">]</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="n">planet</span><span class="p">:</span>
+  <span class="n">P</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.0307784240</span><span class="p">,</span> <span class="mf">0.00015</span><span class="p">]</span> <span class="c1"># period in days</span>
+    <span class="n">fit</span><span class="p">:</span> <span class="kc">False</span>
+  <span class="n">aRs</span><span class="p">:</span> <span class="p">[</span><span class="mf">16.268</span><span class="p">,</span>  <span class="mf">0.074</span><span class="p">]</span>
+  <span class="n">b</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.192</span><span class="p">,</span> <span class="mf">0.065</span><span class="p">]</span>
+  <span class="n">Rp</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.58</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]</span> <span class="c1"># Planetary Radiu in Rearth</span>
+  <span class="c1">#D: [0.00642, 0.00018] # flux depth</span>
+  <span class="c1">#k: None # = Rp/Rstar, None, omitted or as D, D stronger than k</span>
+  <span class="c1"># or Rp in Rearth</span>
+  <span class="c1"># k: [0.1019, 0.0002] # Almenara et al., 2016</span>
+  <span class="c1"># provide:</span>
+  <span class="c1"># {inc, aRs, b}</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {inc, aRs} =&gt; b</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, aRs} ==&gt; inc</span>
+  <span class="c1"># or</span>
+  <span class="c1"># {b, inc} ==&gt; aRs</span>
+  <span class="c1">#b: None</span>
+  <span class="n">inc</span><span class="p">:</span> <span class="p">[</span><span class="mf">89.32</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">]</span> <span class="c1"># degrees  # Almenara et al., 2016</span>
+  <span class="c1"># aRs: [9.705, 0.047] # Almenara et al., 2016</span>
+  <span class="c1"># if total duration T14 in days provided use it for W = T14/P,</span>
+  <span class="c1"># otherwise computed from</span>
+  <span class="c1"># {k, b, aRs}</span>
+  <span class="c1">#T14: None</span>
+  <span class="n">T_ref</span><span class="p">:</span> <span class="p">[</span><span class="mf">2173.3700844621</span><span class="p">,</span> <span class="mf">0.0003633881</span><span class="p">]</span>
+<span class="c1"># emcee parameters:</span>
+<span class="n">emcee</span><span class="p">:</span>
+  <span class="n">nwalkers</span><span class="p">:</span> <span class="mi">256</span>
+  <span class="n">nprerun</span> <span class="p">:</span> <span class="mi">512</span>
+  <span class="n">nsteps</span>  <span class="p">:</span> <span class="mi">1024</span>
+  <span class="n">nburn</span>   <span class="p">:</span> <span class="mi">0</span>
+  <span class="n">nthin</span>   <span class="p">:</span> <span class="mi">1</span>
+  <span class="n">progress</span><span class="p">:</span> <span class="kc">True</span>
+<span class="n">ultranest</span><span class="p">:</span>
+  <span class="n">tol</span><span class="p">:</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+<p>To fit the lightcurve launch the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cheope</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">parameters</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">a</span>
 </pre></div>
 </div>
 </div>
