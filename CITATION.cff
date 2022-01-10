@@ -5,5 +5,5 @@ authors:
     given-names: Tiziano, Luca
     orcid: https://orcid.org/0000-0001-6880-5356
 title: "cheope - interpreting light curves"
-version: 0.3.3
+version: 0.3.4
 date-released: 2022-10-01
