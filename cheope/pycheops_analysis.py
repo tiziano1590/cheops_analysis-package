@@ -2350,6 +2350,76 @@ def model_plot_fit(
     plt.tight_layout()
     # plt.draw()
 
+    # PLOT EMCEE
+
+    # you've already upload the data with pycheops and run lmfit and/or emcee
+
+    # you have the parameters from lmfir or emcee (always use .copy())
+    # print(dataset.lmfit.params)
+    my_best_params = dataset.emcee.params.copy()
+
+    # Get the components as follows:
+    # model1.n        number of data points
+    # model1.time     time axis (the one of the dataset if the argument is None)
+    # model1.tra      model of the transit alone
+    # model1.trend    model of only the detrending, without GP and/or glint (is zero if it doesn't exist)
+    # model1.glint    model of the glint alone (is zero if it doesn't exist)
+    # model1.gp       model of the GP alone(is zero if it doesn't exist)
+    # model1.all_nogp model of transit+detrending_glint, without GP
+    # model1.all      complete model
+
+    # computes the model and the components:
+    model1 = get_full_model(dataset, params_in=my_best_params, time=None)
+
+    # Computes the residuals:
+    res_all = dataset.lc["flux"] - model1.all
+    res_nogp = dataset.lc["flux"] - model1.all_nogp
+
+    # Curve on the data points (model 1)
+    t_data = dataset.lc["time"]
+    f_data = dataset.lc["flux"]
+    ef_data = dataset.lc["flux_err"]
+    out = np.column_stack(
+        (
+            t_data,
+            f_data,
+            ef_data,
+            model1.all,
+            model1.tra,
+            model1.trend,
+            model1.glint,
+            model1.gp,
+            res_all,
+        )
+    )
+    heado = "time flux flux_err full_model transit_model trend_model glint_model gp_model residuals"
+    fmto = "%23.16e"
+    root = model_filename[:-4]
+    model_filename = root + "_on_data.dat"
+    np.savetxt(model_filename, out, header=heado, fmt=fmto)
+
+    # If you want to compute the oversampled models, such as to cover the missing parts, you create a vector of time with N=1000:
+    time_oversampled = np.linspace(
+        dataset.lc["time"][0], dataset.lc["time"][-1], endpoint=True, num=3000
+    )
+    model2 = get_full_model(dataset, params_in=my_best_params, time=time_oversampled)
+
+    # Oversampled curve of the models (model2)
+    out = np.column_stack(
+        (
+            time_oversampled,
+            model2.all,
+            model2.tra,
+            model2.trend,
+            model2.glint,
+            model2.gp,
+        )
+    )
+    heado = "time full_model transit_model trend_model glint_model gp_model"
+    fmto = "%23.16e"
+    model_filename = root + "_oversampled.dat"
+    np.savetxt(model_filename, out, header=heado, fmt=fmto)
+
     return fig, model
 
 
