@@ -134,6 +134,18 @@ class Optimizers:
             )
         plt.close(fig)
 
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "02_roll_angle_vs_residual.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
         printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
         fig = dataset.corner_plot(plotkeys="all")
         for ext in fig_ext:
@@ -371,6 +383,18 @@ class Optimizers:
             fig.savefig(
                 os.path.join(
                     visit_folder.resolve(), "04_trace_emcee_all.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "04_roll_angle_vs_residual.{}".format(ext),
                 ),
                 bbox_inches="tight",
             )
