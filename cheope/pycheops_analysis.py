@@ -2356,7 +2356,7 @@ def model_plot_fit(
 
     # you have the parameters from lmfir or emcee (always use .copy())
     # print(dataset.lmfit.params)
-    my_best_params = dataset.emcee.params.copy()
+    my_best_params = par_fit
 
     # Get the components as follows:
     # model1.n        number of data points

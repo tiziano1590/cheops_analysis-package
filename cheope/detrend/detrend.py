@@ -3,7 +3,6 @@
 
 # WG-P3 EXPLORE/TTV
 
-
 from math import floor
 import emcee
 import matplotlib as mpl
@@ -360,6 +359,27 @@ class SingleBayes:
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
 
+        # glint section
+        if visit_args["glint"] is not None and visit_args["glint"]["add"]:
+            dataset.add_glint(
+                nspline=visit_args["glint"]["nspline"],
+                binwidth=visit_args["glint"]["binwidth"],
+                fit_flux=True,
+                figsize=(10, 4),
+                gapmax=visit_args["glint"]["gapmax"],
+            )
+            in_par["glint_scale"] = Parameter(
+                "glint_scale",
+                value=1,
+                vary=True,
+                min=visit_args["glint"]["scale"][0],
+                max=visit_args["glint"]["scale"][1],
+                user_data=None,
+            )
+            glint_scale = in_par["glint_scale"]
+        else:
+            glint_scale = None
+
         ### *** 1) FIT TRANSIT MODEL ONLY WITH LMFIT
         det_par = {
             "dfdt": None,
@@ -378,8 +398,10 @@ class SingleBayes:
             "dfdsin3phi": None,
             "dfdcos3phi": None,
             "ramp": None,
-            "glint_scale": None,
         }
+
+        if glint_scale is None:
+            det_par["glint_scale"] = None
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
@@ -387,7 +409,12 @@ class SingleBayes:
         # set fixed LD parameters
         in_par["h_1"].vary = False
         in_par["h_2"].vary = False
-        #
+
+        if "glint_scale" in in_par.keys():
+            glint_scale = in_par["glint_scale"]
+        else:
+            glint_scale = det_par["glint_scale"]
+
         # Fit with lmfit
         lmfit0 = dataset.lmfit_transit(
             P=in_par["P"],
@@ -417,7 +444,7 @@ class SingleBayes:
             dfdsin3phi=det_par["dfdsin3phi"],
             dfdcos3phi=det_par["dfdcos3phi"],
             ramp=det_par["ramp"],
-            glint_scale=det_par["glint_scale"],
+            glint_scale=glint_scale,
         )
 
         lmfit0_rep = dataset.lmfit_report(min_correl=0.5)
@@ -427,16 +454,16 @@ class SingleBayes:
         printlog("", olog=olog)
 
         # roll angle plot
-        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(),
-        #             "00_lmfit0_roll_angle_vs_residual.{}".format(ext),
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "00_lmfit0_roll_angle_vs_residual.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
 
         # input params plot
         fig, _ = pyca.model_plot_fit(
@@ -507,6 +534,11 @@ class SingleBayes:
 
         ### *** 3) while loop to determine bayes factor and which parameters remove and keep
         while_cnt = 0
+
+        if "glint_scale" in in_par.keys():
+            glint_scale = params_lm0["glint_scale"]
+        else:
+            glint_scale = det_par["glint_scale"]
         while True:
             # LMFIT -------------------------------------------------------------
             printlog("\n- LMFIT - iter {}".format(while_cnt), olog=olog)
@@ -545,7 +577,7 @@ class SingleBayes:
                 dfdsin3phi=det_par["dfdsin3phi"],
                 dfdcos3phi=det_par["dfdcos3phi"],
                 ramp=det_par["ramp"],
-                glint_scale=det_par["glint_scale"],
+                glint_scale=glint_scale,
             )
             printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
             printlog("", olog=olog)
@@ -611,16 +643,16 @@ class SingleBayes:
         printlog("\n{}".format(", ".join(det_list)), olog=olog)
 
         # roll angle plot
-        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(),
-        #             "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
         # best-fit plot
         fig, _ = pyca.model_plot_fit(
             dataset,

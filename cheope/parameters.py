@@ -30,7 +30,7 @@ class ReadFile:
             "dace",
             "shape",
             "seed",
-            "glint_type",
+            "glint",
             "clipping",
             "unroll",
             "nroll",
@@ -277,9 +277,29 @@ class ReadFile:
 
         # glint_type
         glints = ["moon", "glint"]
-        self.visit_args["glint_type"] = self.visit_args["glint_type"].strip().lower()
-        if not self.visit_args["glint_type"] in glints:
-            self.visit_args["glint_type"] = False
+        if self.visit_args["glint"] == "None" or not self.visit_args["glint"]["add"]:
+            self.visit_args["glint"] = None
+        else:
+            self.visit_args["glint"]["type"] = (
+                self.visit_args["glint"]["type"].strip().lower()
+            )
+            if not self.visit_args["glint"]["type"] in glints:
+                self.visit_args["glint"]["type"] = False
+            if self.visit_args["glint"].get("scale") is not None:
+                self.visit_args["glint"]["scale"] = tuple(
+                    self.visit_args["glint"]["scale"]
+                )
+            else:
+                self.visit_args["glint"]["scale"] = (0, 2)
+            self.visit_args["glint"]["nspline"] = self.visit_args["glint"].get(
+                "nspline", 48
+            )
+            self.visit_args["glint"]["binwidth"] = self.visit_args["glint"].get(
+                "binwidth", 5
+            )
+            self.visit_args["glint"]["gapmax"] = self.visit_args["glint"].get(
+                "gapmax", 5
+            )
 
         # clip_outliers
         self.visit_args["clip_outliers"] = 5
