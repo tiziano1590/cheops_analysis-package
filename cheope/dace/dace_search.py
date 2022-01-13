@@ -157,7 +157,7 @@ class DACESearch:
 
         @_wait_browser_and_click
         def cheops_polygon():
-            return self.driver.find_element_by_id("cheops_polygon")
+            return self.driver.find_element_by_id("smallCircle1")
 
         cheops_polygon()
 
@@ -201,7 +201,7 @@ class DACESearch:
 
         @_wait_browser_and_click
         def download_all():
-            return self.driver.find_element_by_link_text("Light curves")
+            return self.driver.find_element_by_partial_link_text("Light curves")
 
         print("Downloading updated catalogue...")
         download_all()
