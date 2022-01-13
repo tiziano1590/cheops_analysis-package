@@ -377,6 +377,7 @@ class ReadFile:
             D = ufloat(
                 self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
             )
+            self.planet_args["D"] = D.n
             k = um.sqrt(D)
         elif "k" in planet_yaml:
             k = ufloat(
