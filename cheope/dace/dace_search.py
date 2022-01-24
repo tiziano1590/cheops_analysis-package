@@ -95,11 +95,16 @@ class DACESearch:
 
     def get_observations(self):
 
-        if not os.path.exists(self.visit_args["main_folder"] + "/private"):
+        if not os.path.exists(
+            os.path.join(self.visit_args["pycheops_path"] + "/keys/private")
+        ):
+            os.makedirs(os.path.join(self.visit_args["pycheops_path"] + "/keys"))
             message = self.visit_args["password"]
             key = Fernet.generate_key()
 
-            with open(self.visit_args["main_folder"] + "/private", "wb") as private:
+            with open(
+                os.path.join(self.visit_args["pycheops_path"] + "/keys/private"), "wb"
+            ) as private:
                 private.write(key)
             fernet = Fernet(key)
 
@@ -107,19 +112,25 @@ class DACESearch:
             # to encrypt the string string must must
             # be encoded to byte string before encryption
             encMessage = fernet.encrypt(message.encode())
-            with open(self.visit_args["main_folder"] + "/public", "wb") as public:
+            with open(
+                os.path.join(self.visit_args["pycheops_path"] + "/keys/public"), "wb"
+            ) as public:
                 public.write(encMessage)
 
-            print("original string: ", message)
-            print("encrypted string: ", encMessage)
+            # print("original string: ", message)
+            # print("encrypted string: ", encMessage)
         else:
-            with open(self.visit_args["main_folder"] + "/private", "rb") as private:
+            with open(
+                os.path.join(self.visit_args["pycheops_path"] + "/keys/private"), "rb"
+            ) as private:
                 key = private.read()
 
             fernet = Fernet(key)
             # Instance the Fernet class with the key
 
-            with open(self.visit_args["main_folder"] + "/public", "rb") as public:
+            with open(
+                os.path.join(self.visit_args["pycheops_path"] + "/keys/public"), "rb"
+            ) as public:
                 encMessage = public.read()
 
             # decrypt the encrypted string with the
@@ -127,7 +138,7 @@ class DACESearch:
             # that was used for encrypting the string
             # encoded byte string is returned by decrypt method,
             # so decode it to string with decode methods
-            decMessage = fernet.decrypt(encMessage).decode()
+        decMessage = fernet.decrypt(encMessage).decode()
 
         self.driver.get("https://dace.unige.ch/dashboard/index.html")
 
