@@ -792,7 +792,7 @@ class MultivisitAnalysis:
             target=star_args["star_name"],
             datasets_list=datasets_list,
             id_kws={
-                "dace": star_args["dace"],
+                "dace": visit_args["dace"],
                 "teff": star_args["teff"],
                 "logg": star_args["logg"],
                 "metal": star_args["feh"],
