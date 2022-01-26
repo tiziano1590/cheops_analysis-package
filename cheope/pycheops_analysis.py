@@ -1400,12 +1400,16 @@ def get_best_parameters(
 
     if "multi" in dataset_type.lower():
 
-        if nburn > 0:
-            flatchain = dataset.sampler.get_chain(flat=True, discard=nburn)
-            lnprob = dataset.sampler.get_log_prob(flat=True, discard=nburn)
-        else:
-            flatchain = dataset.sampler.get_chain(flat=True, discard=0)
-            lnprob = dataset.sampler.get_log_prob(flat=True, discard=0)
+        try:
+            flatchain = result.flat_chain
+            lnprob = dataset._lnpost_
+        except:
+            if nburn > 0:
+                flatchain = dataset.sampler.get_chain(flat=True, discard=nburn)
+                lnprob = dataset.sampler.get_log_prob(flat=True, discard=nburn)
+            else:
+                flatchain = dataset.sampler.get_chain(flat=True, discard=0)
+                lnprob = dataset.sampler.get_log_prob(flat=True, discard=0)
 
         if update_dataset:
             print("Updating result.flatchain and result.lnprob")
@@ -8068,6 +8072,27 @@ def q1q2_to_u1u2(q1, q2):
     u2 = sq1 * (1.0 - twoq2)
 
     return u1, u2
+
+
+def q1q2_to_h1h2(q1, q2):
+    """
+    Inverse transform to h1, h2 from uninformative paramaters q1, q2
+
+    h1 = 1 - sqrt(q1) + q2*sqrt(q1)
+    h2 = 1 - sqrt(q1)
+
+    :param q1: (1 - h2)**2
+    :param q2: (h1 - h2)/(1-h2)
+
+    returns: h1, h2
+
+    """
+    return 1 - q1 ** (1.0 / 2.0) + q2 * q1 ** (1.0 / 2.0), 1 - q1 ** (1.0 / 2.0)
+
+
+def u1u2_to_h1h2(u1, u2):
+    q1, q2 = u1u2_to_q1q2(u1, u2)
+    return q1q2_to_h1h2(q1, q2)
 
 
 def generate_private_key(path):
