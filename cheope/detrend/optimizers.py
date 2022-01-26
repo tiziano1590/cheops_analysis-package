@@ -1985,9 +1985,9 @@ class OptimizersMultivisit:
         )
         # updates params/parbest in result and M.result
         result_lin.params = par_med.copy()
-        M.result.params = par_med.copy()
+        M.__result__.params = par_med.copy()
         result_lin.parbest = par_mle.copy()
-        M.result.parbest = par_mle.copy()
+        M.__result__.parbest = par_mle.copy()
         pyca.quick_save_params(
             os.path.join(main_folder, "params_med_lin.dat"), par_med, bjd_ref=cst.btjd
         )
@@ -2122,9 +2122,9 @@ class OptimizersMultivisit:
         )
         # updates params/parbest in result and M.result
         result_fit.params = par_med.copy()
-        M.result.params = par_med.copy()
+        M.__result__.params = par_med.copy()
         result_fit.parbest = par_mle.copy()
-        M.result.parbest = par_mle.copy()
+        M.__result__.parbest = par_mle.copy()
         pyca.quick_save_params(
             os.path.join(main_folder, "params_med_fit.dat"), par_med, bjd_ref=cst.btjd
         )

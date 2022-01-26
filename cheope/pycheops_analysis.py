@@ -1400,16 +1400,12 @@ def get_best_parameters(
 
     if "multi" in dataset_type.lower():
 
-        try:
-            flatchain = result.flat_chain
-            lnprob = dataset._lnpost_
-        except:
-            if nburn > 0:
-                flatchain = dataset.sampler.get_chain(flat=True, discard=nburn)
-                lnprob = dataset.sampler.get_log_prob(flat=True, discard=nburn)
-            else:
-                flatchain = dataset.sampler.get_chain(flat=True, discard=0)
-                lnprob = dataset.sampler.get_log_prob(flat=True, discard=0)
+        if nburn > 0:
+            flatchain = dataset.__sampler__.get_chain(flat=True, discard=nburn)
+            lnprob = dataset.__sampler__.get_log_prob(flat=True, discard=nburn)
+        else:
+            flatchain = dataset.__sampler__.get_chain(flat=True, discard=0)
+            lnprob = dataset.__sampler__.get_log_prob(flat=True, discard=0)
 
         if update_dataset:
             print("Updating result.flatchain and result.lnprob")
@@ -1459,12 +1455,12 @@ def get_best_parameters(
 
         if "multi" in dataset_type.lower():
             # update also the dataset.result.params values!!
-            dataset.result.params[n].value = pmed[i_n]
-            dataset.result.params[n].stderr = err
+            dataset.__result__.params[n].value = pmed[i_n]
+            dataset.__result__.params[n].stderr = err
 
             # update also the dataset.result.parbest values!!
-            dataset.result.parbest[n].value = pmle[i_n]
-            dataset.result.parbest[n].stderr = err
+            dataset.__result__.parbest[n].value = pmle[i_n]
+            dataset.__result__.parbest[n].stderr = err
 
         else:
             # update also the dataset.emcee.params values!!
@@ -7121,7 +7117,7 @@ def custom_plot_phase(M, result, title=None):
 
     parbest = result.parbest.copy()
 
-    modpars = M.modpars
+    modpars = M.__modpars__
 
     P = parbest["P"].value
     T_0 = parbest["T_0"].value
@@ -7178,7 +7174,7 @@ def custom_plot_phase(M, result, title=None):
         f = d.lc["flux"]
         ef = d.lc["flux_err"]
         ph = (((t - T_0) / P) % 1 + 0.5) % 1
-        models = M.models[i]
+        models = M.__models__[i]
 
         # needed to have a true transit model
         for dp in (
