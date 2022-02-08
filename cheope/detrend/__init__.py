@@ -3,6 +3,7 @@ from .detrend import (
     MultivisitAnalysis,
     SingleBayesKeplerTess,
     SingleBayesASCII,
+    SingleBayesPIPE,
 )
 
 from .optimizers import Optimizers, OptimizersKeplerTESS, OptimizersMultivisit

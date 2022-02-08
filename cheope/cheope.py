@@ -21,6 +21,7 @@ def main():
         SingleBayesKeplerTess,
         SingleBayesASCII,
         SingleCheck,
+        SingleBayesPIPE,
         CheckEphemerids,
         MultivisitAnalysis,
     )
@@ -68,6 +69,15 @@ def main():
         default=False,
         help="When set, runs single visit detrending to compute the Bayes Factor"
         + "as a function of the models and their parameters. Including Kepler/Tess points.",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "-p",
+        "--pipe",
+        dest="pipe",
+        default=False,
+        help="When set, runs single visit detrending to compute the Bayes Factor using a PIPE dataset.",
         action="store_true",
     )
 
@@ -162,6 +172,10 @@ def main():
     if args.single_bayes:
         sb = SingleBayes(args.input_file)
         sb.run()
+
+    if args.pipe:
+        sbp = SingleBayesPIPE(args.input_file)
+        sbp.run()
 
     if args.single_kepler_tess:
         skt = SingleBayesKeplerTess(args.input_file)

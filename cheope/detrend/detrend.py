@@ -3005,33 +3005,13 @@ class SingleBayesPIPE:
         ]
         self.n_threads = n_threads
 
-    def single_Bayes_PIPE(
-        self,
-        ascii_data,
-        star_args,
-        visit_args,
-        planet_args,
-        emcee_args,
-        epoch_folder,
-        olog=None,
-        n_threads=1,
-    ):
+    def single_Bayes_PIPE(self, star_args, visit_args, planet_args, emcee_args):
 
         start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
         # ======================================================================
         # CONFIGURATION
         # ======================================================================
-
-        inpars = ReadFile(self.input_file)
-
-        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
-            inpars.visit_args,
-            inpars.star_args,
-            inpars.planet_args,
-            inpars.emcee_args,
-            inpars.read_file_status,
-        )
 
         # seed = 42
         seed = visit_args["seed"]
@@ -3087,17 +3067,6 @@ class SingleBayesPIPE:
         printlog("TARGET: {}".format(star_name), olog=olog)
         printlog("FILE_KEY: {}".format(file_key), olog=olog)
         printlog("APERTURE: {} -> PIPE".format(aperture), olog=olog)
-
-        # CHECK INPUT FILE
-        error_read = False
-        for l in read_file_status:
-            if len(l) > 0:
-                printlog(l, olog=olog)
-            if "ERROR" in l:
-                error_read = True
-        if error_read:
-            olog.close()
-            sys.exit()
 
         visit_folder = Path(os.path.join(main_folder, visit_name))
         if not visit_folder.is_dir():
@@ -4000,7 +3969,32 @@ class SingleBayesPIPE:
 
         olog.close()
 
+    def run(self):
+
+        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
+        # ======================================================================
+        # CONFIGURATION
+        # ======================================================================
+
+        inpars = ReadFile(self.input_file)
+
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
+
+        self.single_Bayes_PIPE(
+            star_args,
+            visit_args,
+            planet_args,
+            emcee_args,
+        )
+
 
 if __name__ == "__main__":
-    sb = SingleBayes()
-    sb.run_analysis()
+    sb = SingleBayes("test.yml")
+    sb.run()
