@@ -81,7 +81,7 @@ class DACESearch:
         )
 
         options = webdriver.FirefoxOptions()
-        # options.headless = True
+        options.headless = True
         profile = webdriver.FirefoxProfile()
         profile.set_preference(
             "browser.helperApps.neverAsk.saveToDisk",
