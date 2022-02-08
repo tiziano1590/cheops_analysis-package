@@ -3007,6 +3007,16 @@ class SingleBayesPIPE:
 
     def single_Bayes_PIPE(self, star_args, visit_args, planet_args, emcee_args):
 
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                self.read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
+
         start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
         # ======================================================================
@@ -3083,7 +3093,12 @@ class SingleBayesPIPE:
         feh = star_args["feh"]
 
         star = StarProperties(
-            star_name, match_arcsec=None, teff=teff, logg=logg, metal=feh, dace=False
+            star_name,
+            match_arcsec=5,
+            teff=teff,
+            logg=logg,
+            metal=feh,
+            dace=visit_args["dace"],
         )
 
         printlog("STAR INFORMATION", olog=olog)
@@ -3226,83 +3241,37 @@ class SingleBayesPIPE:
         printlog("f_s  = {}".format(f_s), olog=olog)
         printlog("T_0  = {}\n".format(T_0), olog=olog)
 
-        # determine the out-of-transit lc for initial guess of c based on T_0 min/max
-        oot = np.logical_or(t < T_0[0], t > T_0[2])
+       # determine the out-of-transit lc for initial guess of c based on T_0 min/max
+        oot = np.logical_or(
+            t < planet_args["T_0_bounds"][0], t > planet_args["T_0_bounds"][1]
+        )
 
         # DEFINE HERE HOW TO USE THE PARAMETERS,
         # WE HAVE TO DEFINE IF IT VARY (FIT) OR NOT (FIXED)
         in_par = Parameters()
-        in_par["P"] = Parameter(
-            "P", value=P.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["T_0"] = Parameter(
-            "T_0", value=T_0[1], vary=True, min=T_0[0], max=T_0[2], user_data=None
-        )
 
-        # I will randomize only fitting parameters...
-        in_par["D"] = Parameter(
-            "D",
-            value=np.abs(np.random.normal(loc=D.n, scale=D.s)),
-            vary=True,
-            min=0.5 * D.n,
-            max=1.5 * D.n,
-            user_data=D,
-        )
-        in_par["W"] = Parameter(
-            "W",
-            value=np.abs(np.random.normal(loc=W.n, scale=W.s)),
-            vary=True,
-            min=0.5 * W.n,
-            max=1.5 * W.n,
-            user_data=W,
-        )
-        in_par["b"] = Parameter(
-            "b",
-            value=np.abs(np.random.normal(loc=b.n, scale=b.s)),
-            vary=True,
-            min=0.0,
-            max=1.5,
-            user_data=b,
-        )
-        if shape == "fix":
-            for n in ["D", "W", "b"]:
-                in_par[n].vary = False
-            in_par["D"].value = D.n
-            in_par["W"].value = W.n
-            in_par["b"].value = b.n
+        for key in self.input_pars:
+            print(key)
+            cat = category_args(key)
+            if key in ["D", "W", "b"]:
+                # Randomize here
+                val = np.abs(
+                    np.random.normal(
+                        loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                    )
+                )
+            else:
+                val = cat[key]
+            in_par[key] = Parameter(
+                key,
+                value=val,
+                vary=cat[key + "_fit"],
+                min=cat[key + "_bounds"][0],
+                max=cat[key + "_bounds"][1],
+                user_data=cat[key + "_user_data"],
+            )
 
-        in_par["h_1"] = Parameter(
-            "h_1",
-            value=star.h_1.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_1.n, 0.1),
-        )
-        in_par["h_2"] = Parameter(
-            "h_2",
-            value=star.h_2.n,
-            vary=True,
-            min=0.0,
-            max=1.0,
-            user_data=ufloat(star.h_2.n, 0.1),
-        )
-
-        in_par["f_s"] = Parameter(
-            "f_s", value=f_s.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-        in_par["f_c"] = Parameter(
-            "f_c", value=f_c.n, vary=False, min=-np.inf, max=np.inf, user_data=None
-        )
-
-        in_par["logrho"] = Parameter(
-            "logrho",
-            value=star.logrho.n,
-            vary=True,
-            min=-9,
-            max=6,
-            user_data=star.logrho,
-        )
+        # c parameter treated separately
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
