@@ -3005,8 +3005,9 @@ class SingleBayesPIPE:
         ]
         self.n_threads = n_threads
 
-    def single_Bayes_PIPE(self, star_args, visit_args, planet_args, emcee_args):
-
+    # Commented to accept only ReadFile object as argument
+    # def single_Bayes_PIPE(self, star_args, visit_args, planet_args, emcee_args):
+    def single_Bayes_PIPE(self, inpars):
         def category_args(par):
             if par in star_args.keys():
                 return star_args
@@ -3017,11 +3018,20 @@ class SingleBayesPIPE:
                     f"ERROR: {par} is not defined in neither the star or planet arguments"
                 )
 
-        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+        # already used in the .run() method
+        # start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
         # ======================================================================
         # CONFIGURATION
         # ======================================================================
+
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
 
         # seed = 42
         seed = visit_args["seed"]
@@ -3605,20 +3615,21 @@ class SingleBayesPIPE:
 
         inpars = ReadFile(self.input_file)
 
-        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
-            inpars.visit_args,
-            inpars.star_args,
-            inpars.planet_args,
-            inpars.emcee_args,
-            inpars.read_file_status,
-        )
+        # (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+        #     inpars.visit_args,
+        #     inpars.star_args,
+        #     inpars.planet_args,
+        #     inpars.emcee_args,
+        #     inpars.read_file_status,
+        # )
 
-        self.single_Bayes_PIPE(
-            star_args,
-            visit_args,
-            planet_args,
-            emcee_args,
-        )
+        # self.single_Bayes_PIPE(
+        #     star_args,
+        #     visit_args,
+        #     planet_args,
+        #     emcee_args,
+        # )
+        self.single_Bayes_PIPE(inpars)
 
 
 if __name__ == "__main__":
