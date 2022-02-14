@@ -3140,7 +3140,8 @@ class SingleBayesPIPE:
             hdr = hdul[1].header
             hdd = hdul[1].data
             for k in PIPE_keys:
-                PIPE_data[k] = hdd[k]
+                if k in hdd:
+                    PIPE_data[k] = hdd[k]
 
         printlog("Loading dataset", olog=olog)
         # dataset  = Dataset(
