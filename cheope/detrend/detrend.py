@@ -3580,7 +3580,7 @@ class SingleBayesPIPE:
         ### *** ===== EMCEE ==================================================
         optimizer = Optimizers()
         optimizer.emcee(
-            inpars=inpars,
+            inpars=emcee_args,
             dataset=dataset,
             olog=olog,
             params_lm_loop=params_lm_loop,
