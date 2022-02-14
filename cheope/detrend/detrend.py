@@ -3565,27 +3565,27 @@ class SingleBayesPIPE:
             params_lm_loop[key] = in_par[key]
             params_lm_loop[key].vary = cat[key + "_fit"]
 
-        if visit_args["optimizer"].lower() == "ultranest":
-            ### *** ===== Ultranest ==================================================
-            optimizer = Optimizers()
-            optimizer.ultranest(
-                inpars=inpars,
-                dataset=dataset,
-                olog=olog,
-                params_lm_loop=params_lm_loop,
-                star=star,
-            )
+        # if visit_args["optimizer"].lower() == "ultranest":
+        #     ### *** ===== Ultranest ==================================================
+        #     optimizer = Optimizers()
+        #     optimizer.ultranest(
+        #         inpars=inpars,
+        #         dataset=dataset,
+        #         olog=olog,
+        #         params_lm_loop=params_lm_loop,
+        #         star=star,
+        #     )
 
-        else:
-            ### *** ===== EMCEE ==================================================
-            optimizer = Optimizers()
-            optimizer.emcee(
-                inpars=inpars,
-                dataset=dataset,
-                olog=olog,
-                params_lm_loop=params_lm_loop,
-                star=star,
-            )
+        # else:
+        ### *** ===== EMCEE ==================================================
+        optimizer = Optimizers()
+        optimizer.emcee(
+            inpars=inpars,
+            dataset=dataset,
+            olog=olog,
+            params_lm_loop=params_lm_loop,
+            star=star,
+        )
 
         printlog("", olog=olog)
         printlog(" *********** ", olog=olog)
