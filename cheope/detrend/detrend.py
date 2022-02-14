@@ -3018,8 +3018,7 @@ class SingleBayesPIPE:
                     f"ERROR: {par} is not defined in neither the star or planet arguments"
                 )
 
-        # already used in the .run() method
-        # start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
         # ======================================================================
         # CONFIGURATION
@@ -3607,7 +3606,7 @@ class SingleBayesPIPE:
 
     def run(self):
 
-        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+        # start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
         # ======================================================================
         # CONFIGURATION
