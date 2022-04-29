@@ -191,18 +191,18 @@ def main():
 
     if args.selenium_dace:
         search = DACESearch(args.input_file)
-        keywords = search.get_observations()
+        keywords = search.get_observations(download=args.download)
 
-        def check_gen_file(num, keyword):
+        for num, keyword in enumerate(keywords):
             infile = search.substitute_file_key(keyword, num + 1)
 
             if args.add_sc:
                 sb = SingleCheck(infile)
                 sb.run()
 
-        process_pool = Pool()
-        data = list(enumerate(keywords))
-        process_pool.starmap(check_gen_file, data)
+        # process_pool = Pool()
+        # data = list(enumerate(keywords))
+        # process_pool.starmap(check_gen_file, data)
 
     if args.selenium_tess and args.read_fits:
         fits = ReadFits(args.input_file)

@@ -166,7 +166,7 @@ class SingleCheck:
 
         star = StarProperties(
             star_name,
-            match_arcsec=5,
+            match_arcsec=star_args["match_arcsec"],
             teff=teff,
             logg=logg,
             metal=feh,

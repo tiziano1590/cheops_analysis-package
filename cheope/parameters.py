@@ -48,6 +48,7 @@ class ReadFile:
             "feh",
             "h_1",
             "h_2",
+            "match_arcsec",
         ]
 
         self.planet_keys = [
@@ -319,9 +320,12 @@ class ReadFile:
 
     def apply_star_conditions(self):
 
+        if self.star_args["match_arcsec"] == "None":
+            self.star_args["match_arcsec"] = None
+
         star = StarProperties(
             self.star_args["star_name"],
-            match_arcsec=5,
+            match_arcsec=self.star_args["match_arcsec"],
             teff=self.star_args["teff"],
             logg=self.star_args["logg"],
             metal=self.star_args["feh"],

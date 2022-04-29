@@ -207,7 +207,7 @@ class SingleBayes:
 
         star = StarProperties(
             star_name,
-            match_arcsec=5,
+            match_arcsec=star_args["match_arcsec"],
             teff=teff,
             logg=logg,
             metal=feh,
@@ -3251,7 +3251,7 @@ class SingleBayesPIPE:
         printlog("f_s  = {}".format(f_s), olog=olog)
         printlog("T_0  = {}\n".format(T_0), olog=olog)
 
-       # determine the out-of-transit lc for initial guess of c based on T_0 min/max
+        # determine the out-of-transit lc for initial guess of c based on T_0 min/max
         oot = np.logical_or(
             t < planet_args["T_0_bounds"][0], t > planet_args["T_0_bounds"][1]
         )
@@ -3281,10 +3281,31 @@ class SingleBayesPIPE:
                 user_data=cat[key + "_user_data"],
             )
 
-        # c parameter treated separately
+        # Treat "c" separately
         in_par["c"] = Parameter(
             "c", value=np.median(f[oot]), vary=True, min=0.5, max=1.5, user_data=None
         )
+
+        # glint section
+        if visit_args["glint"] is not None and visit_args["glint"]["add"]:
+            dataset.add_glint(
+                nspline=visit_args["glint"]["nspline"],
+                binwidth=visit_args["glint"]["binwidth"],
+                fit_flux=True,
+                figsize=(10, 4),
+                gapmax=visit_args["glint"]["gapmax"],
+            )
+            in_par["glint_scale"] = Parameter(
+                "glint_scale",
+                value=1,
+                vary=True,
+                min=visit_args["glint"]["scale"][0],
+                max=visit_args["glint"]["scale"][1],
+                user_data=None,
+            )
+            glint_scale = in_par["glint_scale"]
+        else:
+            glint_scale = None
 
         ### *** 1) FIT TRANSIT MODEL ONLY WITH LMFIT
         det_par = {
@@ -3304,11 +3325,23 @@ class SingleBayesPIPE:
             "dfdsin3phi": None,
             "dfdcos3phi": None,
             "ramp": None,
-            "glint_scale": None,
         }
+
+        if glint_scale is None:
+            det_par["glint_scale"] = None
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
+        #
+        # set fixed LD parameters
+        in_par["h_1"].vary = False
+        in_par["h_2"].vary = False
+
+        if "glint_scale" in in_par.keys():
+            glint_scale = in_par["glint_scale"]
+        else:
+            glint_scale = det_par["glint_scale"]
+
         # Fit with lmfit
         lmfit0 = dataset.lmfit_transit(
             P=in_par["P"],
@@ -3338,12 +3371,12 @@ class SingleBayesPIPE:
             dfdsin3phi=det_par["dfdsin3phi"],
             dfdcos3phi=det_par["dfdcos3phi"],
             ramp=det_par["ramp"],
-            glint_scale=det_par["glint_scale"],
+            glint_scale=glint_scale,
         )
 
         lmfit0_rep = dataset.lmfit_report(min_correl=0.5)
         # for l in lmfit0_rep:
-        #   printlog(l, olog=olog)
+        #     printlog(l, olog=olog)
         printlog(lmfit0_rep, olog=olog)
         printlog("", olog=olog)
 
@@ -3353,7 +3386,7 @@ class SingleBayesPIPE:
             fig.savefig(
                 os.path.join(
                     visit_folder.resolve(),
-                    "00_lmfit_roll_angle_vs_residual.{}".format(ext),
+                    "00_lmfit0_roll_angle_vs_residual.{}".format(ext),
                 ),
                 bbox_inches="tight",
             )
@@ -3415,9 +3448,7 @@ class SingleBayesPIPE:
             "Assign prior ufloat(0,sigma_0) to all the detrending parameters", olog=olog
         )
         for k in det_par.keys():
-            # in the PIPE light-curve the following columns/diagnostics are
-            # not available ... kept set to None
-            if k not in ["dfdcontam", "dfdsmear", "ramp", "glint_scale"]:
+            if k not in ["ramp", "glint_scale"]:
                 det_par[k] = dprior
             # printlog("{:20s} = {:.6f}".format(k, det_par[k]), olog=olog)
         printlog(
@@ -3430,6 +3461,11 @@ class SingleBayesPIPE:
 
         ### *** 3) while loop to determine bayes factor and which parameters remove and keep
         while_cnt = 0
+
+        if "glint_scale" in in_par.keys():
+            glint_scale = params_lm0["glint_scale"]
+        else:
+            glint_scale = det_par["glint_scale"]
         while True:
             # LMFIT -------------------------------------------------------------
             printlog("\n- LMFIT - iter {}".format(while_cnt), olog=olog)
@@ -3451,7 +3487,7 @@ class SingleBayesPIPE:
                 h_1=params_lm0["h_1"],
                 h_2=params_lm0["h_2"],
                 logrhoprior=in_par["logrho"],
-                c=in_par["c"],
+                c=params_lm0["c"],
                 dfdt=det_par["dfdt"],
                 d2fdt2=det_par["d2fdt2"],
                 dfdbg=det_par["dfdbg"],
@@ -3468,7 +3504,7 @@ class SingleBayesPIPE:
                 dfdsin3phi=det_par["dfdsin3phi"],
                 dfdcos3phi=det_par["dfdcos3phi"],
                 ramp=det_par["ramp"],
-                glint_scale=det_par["glint_scale"],
+                glint_scale=glint_scale,
             )
             printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
             printlog("", olog=olog)
@@ -3517,6 +3553,7 @@ class SingleBayesPIPE:
                         olog=olog,
                     )
                     det_par[k] = None
+                    ##TODO if k == 'glint_scale': remove/set to none the variable of pycheops add_glint
 
                 while_cnt += 1
 
@@ -3538,7 +3575,7 @@ class SingleBayesPIPE:
             fig.savefig(
                 os.path.join(
                     visit_folder.resolve(),
-                    "01_lmfit_roll_angle_vs_residual.{}".format(ext),
+                    "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
                 ),
                 bbox_inches="tight",
             )
@@ -3574,7 +3611,7 @@ class SingleBayesPIPE:
             params_lm_loop[key] = in_par[key]
             params_lm_loop[key].vary = cat[key + "_fit"]
 
-                ### *** ==============================================================
+            ### *** ==============================================================
         ### *** ===== EMCEE ==================================================
 
         nwalkers = emcee_args["nwalkers"]

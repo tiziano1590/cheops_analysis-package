@@ -93,7 +93,7 @@ class DACESearch:
             options=options,
         )
 
-    def get_observations(self):
+    def get_observations(self, download=False):
 
         if not os.path.exists(
             os.path.join(self.visit_args["pycheops_path"] + "/keys/private")
@@ -138,92 +138,97 @@ class DACESearch:
             # that was used for encrypting the string
             # encoded byte string is returned by decrypt method,
             # so decode it to string with decode methods
-        decMessage = fernet.decrypt(encMessage).decode()
+        if download:
+            decMessage = fernet.decrypt(encMessage).decode()
 
-        self.driver.get("https://dace.unige.ch/dashboard/index.html")
+            self.driver.get("https://dace.unige.ch/dashboard/index.html")
 
-        @_wait_browser_and_click
-        def signin():
-            return self.driver.find_element_by_link_text("Sign in / Create account")
+            @_wait_browser_and_click
+            def signin():
+                return self.driver.find_element_by_link_text("Sign in / Create account")
 
-        signin()
+            signin()
 
-        @_wait_browser_and_send_keys
-        def userid(ref):
-            return self.driver.find_element_by_id("loginUserField")
+            @_wait_browser_and_send_keys
+            def userid(ref):
+                return self.driver.find_element_by_id("loginUserField")
 
-        userid(self.visit_args["login_dace"])
+            userid(self.visit_args["login_dace"])
 
-        @_wait_browser_and_send_keys
-        def userpass(ref):
-            return self.driver.find_element_by_id("loginPassField")
+            @_wait_browser_and_send_keys
+            def userpass(ref):
+                return self.driver.find_element_by_id("loginPassField")
 
-        userpass(decMessage)
+            userpass(decMessage)
 
-        @_wait_browser_and_click
-        def login():
-            return self.driver.find_element_by_css_selector("button.popup_login_row")
+            @_wait_browser_and_click
+            def login():
+                return self.driver.find_element_by_css_selector(
+                    "button.popup_login_row"
+                )
 
-        login()
+            login()
 
-        @_wait_browser_and_click
-        def cheops_polygon():
-            return self.driver.find_element_by_id("smallCircle1")
+            @_wait_browser_and_click
+            def cheops_polygon():
+                return self.driver.find_element_by_id("smallCircle1")
 
-        cheops_polygon()
+            cheops_polygon()
 
-        @_wait_browser_and_click
-        def observations_data():
-            return self.driver.find_element_by_css_selector(
-                ".col-lg-9 > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) > div:nth-child(1)"
-            )
+            @_wait_browser_and_click
+            def observations_data():
+                return self.driver.find_element_by_css_selector(
+                    ".col-lg-9 > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) > div:nth-child(1)"
+                )
 
-        observations_data()
+            observations_data()
 
-        @_wait_browser_and_click
-        def object_search():
-            return self.driver.find_element_by_css_selector("span.fa-search")
+            @_wait_browser_and_click
+            def object_search():
+                return self.driver.find_element_by_css_selector("span.fa-search")
 
-        object_search()
+            object_search()
 
-        @_wait_browser_and_send_keys
-        def object_equals(ref):
-            return self.driver.find_element_by_xpath(
-                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[2]/th[3]/span/div/ul/li/form/div/input[1]"
-            )
+            @_wait_browser_and_send_keys
+            def object_equals(ref):
+                return self.driver.find_element_by_xpath(
+                    "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[2]/th[3]/span/div/ul/li/form/div/input[1]"
+                )
 
-        object_equals(self.visit_args["object_name"] + Keys.ENTER)
+            object_equals(self.visit_args["object_name"] + Keys.ENTER)
 
-        @_wait_browser_and_click
-        def actions():
-            return self.driver.find_element_by_xpath(
-                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div"
-            )
+            @_wait_browser_and_click
+            def actions():
+                return self.driver.find_element_by_xpath(
+                    "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div"
+                )
 
-        actions()
+            actions()
 
-        @_wait_browser_and_click
-        def select_all():
-            return self.driver.find_element_by_xpath(
-                "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div/ul/li[3]/ul/li[1]"
-            )
+            @_wait_browser_and_click
+            def select_all():
+                return self.driver.find_element_by_xpath(
+                    "/html/body/div[3]/div[2]/div[2]/div[1]/div/table/thead/tr[1]/th/div/ul/li[3]/ul/li[1]"
+                )
 
-        select_all()
+            select_all()
 
-        @_wait_browser_and_click
-        def download_all():
-            return self.driver.find_element_by_partial_link_text("Light curves")
+            @_wait_browser_and_click
+            def download_all():
+                return self.driver.find_element_by_partial_link_text("Light curves")
 
-        print("Downloading updated catalogue...")
-        download_all()
+            print("Downloading updated catalogue...")
+            download_all()
 
-        time.sleep(10)
+            time.sleep(10)
 
-        while os.path.exists(os.path.join(self.visit_args["download_path"], "*.part")):
-            print("Still downloading...")
-            time.sleep(1)
+            while os.path.exists(
+                os.path.join(self.visit_args["download_path"], "*.part")
+            ):
+                print("Still downloading...")
+                time.sleep(1)
 
-        print("Download finished!")
+            print("Download finished!")
 
         list_of_files = glob.glob(
             os.path.join(self.visit_args["download_path"], "*")
