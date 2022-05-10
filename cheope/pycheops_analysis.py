@@ -652,9 +652,13 @@ def get_full_model(dataset, params_in=None, time=None):
 
     # transit, detrending, and glint model
     if "glint_scale" in params:
-        m.tra = dataset.model.left.left.eval(params, t=t)
-        m.trend = dataset.model.left.right.eval(params, t=t)
-        m.glint = dataset.model.right.eval(params, t=t)
+        try:
+            m.tra = dataset.model.left.left.eval(params, t=t)
+            m.trend = dataset.model.left.right.eval(params, t=t)
+            m.glint = dataset.model.right.eval(params, t=t)
+        except AttributeError:
+            m.tra = dataset.model.left.eval(params, t=t)
+            m.trend = dataset.model.right.eval(params, t=t)
     else:
         m.tra = dataset.model.left.eval(params, t=t)
         m.trend = dataset.model.right.eval(params, t=t)

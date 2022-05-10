@@ -442,6 +442,18 @@ class SingleBayes:
                 bbox_inches="tight",
             )
         plt.close(fig)
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "00_input_roll_angle.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
         pyca.quick_save_params(
             os.path.join(visit_folder.resolve(), "00_params_0_input.dat"),
             in_par,
