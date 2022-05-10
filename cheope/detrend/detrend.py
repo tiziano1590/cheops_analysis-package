@@ -600,17 +600,17 @@ class SingleBayes:
                 printlog("{:20s} = {:9.5f}".format(k, v), olog=olog)
         printlog("\n{}".format(", ".join(det_list)), olog=olog)
 
-        # # roll angle plot
-        # fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(),
-        #             "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        # roll angle plot
+        fig = dataset.rollangle_plot(figsize=plt.rcParams["figure.figsize"], fontsize=8)
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(),
+                    "01_lmfit_loop_roll_angle_vs_residual.{}".format(ext),
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
         # best-fit plot
         fig, _ = pyca.model_plot_fit(
             dataset,
