@@ -15,6 +15,7 @@ import glob
 import tarfile
 import shutil
 import functools
+from zipfile import ZipFile
 
 LIMIT_TIME = 60
 
@@ -242,6 +243,8 @@ class DACESearch:
         if os.path.exists(path):
             shutil.rmtree(path)
 
+        # os.makedirs(path)
+
         if latest_file.endswith("tar.gz"):
             tar = tarfile.open(latest_file, "r:gz")
             tar.extractall(path=path)
@@ -250,6 +253,10 @@ class DACESearch:
             tar = tarfile.open(latest_file, "r:")
             tar.extractall(path=path)
             tar.close()
+        elif latest_file.endswith("zip"):
+            zipfile = ZipFile(latest_file, "r")
+            zipfile.extractall(path)
+            zipfile.close()
 
         all_downloaded = glob.glob(
             os.path.join(self.visit_args["download_path"], "newly_extracted/*")

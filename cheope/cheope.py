@@ -193,10 +193,13 @@ def main():
         search = DACESearch(args.input_file)
         keywords = search.get_observations(download=args.download)
 
+        print(keywords)
+
         for num, keyword in enumerate(keywords):
             infile = search.substitute_file_key(keyword, num + 1)
 
             if args.add_sc:
+                print(f"Running Single check for {infile}")
                 sb = SingleCheck(infile)
                 sb.run()
 
