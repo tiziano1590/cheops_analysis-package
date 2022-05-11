@@ -652,6 +652,7 @@ class SingleBayes:
             dataset.add_glint(
                 nspline=visit_args["glint"]["nspline"],
                 binwidth=visit_args["glint"]["binwidth"],
+                moon = visit_args["glint"]["moon"],
                 fit_flux=True,
                 figsize=(10, 4),
                 gapmax=visit_args["glint"]["gapmax"],

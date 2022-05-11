@@ -278,14 +278,20 @@ class ReadFile:
 
         # glint_type
         glints = ["moon", "glint"]
+
         if self.visit_args["glint"] == "None" or not self.visit_args["glint"]["add"]:
             self.visit_args["glint"] = None
         else:
             self.visit_args["glint"]["type"] = (
                 self.visit_args["glint"]["type"].strip().lower()
             )
-            if not self.visit_args["glint"]["type"] in glints:
+            if not self.visit_args["glint"]["type"].lower() in glints:
                 self.visit_args["glint"]["type"] = False
+
+            self.visit_args["glint"]["moon"] = False
+            if self.visit_args["glint"]["type"].lower() == "moon":
+                self.visit_args["glint"]["moon"] = True
+
             if self.visit_args["glint"].get("scale") is not None:
                 self.visit_args["glint"]["scale"] = tuple(
                     self.visit_args["glint"]["scale"]
