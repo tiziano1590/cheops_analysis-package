@@ -506,6 +506,28 @@ class SingleBayes:
         for k in ["dfdt", "d2fdt2"]:
             det_par[k] = dprior / dt
 
+        # glint section
+        if visit_args["glint"] is not None and visit_args["glint"]["add"]:
+            dataset.add_glint(
+                nspline=visit_args["glint"]["nspline"],
+                binwidth=visit_args["glint"]["binwidth"],
+                moon=visit_args["glint"]["moon"],
+                fit_flux=True,
+                figsize=(10, 4),
+                gapmax=visit_args["glint"]["gapmax"],
+            )
+            in_par["glint_scale"] = Parameter(
+                "glint_scale",
+                value=1,
+                vary=True,
+                min=visit_args["glint"]["scale"][0],
+                max=visit_args["glint"]["scale"][1],
+                user_data=None,
+            )
+            glint_scale = in_par["glint_scale"]
+        else:
+            glint_scale = det_par["glint_scale"]
+
         ### *** 3) while loop to determine bayes factor and which parameters remove and keep
         while_cnt = 0
 
@@ -547,7 +569,7 @@ class SingleBayes:
                 dfdsin3phi=det_par["dfdsin3phi"],
                 dfdcos3phi=det_par["dfdcos3phi"],
                 ramp=det_par["ramp"],
-                glint_scale=det_par["glint_scale"],
+                glint_scale=glint_scale,
             )
             printlog(dataset.lmfit_report(min_correl=0.5), olog=olog)
             printlog("", olog=olog)
@@ -647,27 +669,27 @@ class SingleBayes:
             dataset.lc["bjd_ref"],
         )
 
-        # glint section
-        if visit_args["glint"] is not None and visit_args["glint"]["add"]:
-            dataset.add_glint(
-                nspline=visit_args["glint"]["nspline"],
-                binwidth=visit_args["glint"]["binwidth"],
-                moon = visit_args["glint"]["moon"],
-                fit_flux=True,
-                figsize=(10, 4),
-                gapmax=visit_args["glint"]["gapmax"],
-            )
-            in_par["glint_scale"] = Parameter(
-                "glint_scale",
-                value=1,
-                vary=True,
-                min=visit_args["glint"]["scale"][0],
-                max=visit_args["glint"]["scale"][1],
-                user_data=None,
-            )
-            glint_scale = in_par["glint_scale"]
-            params_lm_loop["glint_scale"] = in_par["glint_scale"]
-            params_lm_loop["glint_scale"].vary = True
+        # # glint section
+        # if visit_args["glint"] is not None and visit_args["glint"]["add"]:
+        #     dataset.add_glint(
+        #         nspline=visit_args["glint"]["nspline"],
+        #         binwidth=visit_args["glint"]["binwidth"],
+        #         moon = visit_args["glint"]["moon"],
+        #         fit_flux=True,
+        #         figsize=(10, 4),
+        #         gapmax=visit_args["glint"]["gapmax"],
+        #     )
+        #     in_par["glint_scale"] = Parameter(
+        #         "glint_scale",
+        #         value=1,
+        #         vary=True,
+        #         min=visit_args["glint"]["scale"][0],
+        #         max=visit_args["glint"]["scale"][1],
+        #         user_data=None,
+        #     )
+        #     glint_scale = in_par["glint_scale"]
+        #     params_lm_loop["glint_scale"] = in_par["glint_scale"]
+        #     params_lm_loop["glint_scale"].vary = True
 
         # set the LD to proper fit or fix
         keys = ["h_1", "h_2"]
