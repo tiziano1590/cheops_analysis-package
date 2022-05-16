@@ -6,6 +6,7 @@ from uncertainties import ufloat
 from uncertainties import umath as um
 
 from pycheops import StarProperties
+from cheope.pycheops_analysis import printlog
 
 import cheope.pyconstants as cst
 
@@ -20,6 +21,8 @@ class ReadFile:
         self.read_file_status = []
         self.yaml_input = {}
         self.multivisit = multivisit
+
+        self.bound_fac = 10
 
         self.visit_keys = [
             "main_folder",
@@ -132,8 +135,8 @@ class ReadFile:
                 self.star_args[key] = ufloat(inval[0], inval[1])
                 self.star_args[key + "_fit"] = False
                 self.star_args[key + "_bounds"] = [
-                    inval[0] - inval[1],
-                    inval[0] + inval[1],
+                    inval[0] - self.bound_fac * inval[1],
+                    inval[0] + self.bound_fac * inval[1],
                 ]
                 self.star_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):
@@ -150,8 +153,8 @@ class ReadFile:
                     and abs(val[1]) > 0
                 ):
                     self.star_args[key + "_bounds"] = [
-                        val[0] - val[1],
-                        val[0] + val[1],
+                        val[0] - self.bound_fac * val[1],
+                        val[0] + self.bound_fac * val[1],
                     ]
                 elif inval.get("bounds") != None:
                     self.star_args[key + "_bounds"] = inval.get("bounds")
@@ -161,9 +164,6 @@ class ReadFile:
                     self.star_args[key + "_user_data"] = ufloat(val[0], val[1])
                 else:
                     self.star_args[key + "_user_data"] = None
-                # if key == "h_1":
-                #     print("HAHA")
-                #     break
             else:
                 self.read_file_status.append(
                     f"{key} should be either a list or a dictionary."
@@ -184,26 +184,18 @@ class ReadFile:
                 self.planet_args[key] = ufloat(inval[0], inval[1])
                 self.planet_args[key + "_fit"] = True
                 self.planet_args[key + "_bounds"] = [
-                    inval[0] - inval[1],
-                    inval[0] + inval[1],
+                    inval[0] - self.bound_fac * inval[1],
+                    inval[0] + self.bound_fac * inval[1],
                 ]
                 self.planet_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):
                 val = inval.get("value")
                 fit = inval.get("fit")
+                bounds = inval.get("bounds")
                 self.planet_args[key] = val[0]
                 self.planet_args[key + "_fit"] = fit
-                if (
-                    inval.get("bounds") != None
-                    and np.isfinite(val[1])
-                    and abs(val[1]) > 0
-                ):
-                    self.planet_args[key + "_bounds"] = [
-                        val[0] - val[1],
-                        val[0] + val[1],
-                    ]
-                elif inval.get("bounds") != None:
-                    self.planet_args[key + "_bounds"] = inval.get("bounds")
+                if bounds != None:
+                    self.planet_args[key + "_bounds"] = bounds
                 else:
                     self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
                 self.planet_args[key + "_user_data"] = ufloat(val[0], val[1])
@@ -217,6 +209,11 @@ class ReadFile:
 
         if not self.multivisit:
             self.apply_planet_conditions()
+
+        if self.multivisit:
+            if self.planet_args["P_ref_bounds"][0] <= 0:
+                printlog("Found P_ref lower bound <= 0. Setting to 1e-4 days")
+                self.planet_args["P_ref_bounds"][0] = 1e-4
 
     def emcee_pars(self):
 
@@ -479,10 +476,11 @@ class ReadFile:
         except AttributeError:
             self.planet_args["b"] = b
 
-        self.planet_args["aRs_bounds"] = [
-            0.1 * self.planet_args["aRs"],
-            10 * self.planet_args["aRs"],
-        ]
+        # self.planet_args["aRs_bounds"] = [
+        #     0.1 * self.planet_args["aRs"],
+        #     10 * self.planet_args["aRs"],
+        # ]
+
         self.planet_args["b_fit"] = True
         self.planet_args["b_bounds"] = [
             0.0,
@@ -552,6 +550,18 @@ class ReadFile:
             self.planet_args["D_fit"] = False
             self.planet_args["W_fit"] = False
             self.planet_args["b_fit"] = False
+
+        if self.planet_args["aRs_bounds"][0] < 1:
+            printlog("Found aRs lower bound < 1. Setting to 1")
+            self.planet_args["aRs_bounds"][0] = 1
+
+        if self.planet_args["P_bounds"][0] <= 0:
+            printlog("Found P lower bound <= 0. Setting to 1e-4 days")
+            self.planet_args["P_bounds"][0] = 1e-4
+
+        if self.planet_args["b_bounds"][0] < 0:
+            printlog("Found b lower bound < 0. Setting to 0")
+            self.planet_args["b_bounds"][0] = 0
 
     def category_args(self, par):
         if par in self.star_args.keys():

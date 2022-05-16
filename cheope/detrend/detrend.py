@@ -810,6 +810,7 @@ class MultivisitAnalysis:
                 "teff": star_args["teff"],
                 "logg": star_args["logg"],
                 "metal": star_args["feh"],
+                "match_arcsec": star_args["match_arcsec"],
             },
             verbose=True,
         )
@@ -1715,7 +1716,7 @@ class SingleBayesKeplerTess:
 
         star = pyca.CustomStarProperties(
             star_name,
-            match_arcsec=5,
+            match_arcsec=star_args["match_arcsec"],
             teff=teff,
             logg=logg,
             metal=feh,
