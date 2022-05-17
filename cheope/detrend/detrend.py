@@ -989,7 +989,7 @@ class MultivisitAnalysis:
         return M, result_lin, result_fit
 
 
-class MultivisitAnalysis_backup:
+class MultivisitAnalysis_V0:
     def __init__(self, input_file):
         self.input_file = input_file
 
