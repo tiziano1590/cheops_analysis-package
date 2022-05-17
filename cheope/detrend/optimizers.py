@@ -1955,6 +1955,7 @@ class OptimizersMultivisit:
         params["D"].value, params["W"].value, params["b"].value = D, W, b
 
         for p in ["D", "W", "b"]:
+            params[p].vary = True  # forces params to vary by default
             print(params[p])
             print(params[p].value)
             print(params[p].stderr)
