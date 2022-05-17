@@ -989,6 +989,266 @@ class MultivisitAnalysis:
         return M, result_lin, result_fit
 
 
+class MultivisitAnalysis_backup:
+    def __init__(self, input_file):
+        self.input_file = input_file
+
+    # ======================================================================
+    # ======================================================================
+    # ======================================================================
+    # ======================================================================
+    def run(self):
+
+        start_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
+        # ======================================================================
+        # CONFIGURATION
+        # ======================================================================
+
+        inpars = ReadFile(self.input_file, multivisit=True)
+
+        (visit_args, star_args, planet_args, emcee_args, read_file_status,) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.read_file_status,
+        )
+
+        def category_args(par):
+            if par in star_args.keys():
+                return star_args
+            elif par in planet_args.keys():
+                return planet_args
+            else:
+                read_file_status.append(
+                    f"ERROR: {par} is not defined in neither the star or planet arguments"
+                )
+
+        seed = visit_args["seed"]
+        np.random.seed(seed)
+
+        main_folder = os.path.abspath(visit_args["main_folder"])
+        if not os.path.isdir(main_folder):
+            os.makedirs(main_folder, exist_ok=True)
+
+        visit_name = os.path.basename(main_folder)
+        logs_folder = os.path.join(main_folder, "logs")
+        if not os.path.isdir(logs_folder):
+            os.makedirs(logs_folder, exist_ok=True)
+        log_file = os.path.join(logs_folder, "{}_{}.log".format(start_time, visit_name))
+        olog = open(log_file, "w")
+
+        printlog("", olog=olog)
+        printlog(
+            "################################################################",
+            olog=olog,
+        )
+        printlog(" ANALYSIS OF MULTIPLE VISITS OF CHEOPS OBSERVATION", olog=olog)
+        printlog(
+            "################################################################",
+            olog=olog,
+        )
+
+        printlog("\nPreparing datasets_list:", olog=olog)
+        printlog("from:", olog=olog)
+        datasets_list = []
+        for k, v in visit_args["datasets"].items():
+            printlog("{} {}".format(k, v), olog=olog)
+            datasets_list.append(os.path.abspath(v["file_name"]))
+
+        printlog("to:", olog=olog)
+        for il, dl in enumerate(datasets_list):
+            printlog("{:02d}: {:s}".format(il, dl), olog=olog)
+
+        printlog("\nLoad CustomMultiVisit", olog=olog)
+        M = pyca.CustomMultiVisit(
+            target=star_args["star_name"],
+            datasets_list=datasets_list,
+            id_kws={
+                "dace": visit_args["dace"],
+                "teff": star_args["teff"],
+                "logg": star_args["logg"],
+                "metal": star_args["feh"],
+                "match_arcsec": star_args["match_arcsec"],
+            },
+            verbose=True,
+        )
+
+        printlog("\nDefine new T_0 and P based on datasets and T_ref, P_ref", olog=olog)
+        T_ref = planet_args["T_ref"]
+        P_ref = planet_args["P_ref"]
+
+        for k, v in planet_args.items():
+            printlog("{} = {}".format(k, v), olog=olog)
+
+        # default in pycheops MultiVisit
+        # T_0   = ufloat(M.tzero(T_ref, P_ref), T_ref.s)  # Time of mid-transit closest to middle of datasets
+        # LBo: using input ephemeris
+        # T_0 = T_ref - cst.btjd
+        # LBo: pycheops-like but propagating error on linear ephemeris
+        t_mid = np.median([np.median(d.lc["time"]) for d in M.datasets])
+        epo = np.rint((t_mid + cst.btjd - T_ref.n) / P_ref.n)
+        T_0 = T_ref + epo * P_ref - cst.btjd
+        printlog(
+            "median times: {}".format([np.median(d.lc["time"]) for d in M.datasets]),
+            olog=olog,
+        )
+        printlog("t_mid = {} => epo = {}".format(t_mid, epo), olog=olog)
+        printlog("T_ref = {:.5f} ({:.5f})".format(T_ref, T_ref.n - cst.btjd), olog=olog)
+        printlog("P_ref = {:.5f}".format(P_ref), olog=olog)
+        printlog("T_0   = {:.5f}".format(T_0), olog=olog)
+        printlog("", olog=olog)
+
+        printlog("Updating common transit parameters", olog=olog)
+        gnames = pyca.global_names.copy()  # .remove('Tref')
+
+        # new_params = M.datasets[0].emcee.params_best.copy()
+        new_params = Parameters()
+        # for p in gnames:
+        for p in ["D", "W", "b", "h_1", "h_2"]:
+            par = []
+            # wei = []
+            for i, m in enumerate(M.datasets):
+                px = m.emcee.params_best[p]
+                par.append(px.value)
+                if i == 0:
+                    pxmin = px.min
+                    pxmax = px.max
+                    pxuser = px.user_data
+            par = np.array(par)
+            par_mean = np.mean(par)
+            cat = category_args(p)
+            new_params[p] = Parameter(
+                p,
+                value=par_mean,
+                vary=cat[p + "_fit"],
+                min=pxmin,
+                max=pxmax,
+                user_data=pxuser,
+            )
+            printlog(
+                "{:15s} ==> {:.6f} bounds = ( {:.6f} , {:.6f}) priors = {:.6f} vary: {}".format(
+                    p,
+                    new_params[p].value,
+                    new_params[p].min,
+                    new_params[p].max,
+                    new_params[p].user_data,
+                    new_params[p].vary,
+                ),
+                olog=olog,
+            )
+        for p in ["f_c", "f_s"]:
+            m = M.datasets[0]
+            px = m.emcee.params_best[p]
+            new_params[p] = Parameter(
+                p,
+                value=px.value,
+                vary=False,
+                min=px.min,
+                max=px.max,
+                user_data=px.user_data,
+            )
+
+        if visit_args["GP"]:
+            log_S0_v, log_S0_e = [], []
+            log_omega0_v, log_omega0_e = [], []
+            for i, m in enumerate(M.datasets):
+                printlog("dataset {}: gp status = {}".format(i + 1, m.gp), olog=olog)
+                if m.gp is not None:
+                    if m.gp is True:
+                        log_S0_v.append(m.emcee.params["log_S0"].value)
+                        log_S0_e.append(m.emcee.params["log_S0"].stderr)
+                        log_omega0_v.append(m.emcee.params["log_omega0"].value)
+                        log_omega0_e.append(m.emcee.params["log_omega0"].stderr)
+            if len(log_S0_v) > 0:
+                log_S0_mean, swei = np.average(
+                    log_S0_v, weights=1.0 / (np.array(log_S0_e) ** 2), returned=True
+                )
+                log_S0_err = 1.0 / np.sqrt(swei)
+                log_S0 = ufloat(log_S0_mean, log_S0_err)
+                log_omega0_mean, swei = np.average(
+                    log_omega0_v,
+                    weights=1.0 / (np.array(log_omega0_e) ** 2),
+                    returned=True,
+                )
+                log_omega0_err = 1.0 / np.sqrt(swei)
+                log_omega0 = ufloat(log_omega0_mean, log_omega0_err)
+
+                printlog("log_S0 = {}".format(log_S0), olog=olog)
+                printlog("log_omega0 = {}".format(log_omega0), olog=olog)
+            else:
+                printlog(
+                    "I did not find any GP hyperparameters! Set to default", olog=olog
+                )
+                log_S0 = Parameter("log_S0", value=-12, vary=True, min=-30, max=0)
+                log_omega0 = Parameter(
+                    "log_omega0", value=3, vary=True, min=-2.3, max=8
+                )
+                log_S0.vary = True
+                log_omega0.vary = True
+        else:
+            log_S0, log_omega0 = None, None
+            printlog("I did not find any GP hyperparameters! Not using GP!", olog=olog)
+
+        # create extra priors for detrending: 0 value for dfdt_XX
+        extra_priors = {}
+        printlog("checking priors for detrending", olog=olog)
+        for i, m in enumerate(M.datasets):
+            # print('dataset: {:02d}'.format(i+1))
+            for kd in pyca.detrend_default.keys():
+                if kd in m.emcee.params_best:
+                    pkd = m.emcee.params_best[kd]
+                    if kd == "dfdt":
+                        extra_priors["dfdt_{:02d}".format(i + 1)] = ufloat(0, 1e-9)
+                    else:
+                        extra_priors["{:s}_{:02d}".format(kd, i + 1)] = ufloat(
+                            pkd.value, pkd.stderr
+                        )
+        printlog("extra priors:", olog=olog)
+        for k, v in extra_priors.items():
+            printlog("{:15s} = {:.6f}".format(k, v), olog=olog)
+
+        if visit_args["optimizer"].lower() == "ultranest":
+            # START FITTING THE LINEAR EPHEMERIS
+            printlog("\nRUNNING ULTRANEST - FIT LINEAR EPHEM", olog=olog)
+            sys.stdout.flush()
+            ### *** ===== Ultranest ==================================================
+            optimizer = OptimizersMultivisit()
+            results = optimizer.ultranest(
+                inpars=inpars,
+                M=M,
+                olog=olog,
+                new_params=new_params,
+                T_0=T_0,
+                T_ref=T_ref,
+                P_ref=P_ref,
+                log_omega0=log_omega0,
+                log_S0=log_S0,
+                extra_priors=extra_priors,
+            )
+        else:
+            # START FITTING THE LINEAR EPHEMERIS
+            printlog("\nRUNNING EMCEE - FIT LINEAR EPHEM", olog=olog)
+            sys.stdout.flush()
+            ### *** ===== EMCEE ==================================================
+            optimizer = OptimizersMultivisit()
+            results = optimizer.emcee(
+                inpars=inpars,
+                M=M,
+                olog=olog,
+                new_params=new_params,
+                T_0=T_0,
+                T_ref=T_ref,
+                P_ref=P_ref,
+                log_omega0=log_omega0,
+                log_S0=log_S0,
+                extra_priors=extra_priors,
+            )
+
+        return results
+
+
 class SingleBayesKeplerTess:
     def __init__(self, input_file):
         self.input_file = input_file

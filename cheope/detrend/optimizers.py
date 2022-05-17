@@ -1923,6 +1923,174 @@ class OptimizersMultivisit:
             inpars.read_file_status,
         )
 
+        main_folder = visit_args["main_folder"]
+
+        d = M.datasets[0]
+        params = d.emcee.params_best.copy()
+
+        f_c = params["f_c"]
+        f_s = params["f_s"]
+        h_1 = params["h_1"]
+        h_2 = params["h_2"]
+        logrho = params["logrho"]
+
+        T_ref = inpars.planet_args["T_ref"] - cst.btjd
+        P_ref = inpars.planet_args["P_ref"]
+        print("P_ref   = ", P_ref)
+        print("T_ref   = ", T_ref)
+        Tjd = M.tzero(T_ref.n, P_ref.n)
+        print("M.tzero = ", Tjd)
+
+        nsets = len(M.datasets)
+        Ds, Ws, bs = np.zeros((nsets)), np.zeros((nsets)), np.zeros((nsets))
+        for i_d, d in enumerate(M.datasets):
+            Ds[i_d] = d.emcee.params_best["D"].value
+            Ws[i_d] = d.emcee.params_best["W"].value
+            bs[i_d] = d.emcee.params_best["b"].value
+        D, W, b = np.median(Ds), np.median(Ws), np.median(bs)
+        print("D = {} ==> {}".format(Ds, D))
+        print("W = {} ==> {}".format(Ws, W))
+        print("b = {} ==> {}".format(bs, b))
+        print(params["D"])
+        params["D"].value, params["W"].value, params["b"].value = D, W, b
+
+        for p in ["D", "W", "b"]:
+            print(params[p])
+            print(params[p].value)
+            print(params[p].stderr)
+            print(params[p].user_data)
+
+        res = M.fit_transit(
+            steps=inpars.emcee_args["nsteps"],
+            nwalkers=inpars.emcee_args["nwalkers"],
+            burn=inpars.emcee_args["nprerun"],
+            T_0=T_ref.n,
+            P=P_ref.n,
+            D=params["D"],
+            W=params["W"],
+            b=params["b"],
+            f_c=f_c,
+            f_s=f_s,
+            h_1=h_1,
+            h_2=h_2,
+            ttv=True,
+            ttv_prior=3600,
+            extra_priors=None,
+            log_sigma_w=None,
+            log_omega0=None,
+            log_S0=None,
+            log_Q=None,
+            unroll=inpars.visit_args["unroll"],
+            nroll=inpars.visit_args["nroll"],
+            unwrap=inpars.visit_args["unwrap"],
+            thin=1,
+            init_scale=1.0e-3,
+            progress=True,
+            backend=None,
+        )
+
+        print(M.fit_report(min_correl=0.8))
+
+        fig = M.trail_plot()
+        fig_ext = ["png", "pdf"]
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "trail_plot.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close()
+
+        fig = M.plot_fit(detrend=False)
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "plot_fit_undetrended.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close()
+
+        fig = M.plot_fit(detrend=True)
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "plot_fit_detrendedt.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close()
+
+        par_med, stats_med, par_mle, stats_mle = pyca.get_best_parameters(
+            res, M, nburn=inpars.emcee_args["nburn"], dataset_type="multivisit"
+        )
+        # updates params/parbest in result and M.result
+        res.params = par_med.copy()
+        M.__result__.params = par_med.copy()
+        res.parbest = par_mle.copy()
+        M.__result__.parbest = par_mle.copy()
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_med_fit.dat"), par_med, bjd_ref=cst.btjd
+        )
+        pyca.quick_save_params(
+            os.path.join(main_folder, "params_mle_fit.dat"), par_mle, bjd_ref=cst.btjd
+        )
+
+        fig, out_fit = pyca.custom_plot_phase(M, res, title="Fit TTV")
+        fig_ext = ["png", "pdf"]
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "lcs_phased_plot_fit.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close()
+        print("{}".format(plt_file))
+        print("{}".format(os.path.splitext(plt_file)))
+        out_file = "{}.dat".format(os.path.splitext(plt_file)[0])
+        out = np.column_stack([v for v in out_fit.values()])
+        head = "".join(["{:s} ".format(k) for k in out_fit.keys()])
+        fmt = "%23.16e " * (len(out_fit) - 1) + "%03.0f"
+        np.savetxt(out_file, out, header=head, fmt=fmt)
+
+        return res, res
+
+    def ultranest(
+        self,
+        inpars=None,
+        M=None,
+        olog=None,
+        new_params=None,
+        T_0=None,
+        T_ref=None,
+        P_ref=None,
+        log_omega0=None,
+        log_S0=None,
+        extra_priors=None,
+    ):
+        pass
+
+
+class OptimizersMultivisit_V0:
+    def __init__(self):
+        self.optimizers_list = ["emcee", "ultranest"]
+
+    def emcee(
+        self,
+        inpars=None,
+        M=None,
+        olog=None,
+        new_params=None,
+        T_0=None,
+        T_ref=None,
+        P_ref=None,
+        log_omega0=None,
+        log_S0=None,
+        extra_priors=None,
+    ):
+
+        (
+            visit_args,
+            star_args,
+            planet_args,
+            emcee_args,
+            ultranest_args,
+            read_file_status,
+        ) = (
+            inpars.visit_args,
+            inpars.star_args,
+            inpars.planet_args,
+            inpars.emcee_args,
+            inpars.ultranest_args,
+            inpars.read_file_status,
+        )
+
         aperture = visit_args["aperture"]
 
         # =====================
