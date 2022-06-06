@@ -486,7 +486,7 @@ class ReadFile:
         self.planet_args["b_fit"] = True
         self.planet_args["b_bounds"] = [
             0.0,
-            1.0,
+            1.5,
         ]
         self.planet_args["b_user_data"] = b
 
