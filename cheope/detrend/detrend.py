@@ -384,10 +384,6 @@ class SingleBayes:
 
         # LMFIT 0-------------------------------------------------------------
         printlog("\n- LMFIT - ONLY TRANSIT MODEL", olog=olog)
-        #
-        # set fixed LD parameters
-        in_par["h_1"].vary = False
-        in_par["h_2"].vary = False
 
         # Fit with lmfit
         lmfit0 = dataset.lmfit_transit(
