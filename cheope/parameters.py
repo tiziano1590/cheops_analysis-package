@@ -224,6 +224,8 @@ class ReadFile:
         self.emcee_args["nthin"] = 1
         self.emcee_args["nthreads"] = 1
         self.emcee_args["progress"] = "overwrite"
+        self.emcee_args["backend"] = None
+        self.emcee_args["backend_type"] = "overwrite"
 
         for key in self.emcee_keys:
             self.emcee_args[key] = self.yaml_input["emcee"].get(

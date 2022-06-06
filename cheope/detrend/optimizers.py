@@ -1,3 +1,4 @@
+import emcee
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
@@ -11,6 +12,8 @@ import h5py
 import shutil
 from mpi4py import MPI
 import copyreg
+
+from emcee import backends
 
 import cheope.pyconstants as cst
 import cheope.pycheops_analysis as pyca
@@ -26,7 +29,7 @@ rank = comm.Get_rank()
 
 printlog = pyca.printlog
 fig_ext = ["png", "pdf"]
-
+gnames = pyca.global_names.copy()  # .remove('Tref')
 
 class Optimizers:
     """
@@ -1961,6 +1964,26 @@ class OptimizersMultivisit:
             print(params[p].stderr)
             print(params[p].user_data)
 
+        # backend hdf5
+        if emcee_args["backend"]:
+            backend_file = os.path.join(
+                    main_folder,
+                    "mcmc.h5"
+                )
+            if emcee_args["backend_type"] == "overwrite":
+                if os.path.exists(backend_file):
+                    os.remove(backend_file)
+            
+            backend_hdf = backends.HDFBackend(
+                backend_file,
+                read_only=False,
+                compression="gzip"
+            )
+            
+                
+        else:
+            backend_hdf = None
+
         res = M.fit_transit(
             steps=inpars.emcee_args["nsteps"],
             nwalkers=inpars.emcee_args["nwalkers"],
@@ -1987,7 +2010,7 @@ class OptimizersMultivisit:
             thin=1,
             init_scale=1.0e-3,
             progress=True,
-            backend=None,
+            backend=backend_hdf,
         )
 
         print(M.fit_report(min_correl=0.8))
@@ -2039,6 +2062,43 @@ class OptimizersMultivisit:
         head = "".join(["{:s} ".format(k) for k in out_fit.keys()])
         fmt = "%23.16e " * (len(out_fit) - 1) + "%03.0f"
         np.savetxt(out_file, out, header=head, fmt=fmt)
+
+        printlog("Trace plot", olog=olog)
+        fig = M.trail_plot(plotkeys="all", plot_kws={"alpha": 0.1})
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "trace_plot_all_fit.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close(fig)
+
+        printlog("Corner plot of ", olog=olog)
+        pk = []
+        for n in res.params:
+            if res.params[n].vary:
+                if "ttv" in n or n in gnames:
+                    pk.append(n)
+        printlog(" ".join(pk), olog=olog)
+        fig = M.corner_plot(plotkeys=pk)
+        for ext in fig_ext:
+            plt_file = os.path.join(main_folder, "corner_plot_all_fit.{}".format(ext))
+            fig.savefig(plt_file, bbox_inches="tight")
+        plt.close(fig)
+
+        printlog("MASSRADIUS MULTIVISIT", olog=olog)
+        try:
+            _, fig = M.massradius(
+                m_star=star_args["Mstar"],
+                r_star=star_args["Rstar"],
+                K=planet_args["Kms"],
+                jovian=True,
+                verbose=True,
+            )
+            for ext in fig_ext:
+                plt_file = os.path.join(main_folder, "massradius_fit.{}".format(ext))
+                fig.savefig(plt_file, bbox_inches="tight")
+            plt.close(fig)
+        except:
+            printlog("massradius error: to be investigated", olog=olog)
+        sys.stdout.flush()
 
         return res, res
 

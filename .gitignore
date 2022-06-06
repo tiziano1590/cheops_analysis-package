@@ -3,3 +3,4 @@
 cheope.egg-info/*
 docs/_build/*
 dist/*
+*.ipynb_checkpoints/
