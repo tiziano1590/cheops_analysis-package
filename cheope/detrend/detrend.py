@@ -2666,24 +2666,6 @@ class SingleBayesASCII:
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
 
-        printlog("\n-Plot trace of the chains", olog=olog)
-        fig = dataset.trail_plot("all")  # add 'all' for all traces!
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "02_trace_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
         )
@@ -2775,6 +2757,25 @@ class SingleBayesASCII:
             dataset, epoch_folder, star.identifier, epoch_name, gp=False
         )
         printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+        
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -2798,15 +2799,6 @@ class SingleBayesASCII:
         )
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
-
-        printlog("\n-Plot trace of the chains of GP training", olog=olog)
-        fig = dataset.trail_plot("all")  # add 'all' for all traces!
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "03_trace_emcee_gp_train.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
@@ -2858,6 +2850,16 @@ class SingleBayesASCII:
             )
         plt.close(fig)
 
+        printlog("\n-Plot trace of the chains of GP training", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "03_trace_emcee_gp_train.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+
         ### *** =======================================++=====================
         ### *** ===== FIT TRANSIT + DETRENDING + GP =++=======================
         printlog("\nRUN FULL FIT TRANSIT+DETRENDING+GP W/ EMCEE", olog=olog)
@@ -2889,24 +2891,6 @@ class SingleBayesASCII:
         )
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
-
-        printlog("\n-Plot trace of the chains", olog=olog)
-        fig = dataset.trail_plot("all")  # add 'all' for all traces!
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "04_trace_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
@@ -3008,6 +2992,24 @@ class SingleBayesASCII:
             dataset, epoch_folder, star.identifier, epoch_name, gp=True
         )
         printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_trace_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
 
         return (
             stats_lm,
@@ -3914,28 +3916,6 @@ class SingleBayesPIPE:
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
 
-        printlog("\n-Plot trace of the chains", olog=olog)
-        fig = dataset.trail_plot("all")  # add 'all' for all traces!
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "02_trace_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
         )
@@ -4031,6 +4011,29 @@ class SingleBayesPIPE:
             dataset, visit_folder.resolve(), star_name, file_key, gp=False
         )
         printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
+
+        printlog("\n-Plot trace of the chains", olog=olog)
+        fig = dataset.trail_plot("all")  # add 'all' for all traces!
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_trace_emcee_all.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        fig = dataset.corner_plot(plotkeys="all")
+        for ext in fig_ext:
+            fig.savefig(
+                os.path.join(
+                    visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
+                ),
+                bbox_inches="tight",
+            )
+        plt.close(fig)
+
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -4156,29 +4159,6 @@ class SingleBayesPIPE:
         )
 
         printlog(dataset.emcee_report(min_correl=0.5), olog=olog)
-
-        # IT GIVES KILLED OUTPUT AFTER CORNER PLOT, SO I DECIDED TO MOVE AT THE END
-        # printlog("\n-Plot trace of the chains", olog=olog)
-        # fig = dataset.trail_plot("all")  # add 'all' for all traces!
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(), "04_trace_emcee_all.{}".format(ext)
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
-
-        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        # fig = dataset.corner_plot(plotkeys="all")
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
