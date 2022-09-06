@@ -2757,7 +2757,7 @@ class SingleBayesASCII:
             dataset, epoch_folder, star.identifier, epoch_name, gp=False
         )
         printlog("-Dumped dataset into file {}".format(file_emcee), olog=olog)
-        
+
         printlog("\n-Plot trace of the chains", olog=olog)
         fig = dataset.trail_plot("all")  # add 'all' for all traces!
         for ext in fig_ext:
@@ -2767,15 +2767,14 @@ class SingleBayesASCII:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -2858,7 +2857,6 @@ class SingleBayesASCII:
                 bbox_inches="tight",
             )
         plt.close(fig)
-
 
         ### *** =======================================++=====================
         ### *** ===== FIT TRANSIT + DETRENDING + GP =++=======================
@@ -3002,14 +3000,14 @@ class SingleBayesASCII:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         return (
             stats_lm,
@@ -4023,17 +4021,16 @@ class SingleBayesPIPE:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -4277,16 +4274,16 @@ class SingleBayesPIPE:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         printlog("", olog=olog)
         printlog("", olog=olog)

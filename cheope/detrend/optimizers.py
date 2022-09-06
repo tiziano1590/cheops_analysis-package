@@ -31,6 +31,7 @@ printlog = pyca.printlog
 fig_ext = ["png", "pdf"]
 gnames = pyca.global_names.copy()  # .remove('Tref')
 
+
 class Optimizers:
     """
     Optimizers class:
@@ -245,17 +246,16 @@ class Optimizers:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
-
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -510,16 +510,16 @@ class Optimizers:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(
-                    visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
-                ),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(
+        #             visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
+        #         ),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
     def ultranest(
         self,
@@ -1066,14 +1066,14 @@ class OptimizersKeplerTESS:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
@@ -1300,14 +1300,14 @@ class OptimizersKeplerTESS:
             )
         plt.close(fig)
 
-        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        fig = dataset.corner_plot(plotkeys="all")
-        for ext in fig_ext:
-            fig.savefig(
-                os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
-                bbox_inches="tight",
-            )
-        plt.close(fig)
+        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        # fig = dataset.corner_plot(plotkeys="all")
+        # for ext in fig_ext:
+        #     fig.savefig(
+        #         os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+        #         bbox_inches="tight",
+        #     )
+        # plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
@@ -1967,21 +1967,15 @@ class OptimizersMultivisit:
 
         # backend hdf5
         if emcee_args["backend"]:
-            backend_file = os.path.join(
-                    main_folder,
-                    "mcmc.h5"
-                )
+            backend_file = os.path.join(main_folder, "mcmc.h5")
             if emcee_args["backend_type"] == "overwrite":
                 if os.path.exists(backend_file):
                     os.remove(backend_file)
-            
+
             backend_hdf = backends.HDFBackend(
-                backend_file,
-                read_only=False,
-                compression="gzip"
+                backend_file, read_only=False, compression="gzip"
             )
-            
-                
+
         else:
             backend_hdf = None
 
