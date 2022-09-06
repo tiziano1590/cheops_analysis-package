@@ -12,7 +12,7 @@ import h5py
 import shutil
 from mpi4py import MPI
 import copyreg
-import pyGTC
+import pygtc
 
 from emcee import backends
 
