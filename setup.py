@@ -32,6 +32,7 @@ install_requires = [
     "sphinx>=4.3.2",
     "sphinx-autoapi>=1.8.4",
     "renku-sphinx-theme",
+    "pyGTC",
 ]
 
 console_scripts = ["cheope=cheope.cheope:main"]

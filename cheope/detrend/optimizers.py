@@ -12,6 +12,7 @@ import h5py
 import shutil
 from mpi4py import MPI
 import copyreg
+import pyGTC
 
 from emcee import backends
 
@@ -246,16 +247,25 @@ class Optimizers:
             )
         plt.close(fig)
 
-        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        # fig = dataset.corner_plot(plotkeys="all")
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        try:
+            fig = dataset.corner_plot(
+                plotkeys="all",
+                save_name=os.path.join(
+                    visit_folder.resolve(), "02_corner_emcee_all.pdf"
+                ),
+            )
+            plt.close(fig)
+        except ImportError:
+            fig = dataset.corner_plot(plotkeys="all")
+            for ext in fig_ext:
+                fig.savefig(
+                    os.path.join(
+                        visit_folder.resolve(), "02_corner_emcee_all.{}".format(ext)
+                    ),
+                    bbox_inches="tight",
+                )
+            plt.close(fig)
 
         ### *** ==============================================================
         ### *** ===== TRAIN GP ===============================================
@@ -510,16 +520,25 @@ class Optimizers:
             )
         plt.close(fig)
 
-        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        # fig = dataset.corner_plot(plotkeys="all")
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(
-        #             visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
-        #         ),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        try:
+            fig = dataset.corner_plot(
+                plotkeys="all",
+                save_name=os.path.join(
+                    visit_folder.resolve(), "04_corner_emcee_all.pdf"
+                ),
+            )
+            plt.close(fig)
+        except ImportError:
+            fig = dataset.corner_plot(plotkeys="all")
+            for ext in fig_ext:
+                fig.savefig(
+                    os.path.join(
+                        visit_folder.resolve(), "04_corner_emcee_all.{}".format(ext)
+                    ),
+                    bbox_inches="tight",
+                )
+            plt.close(fig)
 
     def ultranest(
         self,
@@ -1066,14 +1085,21 @@ class OptimizersKeplerTESS:
             )
         plt.close(fig)
 
-        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        # fig = dataset.corner_plot(plotkeys="all")
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        try:
+            fig = dataset.corner_plot(
+                plotkeys="all",
+                save_name=os.path.join(epoch_folder, "02_corner_emcee_all.pdf"),
+            )
+            plt.close(fig)
+        except ImportError:
+            fig = dataset.corner_plot(plotkeys="all")
+            for ext in fig_ext:
+                fig.savefig(
+                    os.path.join(epoch_folder, "02_corner_emcee_all.{}".format(ext)),
+                    bbox_inches="tight",
+                )
+            plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
@@ -1300,14 +1326,21 @@ class OptimizersKeplerTESS:
             )
         plt.close(fig)
 
-        # printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
-        # fig = dataset.corner_plot(plotkeys="all")
-        # for ext in fig_ext:
-        #     fig.savefig(
-        #         os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
-        #         bbox_inches="tight",
-        #     )
-        # plt.close(fig)
+        printlog("\n-Plot corner full from pycheops (not removed nburn)", olog=olog)
+        try:
+            fig = dataset.corner_plot(
+                plotkeys="all",
+                save_name=os.path.join(epoch_folder, "04_corner_emcee_all.pdf"),
+            )
+            plt.close(fig)
+        except ImportError:
+            fig = dataset.corner_plot(plotkeys="all")
+            for ext in fig_ext:
+                fig.savefig(
+                    os.path.join(epoch_folder, "04_corner_emcee_all.{}".format(ext)),
+                    bbox_inches="tight",
+                )
+            plt.close(fig)
 
         printlog(
             "\n-Computing my parameters and plot models with random samples", olog=olog
