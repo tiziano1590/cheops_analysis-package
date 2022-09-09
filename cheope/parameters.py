@@ -472,7 +472,7 @@ class ReadFile:
         except AttributeError:
             self.planet_args["aRs"] = aRs
             self.planet_args["aRs_user_data"] = ufloat(aRs, 0.1 * aRs)
-        # self.planet_args["aRs_bounds"] = [1.0, 1e6]
+        self.planet_args["aRs_bounds"] = [1.0, 1e6]
         try:
             self.planet_args["b"] = b.n
         except AttributeError:
