@@ -2052,7 +2052,7 @@ def model_plot_fit(
     lw_a = 1.0  # all
     # lw_t = 0.9 # trend
     # marker size
-    ms_d = 3  # data
+    ms_d = 2  # data
 
     nrows = 5
     ncols = 1
