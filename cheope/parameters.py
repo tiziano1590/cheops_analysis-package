@@ -412,11 +412,11 @@ class ReadFile:
         # self.planet_args["D"] = D.n
         # if self.planet_args["D_bounds"][0] < 0:
         #     self.planet_args["D_bounds"][0] = 0
-
-        self.planet_args["D_bounds"] = [
-            0.1 * D.n,
-            10.0 * D.n,
-        ]
+        if self.planet_args["D_bounds"] == [-np.inf, np.inf]:
+            self.planet_args["D_bounds"] = [
+                0.1 * D.n,
+                10.0 * D.n,
+            ]
         self.planet_args["D_fit"] = True
         self.planet_args["D_user_data"] = D
 
@@ -472,7 +472,8 @@ class ReadFile:
         except AttributeError:
             self.planet_args["aRs"] = aRs
             self.planet_args["aRs_user_data"] = ufloat(aRs, 0.1 * aRs)
-        self.planet_args["aRs_bounds"] = [1.0, 1e6]
+        if self.planet_args["aRs_bounds"] == [-np.inf, np.inf]:
+            self.planet_args["aRs_bounds"] = [1.0, 1e6]
         try:
             self.planet_args["b"] = b.n
         except AttributeError:
