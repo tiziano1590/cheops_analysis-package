@@ -331,15 +331,17 @@ class SingleBayes:
 
         for key in self.input_pars:
             cat = category_args(key)
+            val = cat[key]
             if key in ["D", "W", "b"]:
                 # Randomize here
-                val = np.abs(
-                    np.random.normal(
-                        loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                if isinstance(cat[key + "_user_data"], UFloat):
+                    val = np.abs(
+                        np.random.normal(
+                            loc=cat[key + "_user_data"].n, scale=cat[key + "_user_data"].s
+                        )
                     )
-                )
-            else:
-                val = cat[key]
+            # else:
+            #     val = cat[key]
             in_par[key] = Parameter(
                 key,
                 value=val,

@@ -2,7 +2,7 @@ import os
 import yaml
 import numpy as np
 
-from uncertainties import ufloat
+from uncertainties import ufloat, UFloat
 from uncertainties import umath as um
 
 from pycheops import StarProperties
@@ -190,15 +190,21 @@ class ReadFile:
                 self.planet_args[key + "_user_data"] = ufloat(inval[0], inval[1])
             elif isinstance(inval, dict):
                 val = inval.get("value")
+                if isinstance(val, list):
+                    val = val[0]
                 fit = inval.get("fit")
+                priors = inval.get("priors")
                 bounds = inval.get("bounds")
-                self.planet_args[key] = val[0]
+                self.planet_args[key] = val
                 self.planet_args[key + "_fit"] = fit
                 if bounds != None:
                     self.planet_args[key + "_bounds"] = bounds
                 else:
                     self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
-                self.planet_args[key + "_user_data"] = ufloat(val[0], val[1])
+                if priors != None:
+                    self.planet_args[key + "_user_data"] = ufloat(priors[0], priors[1])
+                else:
+                    self.planet_args[key + "_user_data"] = None
 
             else:
                 self.read_file_status.append(
@@ -379,31 +385,60 @@ class ReadFile:
             self.star_args["logrho_bounds"] = [-9, 6]
             self.star_args["logrho_user_data"] = star.logrho
 
+    def get_planet_value_or_user_data(self, key):
+
+        if (self.planet_args["{}_user_data".format(key)] != None) and (isinstance(self.planet_args["{}_user_data".format(key)], UFloat)):
+            par = self.planet_args["{}_user_data".format(key)]
+        else:
+            par = self.planet_args["{}".format(key)]
+
+        return par
+
     def apply_planet_conditions(self):
 
         planet_yaml = self.yaml_input["planet"]
         if "D" in planet_yaml:
-            D = ufloat(
-                self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
-            )
-            self.planet_args["D"] = D.n
-            k = um.sqrt(D)
+            if self.planet_args["D_user_data"] != None:
+                # D = ufloat(
+                #     self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
+                # )
+                D = self.planet_args["D_user_data"] # already in ufloat type!
+                self.planet_args["D"] = D.n
+                k = um.sqrt(D)
+            else:
+                D = self.planet_args["D"]
+                self.planet_args["D"] = D
+                k = np.sqrt(D)
         elif "k" in planet_yaml:
-            k = ufloat(
-                self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
-            )
-            D = k ** 2
-            self.planet_args["D"] = D.n
+            if self.planet_args["k_user_data"] != None:
+                # k = ufloat(
+                #     self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
+                # )
+                k = self.planet_args["k_user_data"]
+                D = k ** 2
+                self.planet_args["D"] = D.n
+            else:
+                k = self.planet_args["k"]
+                D = k ** 2
+                self.planet_args["D"] = D
         elif "Rp" in planet_yaml:
-            Rp = (
-                ufloat(
-                    self.planet_args["Rp_user_data"].n,
-                    self.planet_args["Rp_user_data"].s,
-                )
-                * cst.Rears
-            )
-            k = Rp / self.star_args["Rstar"]
-            D = k ** 2
+            if self.planet_args["Rp_user_data"] != None:
+                # Rp = (
+                #     ufloat(
+                #         self.planet_args["Rp_user_data"].n,
+                #         self.planet_args["Rp_user_data"].s,
+                #     )
+                #     * cst.Rears
+                # )
+                Rp = self.planet_args["Rp_user_data"] * cst.Rears
+                k = Rp / self.star_args["Rstar"]
+                D = k ** 2
+                self.planet_args["D"] = D.n
+            else:
+                Rp = self.planet_args["Rp"] * cst.Rears
+                k = Rp / self.star_args["Rstar"]
+                D = k ** 2
+                self.planet_args["D"] = D
         else:
             self.read_file_status.append(
                 "ERROR: missing needed planet keyword: D or k or Rp (Rearth)"
@@ -417,44 +452,53 @@ class ReadFile:
                 0.1 * D.n,
                 10.0 * D.n,
             ]
-        self.planet_args["D_fit"] = True
-        self.planet_args["D_user_data"] = D
+        # self.planet_args["D_fit"] = True
+        # self.planet_args["D_user_data"] = D
 
         self.planet_args["k"] = k
 
         if "inc" in planet_yaml and "aRs" in planet_yaml and "b" in planet_yaml:
-            inc = ufloat(
-                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
-            )
-            aRs = ufloat(
-                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
-            )
-            b = ufloat(
-                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
-            )
+            # inc = ufloat(
+            #     self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            # )
+            # aRs = ufloat(
+            #     self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            # )
+            # b = ufloat(
+            #     self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            # )
+            inc = self.get_planet_value_or_user_data("inc")
+            aRs = self.get_planet_value_or_user_data("aRs")
+            b = self.get_planet_value_or_user_data("b")
         elif "inc" in planet_yaml and "aRs" in planet_yaml:
-            inc = ufloat(
-                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
-            )
-            aRs = ufloat(
-                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
-            )
+            # inc = ufloat(
+            #     self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            # )
+            # aRs = ufloat(
+            #     self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            # )
+            inc = self.get_planet_value_or_user_data("inc")
+            aRs = self.get_planet_value_or_user_data("aRs")
             b = aRs * um.cos(inc * cst.deg2rad)
         elif "b" in planet_yaml and "aRs" in planet_yaml:
-            aRs = ufloat(
-                self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
-            )
-            b = ufloat(
-                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
-            )
+            # aRs = ufloat(
+            #     self.planet_args["aRs_user_data"].n, self.planet_args["aRs_user_data"].s
+            # )
+            # b = ufloat(
+            #     self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            # )
+            aRs = self.get_planet_value_or_user_data("aRs")
+            b = self.get_planet_value_or_user_data("b")
             inc = um.acos(b / aRs) * cst.rad2deg
         elif "b" in planet_yaml and "inc" in planet_yaml:
-            b = ufloat(
-                self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
-            )
-            inc = ufloat(
-                self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
-            )
+            # b = ufloat(
+            #     self.planet_args["b_user_data"].n, self.planet_args["b_user_data"].s
+            # )
+            # inc = ufloat(
+            #     self.planet_args["inc_user_data"].n, self.planet_args["inc_user_data"].s
+            # )
+            inc = self.get_planet_value_or_user_data("inc")
+            b = self.get_planet_value_or_user_data("b")
             aRs = b / um.cos(inc * cst.deg2rad)
         else:
             self.read_file_status.append(
@@ -484,12 +528,13 @@ class ReadFile:
         #     10 * self.planet_args["aRs"],
         # ]
 
-        self.planet_args["b_fit"] = True
-        self.planet_args["b_bounds"] = [
-            0.0,
-            1.5,
-        ]
-        self.planet_args["b_user_data"] = b
+        # self.planet_args["b_fit"] = True
+        if self.planet_args["b_bounds"] == [-np.inf, np.inf]:
+            self.planet_args["b_bounds"] = [
+                0.0,
+                1.5,
+            ]
+        # self.planet_args["b_user_data"] = b
 
         if "T14" in planet_yaml:
             W = (
@@ -498,13 +543,22 @@ class ReadFile:
             )
         else:
             W = um.sqrt((1 + k) ** 2 - b ** 2) / np.pi / aRs
-        self.planet_args["W"] = W.n
-        self.planet_args["W_fit"] = True
-        self.planet_args["W_bounds"] = [
-            0.1 * W.n,
-            10.0 * W.n,
-        ]
-        self.planet_args["W_user_data"] = W
+        if isinstance(W, UFloat):
+            self.planet_args["W"] = W.n
+            self.planet_args["W_fit"] = True
+            self.planet_args["W_bounds"] = [
+                0.1 * W.n,
+                10.0 * W.n,
+            ]
+            self.planet_args["W_user_data"] = W
+        else:
+            self.planet_args["W"] = W
+            self.planet_args["W_fit"] = True
+            self.planet_args["W_bounds"] = [
+                0.1 * W,
+                10.0 * W,
+            ]
+            self.planet_args["W_user_data"] = None
 
         ecc = ufloat(0.0, 0.0)
         if "ecc" in planet_yaml:
@@ -546,8 +600,8 @@ class ReadFile:
 
         # self.planet_args["P_bounds"] = [0, 500]
 
-        if type(self.planet_args["P"]) is not float:
-            self.planet_args["P"] = self.planet_args["P"].n
+        # if type(self.planet_args["P"]) is not float:
+        #     self.planet_args["P"] = self.planet_args["P"].n
 
         if self.visit_args["shape"] == "fix":
             self.planet_args["D_fit"] = False
