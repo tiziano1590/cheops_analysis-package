@@ -425,47 +425,76 @@ class ReadFile:
 
         planet_yaml = self.yaml_input["planet"]
         if "D" in planet_yaml:
-            if self.planet_args["D_user_data"] != None:
-                # D = ufloat(
-                #     self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
-                # )
-                D = self.planet_args["D_user_data"]  # already in ufloat type!
-                self.planet_args["D"] = D.n
-                k = um.sqrt(D)
-            else:
-                D = self.planet_args["D"]
-                self.planet_args["D"] = D
-                k = np.sqrt(D)
+            # if self.planet_args["D_user_data"] != None:
+            #     # D = ufloat(
+            #     #     self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
+            #     # )
+            #     D = self.planet_args["D_user_data"]  # already in ufloat type!
+            #     self.planet_args["D"] = D.n
+            #     k = um.sqrt(D)
+            # else:
+            #     D = self.planet_args["D"]
+            #     self.planet_args["D"] = D
+            #     k = np.sqrt(D)
+            D = self.planet_args["D"]
+            k = np.sqrt(D)
+            
         elif "k" in planet_yaml:
+            
+            # if self.planet_args["k_user_data"] != None:
+            #     # k = ufloat(
+            #     #     self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
+            #     # )
+            #     k = self.planet_args["k_user_data"]
+            #     D = k ** 2
+            #     self.planet_args["D"] = D.n
+            # else:
+            #     k = self.planet_args["k"]
+            #     D = k ** 2
+            #     self.planet_args["D"] = D
+
+            k = self.planet_args["k"]
+            D = k ** 2
+            self.planet_args["D"] = D
+            self.planet_args["D_fit"] = self.planet_args["k_fit"]
             if self.planet_args["k_user_data"] != None:
-                # k = ufloat(
-                #     self.planet_args["k_user_data"].n, self.planet_args["k_user_data"].s
-                # )
-                k = self.planet_args["k_user_data"]
-                D = k ** 2
-                self.planet_args["D"] = D.n
-            else:
-                k = self.planet_args["k"]
-                D = k ** 2
-                self.planet_args["D"] = D
+                kpriors = self.planet_args["k_user_data"]
+                Dpriors = kpriors ** 2
+            if self.planet_args["k_bounds"] != None:
+                self.planet_args["D_bounds"] = [kb**2 for kb in self.planet_args["k_bounds"]]
+
         elif "Rp" in planet_yaml:
-            if self.planet_args["Rp_user_data"] != None:
-                # Rp = (
-                #     ufloat(
-                #         self.planet_args["Rp_user_data"].n,
-                #         self.planet_args["Rp_user_data"].s,
-                #     )
-                #     * cst.Rears
-                # )
-                Rp = self.planet_args["Rp_user_data"] * cst.Rears
-                k = Rp / self.star_args["Rstar"]
-                D = k ** 2
-                self.planet_args["D"] = D.n
-            else:
-                Rp = self.planet_args["Rp"] * cst.Rears
-                k = Rp / self.star_args["Rstar"]
-                D = k ** 2
-                self.planet_args["D"] = D
+
+            # if self.planet_args["Rp_user_data"] != None:
+            #     # Rp = (
+            #     #     ufloat(
+            #     #         self.planet_args["Rp_user_data"].n,
+            #     #         self.planet_args["Rp_user_data"].s,
+            #     #     )
+            #     #     * cst.Rears
+            #     # )
+            #     Rp = self.planet_args["Rp_user_data"] * cst.Rears
+            #     k = Rp / self.star_args["Rstar"]
+            #     D = k ** 2
+            #     self.planet_args["D"] = D.n
+            # else:
+            #     Rp = self.planet_args["Rp"] * cst.Rears
+            #     k = Rp / self.star_args["Rstar"]
+            #     D = k ** 2
+            #     self.planet_args["D"] = D
+
+            Rp = self.planet_args["Rp"]
+            k = Rp / self.star_args["Rstar"]
+            D = k ** 2
+            self.planet_args["D"] = D
+            self.planet_args["D_fit"] = self.planet_args["Rp_fit"]
+            if self.planet_args["R_user_data"] != None:
+                Rppriors = self.planet_args["R_user_data"]
+                kpriors = Rppriors/self.star_args["Rstar"]
+                Dpriors = kpriors ** 2
+            if self.planet_args["Rp_bounds"] != None:
+                self.planet_args["D_bounds"] = [(rr/self.star_args["Rstar"])**2 for rr in self.planet_args["Rp_bounds"]]
+
         else:
             self.read_file_status.append(
                 "ERROR: missing needed planet keyword: D or k or Rp (Rearth)"
