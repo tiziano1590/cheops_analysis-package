@@ -66,6 +66,7 @@ class ReadFile:
             "W",
             "b",
             "k",
+            "Rp"
         ]
 
         self.emcee_keys = [
@@ -354,6 +355,7 @@ class ReadFile:
                 self.star_args["h_2_fit"] = False
                 self.star_args["h_1_bounds"] = [0, 1]
                 self.star_args["h_2_bounds"] = [0, 1]
+                # priors_h1 = self.yaml_input["star"]["h_1"].get("priors")
                 self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
                 self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
         else:
@@ -366,24 +368,44 @@ class ReadFile:
                 self.star_args["h_1_fit"] = True
                 self.star_args["h_2_fit"] = True
                 self.star_args["h_1_bounds"] = [
-                    star.h_1.n - star.h_1.s,
-                    star.h_1.n + star.h_1.s,
+                    # star.h_1.n - star.h_1.s,
+                    # star.h_1.n + star.h_1.s,
+                    0, 1
                 ]
                 self.star_args["h_2_bounds"] = [
-                    star.h_2.n - star.h_2.s,
-                    star.h_2.n + star.h_2.s,
+                    # star.h_2.n - star.h_2.s,
+                    # star.h_2.n + star.h_2.s,
+                    0, 1
                 ]
                 self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
                 self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
 
-        if self.yaml_input["star"].get("logrho") is None:
+        # if self.yaml_input["star"].get("logrho") is None:
+        #     try:
+        #         self.star_args["logrho"] = star.logrho.n
+        #     except AttributeError:
+        #         self.star_args["logrho"] = star.logrho
+        #     self.star_args["logrho_fit"] = True
+        #     self.star_args["logrho_bounds"] = [-9, 6]
+        #     self.star_args["logrho_user_data"] = star.logrho
+        Mstar_input = self.yaml_input["star"].get("Mstar")
+        Rstar_input = self.yaml_input["star"].get("Rstar")
+        if (Mstar_input is not None) and (Rstar_input is not None):
+            Ms = ufloat(Mstar_input[0], Mstar_input[1])
+            Rs = ufloat(Rstar_input[0], Rstar_input[1])
+            rho = Ms/(Rs**3)
+            logrho = um.log10(rho)
+            self.star_args["logrho"] = logrho.n
+            self.star_args["logrho_user_data"] = logrho
+        else:
             try:
                 self.star_args["logrho"] = star.logrho.n
             except AttributeError:
                 self.star_args["logrho"] = star.logrho
-            self.star_args["logrho_fit"] = True
-            self.star_args["logrho_bounds"] = [-9, 6]
             self.star_args["logrho_user_data"] = star.logrho
+        self.star_args["logrho_fit"] = True
+        self.star_args["logrho_bounds"] = [-9, 6]
+
 
     def get_planet_value_or_user_data(self, key):
 
