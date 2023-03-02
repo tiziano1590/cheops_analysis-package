@@ -476,8 +476,8 @@ class ReadFile:
         #     self.planet_args["D_bounds"][0] = 0
         if self.planet_args["D_bounds"] == [-np.inf, np.inf]:
             self.planet_args["D_bounds"] = [
-                0.1 * D.n,
-                10.0 * D.n,
+                0.01 * self.planet_args["D"],
+                10.0 * self.planet_args["D"]
             ]
         # self.planet_args["D_fit"] = True
         # self.planet_args["D_user_data"] = D
