@@ -66,7 +66,7 @@ class ReadFile:
             "W",
             "b",
             "k",
-            "Rp"
+            "Rp",
         ]
 
         self.emcee_keys = [
@@ -180,7 +180,9 @@ class ReadFile:
             inval = self.yaml_input["planet"].get(key)  # get the input value
             if (inval is None) or isinstance(inval, str):
                 self.planet_args[key] = inval
+                self.planet_args[key + "_bounds"] = [-np.inf, np.inf]
                 self.planet_args[key + "_fit"] = True
+                self.planet_args[key + "_user_data"] = None
             elif isinstance(inval, list):
                 self.planet_args[key] = ufloat(inval[0], inval[1])
                 self.planet_args[key + "_fit"] = True
@@ -370,12 +372,14 @@ class ReadFile:
                 self.star_args["h_1_bounds"] = [
                     # star.h_1.n - star.h_1.s,
                     # star.h_1.n + star.h_1.s,
-                    0, 1
+                    0,
+                    1,
                 ]
                 self.star_args["h_2_bounds"] = [
                     # star.h_2.n - star.h_2.s,
                     # star.h_2.n + star.h_2.s,
-                    0, 1
+                    0,
+                    1,
                 ]
                 self.star_args["h_1_user_data"] = ufloat(star.h_1.n, star.h_1.s)
                 self.star_args["h_2_user_data"] = ufloat(star.h_2.n, star.h_2.s)
@@ -393,7 +397,7 @@ class ReadFile:
         if (Mstar_input is not None) and (Rstar_input is not None):
             Ms = ufloat(Mstar_input[0], Mstar_input[1])
             Rs = ufloat(Rstar_input[0], Rstar_input[1])
-            rho = Ms/(Rs**3)
+            rho = Ms / (Rs ** 3)
             logrho = um.log10(rho)
             self.star_args["logrho"] = logrho.n
             self.star_args["logrho_user_data"] = logrho
@@ -406,10 +410,11 @@ class ReadFile:
         self.star_args["logrho_fit"] = True
         self.star_args["logrho_bounds"] = [-9, 6]
 
-
     def get_planet_value_or_user_data(self, key):
 
-        if (self.planet_args["{}_user_data".format(key)] != None) and (isinstance(self.planet_args["{}_user_data".format(key)], UFloat)):
+        if (self.planet_args["{}_user_data".format(key)] != None) and (
+            isinstance(self.planet_args["{}_user_data".format(key)], UFloat)
+        ):
             par = self.planet_args["{}_user_data".format(key)]
         else:
             par = self.planet_args["{}".format(key)]
@@ -424,7 +429,7 @@ class ReadFile:
                 # D = ufloat(
                 #     self.planet_args["D_user_data"].n, self.planet_args["D_user_data"].s
                 # )
-                D = self.planet_args["D_user_data"] # already in ufloat type!
+                D = self.planet_args["D_user_data"]  # already in ufloat type!
                 self.planet_args["D"] = D.n
                 k = um.sqrt(D)
             else:
