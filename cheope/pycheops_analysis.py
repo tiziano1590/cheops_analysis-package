@@ -219,6 +219,7 @@ params_units["W"] = "day/P"
 params_units["b"] = "-"
 params_units["f_c"] = "-"
 params_units["f_s"] = "-"
+params_units["l_3"] = "-"
 params_units["h_1"] = "-"
 params_units["h_2"] = "-"
 params_units["c"] = "flux"
@@ -297,7 +298,7 @@ def plot_all_apertures(dataset, out_folder):
     axrs_c = plt.subplot2grid((2, 2), (1, 1), fig=figcli)
     ax_c = [axde_c, axop_c, axri_c, axrs_c]
 
-    all_ap = ["DEFAULT", "OPTIMAL", "RINF", "RSUP"]
+    all_ap = ["DEFAULT", "RINF", "R27", "RSUP"]
     ix = [2, 3]
 
     for i, ap in enumerate(all_ap):

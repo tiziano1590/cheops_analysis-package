@@ -67,6 +67,7 @@ class ReadFile:
             "b",
             "k",
             "Rp",
+            "l_3"
         ]
 
         self.emcee_keys = [
@@ -437,7 +438,8 @@ class ReadFile:
             #     self.planet_args["D"] = D
             #     k = np.sqrt(D)
             D = self.planet_args["D"]
-            k = np.sqrt(D)
+            # print(D)
+            k = D**(1/2)
             
         elif "k" in planet_yaml:
             
@@ -591,6 +593,8 @@ class ReadFile:
                 1.5,
             ]
         # self.planet_args["b_user_data"] = b
+
+        self.planet_args["l_3"] = 0
 
         if "T14" in planet_yaml:
             W = (

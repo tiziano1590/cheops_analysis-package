@@ -191,6 +191,7 @@ class SingleCheck:
         dataset = Dataset(
             file_key=file_key,
             target=star_name,
+            force_download=visit_args["force_download"],
             download_all=True,
             view_report_on_download=False,
         )

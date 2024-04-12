@@ -82,8 +82,10 @@ class SingleBayes:
             "h_2",
             "f_s",
             "f_c",
+            "l_3",
             "logrho",
         ]
+        self.read_file_status = []
 
     def run(self):
 
@@ -238,7 +240,7 @@ class SingleBayes:
             target=star_name,
             download_all=True,
             view_report_on_download=False,
-            n_threads=emcee_args["nthreads"],
+            # n_threads=emcee_args["nthreads"],
         )
 
         # Get original light-curve
@@ -295,6 +297,7 @@ class SingleBayes:
         w = planet_args["w"]
         f_c = planet_args["f_c"]
         f_s = planet_args["f_s"]
+        l_3 = planet_args["l_3"]
 
         T_0 = planet_args["T_0"]  # look at the light curve and change it accordingly
 
@@ -330,6 +333,7 @@ class SingleBayes:
         in_par = Parameters()
 
         for key in self.input_pars:
+            print(key)
             cat = category_args(key)
             val = cat[key]
             if key in ["D", "W", "b"]:
@@ -393,6 +397,7 @@ class SingleBayes:
             T_0=in_par["T_0"],
             f_c=in_par["f_c"],
             f_s=in_par["f_s"],
+            l_3=in_par["l_3"],
             D=in_par["D"],
             W=in_par["W"],
             b=in_par["b"],
